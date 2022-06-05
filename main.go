@@ -10,12 +10,12 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/2mf8/go-pbbot-for-rq"
+	"github.com/2mf8/go-pbbot-for-rq/proto_gen/onebot"
 	. "github.com/2mf8/go-tbot-for-rq/data"
 	_ "github.com/2mf8/go-tbot-for-rq/plugins"
 	. "github.com/2mf8/go-tbot-for-rq/public"
 	. "github.com/2mf8/go-tbot-for-rq/utils"
-	"github.com/2mf8/go-pbbot-for-rq"
-	"github.com/2mf8/go-pbbot-for-rq/proto_gen/onebot"
 	"github.com/fatih/color"
 	"github.com/gin-gonic/gin"
 	cron "github.com/robfig/cron"
@@ -51,12 +51,31 @@ func main() {
 	}
 
 	pbbot.HandleGroupRequest = func(bot *pbbot.Bot, event *onebot.GroupRequestEvent) {
+		groupId := event.GroupId
+		userId := event.UserId
+		invitor_uin, _ := strconv.Atoi(event.Extra["invitor_uin"])
+		botId := bot.BotId
+		if IsBotAdmin(int64(invitor_uin)) {
+			bot.SetGroupAddRequest(event.Flag, event.SubType, true, "")
+			log.Printf("[INFO] Bot(%v) Invitor(%v) -- 机器人加群 %v", botId, invitor_uin, true)
+		}
+		if IsAdmin(bot, groupId, botId) {
+			bot.SetGroupAddRequest(event.Flag, event.SubType, false, "")
+			log.Printf("[INFO] Bot(%v)  Group(%v)  -- %v 加群", botId, groupId, userId)
+		}
+	}
+
+	pbbot.HandleGroupIncreaseNotice = func(bot *pbbot.Bot, event *onebot.GroupIncreaseNoticeEvent) {
+		groupId := event.GroupId
 		userId := event.UserId
 		botId := bot.BotId
-		if IsBotAdmin(userId) {
-			_, _ = bot.SetGroupAddRequest(event.Flag, true, "")
-			log.Printf("[INFO] Bot(%v) -- 机器人加群", botId)
+		if userId == botId {
+			msgPush := pbbot.NewMsg().Text("欢迎使用tbot")
+			bot.SendGroupMessage(groupId, msgPush, false)
 		}
+		msg := strconv.Itoa(int(userId)) + "入群"
+		msgPush := pbbot.NewMsg().Text(msg)
+		bot.SendGroupMessage(groupId, msgPush, false)
 	}
 
 	rand.Seed(time.Now().UnixNano())
@@ -77,10 +96,10 @@ func main() {
 		rawMsg := event.RawMessage
 		botId := bot.BotId
 
-		if Contains(rawMsg, "好") {
+		/*if Contains(rawMsg, "好") {
 			log.Println(event.MessageId)
 			bot.DeleteMsg(event.MessageId)
-		}
+		}*/
 		if groupId == int64(758958532) {
 			push = Push{
 				Bot:     bot,
@@ -132,7 +151,7 @@ func activeMsgPush() {
 	rand.Seed(time.Now().UnixNano())
 	r := rand.Intn(1001)
 	sendMsg := strconv.Itoa(r) + " 你的夜晚太珍贵，我们不忍心占用\n\n为避免影响大家休息，每晚11点开启全员禁言，次日早晨8点解封[测试]"
-	for _, i := range pushes{
+	for _, i := range pushes {
 		if i.Bot != nil && i.GroupId != 0 {
 			reply := pbbot.NewMsg().Text(sendMsg)
 			i.Bot.SendGroupMessage(i.GroupId, reply, false)
@@ -141,8 +160,8 @@ func activeMsgPush() {
 	}
 }
 
-func wholeBan(){
-	for _, i := range pushes{
+func wholeBan() {
+	for _, i := range pushes {
 		if i.Bot != nil && i.GroupId != 0 {
 			i.Bot.SetGroupWholeBan(i.GroupId, true)
 			log.Printf("[推送] Bot(%v) Group(%v) <- 全员禁言", i.Bot, i.GroupId)
@@ -150,8 +169,8 @@ func wholeBan(){
 	}
 }
 
-func wholeBanRelieve(){
-	for _, i := range pushes{
+func wholeBanRelieve() {
+	for _, i := range pushes {
 		if i.Bot != nil && i.GroupId != 0 {
 			i.Bot.SetGroupWholeBan(i.GroupId, false)
 			log.Printf("[推送] Bot(%v) Group(%v) <- 解除全员禁言", i.Bot, i.GroupId)
