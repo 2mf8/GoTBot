@@ -1,0 +1,67 @@
+env:
+  - GO111MODULE=on
+before:
+  hooks:
+    - go mod tidy
+release:
+  draft: true
+  name_template: "{{.ProjectName}}-{{.Tag}}"
+builds:
+  - id: console
+    main: .
+    env:
+      - CGO_ENABLED=0
+      - GO111MODULE=on
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - 386
+      - amd64
+      - arm
+      - arm64
+    goarm:
+      - 7
+    ignore:
+      - goos: darwin
+        goarch: arm
+      - goos: darwin
+        goarch: 386
+      - goos: windows
+        goarch: arm
+      - goos: windows
+        goarch: arm64
+    mod_timestamp: "{{ .CommitTimestamp }}"
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w -extldflags '-static'
+    hooks:
+      post:
+        - upx "{{ .Path }}"
+
+checksum:
+  name_template: "{{ .ProjectName }}_checksums.txt"
+changelog:
+  skip: true
+archives:
+  - id: console
+    builds:
+      - console
+    name_template: "{{ .ProjectName }}_{{ .Tag }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
+    format_overrides:
+      - goos: windows
+        format: binary
+      - goos: linux
+        format: zip
+      - goos: darwin
+        format: zip
+
+nfpms:
+  - license: MIT License
+    file_name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    formats:
+      - deb
+      - rpm
+    maintainer: 2mf8
