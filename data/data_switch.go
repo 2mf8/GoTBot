@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"time"
 
-	. "github.com/2mf8/tbotGo/public"
+	. "github.com/2mf8/go-tbot-for-rq/public"
 	_ "github.com/denisenkom/go-mssqldb"
 	"github.com/gomodule/redigo/redis"
 )

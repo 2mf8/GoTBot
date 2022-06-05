@@ -10,10 +10,10 @@ import (
 	"strconv"
 	"time"
 
-	. "github.com/2mf8/tbotGo/data"
-	_ "github.com/2mf8/tbotGo/plugins"
-	. "github.com/2mf8/tbotGo/public"
-	. "github.com/2mf8/tbotGo/utils"
+	. "github.com/2mf8/go-tbot-for-rq/data"
+	_ "github.com/2mf8/go-tbot-for-rq/plugins"
+	. "github.com/2mf8/go-tbot-for-rq/public"
+	. "github.com/2mf8/go-tbot-for-rq/utils"
 	"github.com/2mf8/go-pbbot-for-rq"
 	"github.com/2mf8/go-pbbot-for-rq/proto_gen/onebot"
 	"github.com/fatih/color"
@@ -32,7 +32,7 @@ var pushes = make(map[int64]*Push)
 
 func main() {
 
-	color.Cyan("[INFO] 欢迎您使用tbotGo")
+	color.Cyan("[INFO] 欢迎您使用go-tbot-for-rq")
 
 	_, err := os.Stat("conf.toml")
 	if err != nil {

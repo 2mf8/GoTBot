@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	. "github.com/2mf8/tbotGo/public"
-	. "github.com/2mf8/tbotGo/utils"
+	. "github.com/2mf8/go-tbot-for-rq/public"
+	. "github.com/2mf8/go-tbot-for-rq/utils"
 	"github.com/2mf8/go-pbbot-for-rq"
 	"github.com/2mf8/go-pbbot-for-rq/proto_gen/onebot"
 )

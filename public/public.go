@@ -3,7 +3,7 @@ package public
 import (
 	"strings"
 	"io"
-	. "github.com/2mf8/tbotGo/config"
+	. "github.com/2mf8/go-tbot-for-rq/config"
 	"github.com/BurntSushi/toml"
 	"github.com/2mf8/go-pbbot-for-rq"
 )
