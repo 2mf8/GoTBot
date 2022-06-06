@@ -4,7 +4,7 @@
 
 [![QQ群](https://img.shields.io/static/v1?label=QQ%E7%BE%A4&message=335783090&color=blue)](https://jq.qq.com/?_wv=1027&k=B7Of3GMZ)
 
-本项目基于[go-pbbot](https://github.com/2mf8/go-pbbot)开发，使用`MIT`开源。推荐配合 [Go-Mirai-Client](https://github.com/ProtobufBot/Go-Mirai-Client/releases) 使用
+本项目基于[go-pbbot-for-rq](https://github.com/2mf8/go-pbbot-for-rq)开发，使用`MIT`开源。推荐配合 [pbbot-rq](https://github.com/ProtobufBot/pbbot-rq) 使用
 
 ## 功能
 
