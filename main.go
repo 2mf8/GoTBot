@@ -50,6 +50,13 @@ func main() {
 		}
 	}
 
+	pbbot.HandleGroupRecallNotice = func(bot *pbbot.Bot, event *onebot.GroupRecallNoticeEvent) {
+		groupId := event.GroupId
+		msg_id := event.MessageId
+		botId := bot.BotId
+		log.Printf("[撤回消息] Bot(%v)  Group(%v)  -- MessageID(%v)", botId, groupId, msg_id)
+	}
+
 	pbbot.HandleGroupRequest = func(bot *pbbot.Bot, event *onebot.GroupRequestEvent) {
 		groupId := event.GroupId
 		userId := event.UserId
@@ -96,10 +103,16 @@ func main() {
 		rawMsg := event.RawMessage
 		botId := bot.BotId
 
-		/*if Contains(rawMsg, "好") {
+		log.Println(event.Sender.Card)
+		if Contains(rawMsg, "撤回") {
 			log.Println(event.MessageId)
 			bot.DeleteMsg(event.MessageId)
-		}*/
+		}
+		if rawMsg == "at" {
+			log.Println(event.MessageId)
+			r := pbbot.NewMsg().At(event.UserId, event.Sender.Card)
+			bot.SendGroupMessage(groupId, r, false)
+		}
 		if groupId == int64(758958532) {
 			push = Push{
 				Bot:     bot,

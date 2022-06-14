@@ -1,4 +1,4 @@
-# Go-PbBot-For-RQ
+# Go-TBot-For-RQ
 
 [![QQ群](https://img.shields.io/static/v1?label=QQ%E7%BE%A4&message=758958532&color=blue)](https://qm.qq.com/cgi-bin/qm/qr?k=gwl9AXlZ3i6_mRAie1RYr0VUWxrAvphc&jump_from=webapi)
 

@@ -3,11 +3,11 @@ module github.com/2mf8/go-tbot-for-rq
 go 1.18
 
 require (
-	github.com/2mf8/go-pbbot-for-rq v0.0.0-20220605150316-c866185405e7
+	github.com/2mf8/go-pbbot-for-rq v0.0.0-20220614122033-eb6deb72221b
 	github.com/BurntSushi/toml v1.1.0
 	github.com/denisenkom/go-mssqldb v0.12.2
 	github.com/fatih/color v1.13.0
-	github.com/gin-gonic/gin v1.8.0
+	github.com/gin-gonic/gin v1.8.1
 	github.com/gomodule/redigo v1.8.8
 	github.com/robfig/cron v1.2.0
 	gopkg.in/guregu/null.v3 v3.5.0
