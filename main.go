@@ -58,18 +58,18 @@ func main() {
 	}
 
 	pbbot.HandleGroupRequest = func(bot *pbbot.Bot, event *onebot.GroupRequestEvent) {
-		groupId := event.GroupId
-		userId := event.UserId
+		//groupId := event.GroupId
+		//userId := event.UserId
 		invitor_uin, _ := strconv.Atoi(event.Extra["invitor_uin"])
 		botId := bot.BotId
 		if IsBotAdmin(int64(invitor_uin)) {
 			bot.SetGroupAddRequest(event.Flag, event.SubType, true, "")
 			log.Printf("[INFO] Bot(%v) Invitor(%v) -- 机器人加群 %v", botId, invitor_uin, true)
 		}
-		if IsAdmin(bot, groupId, botId) {
+		/*if IsAdmin(bot, groupId, botId) {
 			bot.SetGroupAddRequest(event.Flag, event.SubType, false, "")
 			log.Printf("[INFO] Bot(%v)  Group(%v)  -- %v 加群", botId, groupId, userId)
-		}
+		}*/
 	}
 
 	pbbot.HandleGroupIncreaseNotice = func(bot *pbbot.Bot, event *onebot.GroupIncreaseNoticeEvent) {
@@ -80,9 +80,9 @@ func main() {
 			msgPush := pbbot.NewMsg().Text("欢迎使用tbot")
 			bot.SendGroupMessage(groupId, msgPush, false)
 		}
-		msg := strconv.Itoa(int(userId)) + "入群"
-		msgPush := pbbot.NewMsg().Text(msg)
-		bot.SendGroupMessage(groupId, msgPush, false)
+		//msgPush := pbbot.NewMsg().At(userId, event.)
+		//bot.SendGroupMessage(groupId, msgPush, false)
+		log.Println(event)
 	}
 
 	rand.Seed(time.Now().UnixNano())
@@ -102,17 +102,25 @@ func main() {
 		groupId := event.GroupId
 		rawMsg := event.RawMessage
 		botId := bot.BotId
+		userId := event.UserId
 
 		log.Println(event.Sender.Card)
+		if IsBotAdmin(userId) && rawMsg == "打卡" {
+			bot.SetGroupSignIn(groupId)
+			reply := pbbot.NewMsg().Text("打卡成功")
+			bot.SendGroupMessage(groupId, reply, false)
+		}
 		if Contains(rawMsg, "撤回") {
 			log.Println(event.MessageId)
 			bot.DeleteMsg(event.MessageId)
 		}
-		if rawMsg == "at" {
+		/*if rawMsg == "at" {
 			log.Println(event.MessageId)
-			r := pbbot.NewMsg().At(event.UserId, event.Sender.Card)
+			r := pbbot.NewMsg().At(event.UserId, event.Sender.Card).Text(" 填写display的")
+			sr := pbbot.NewMsg().At(event.UserId, "").Text(" 未填写display的")
 			bot.SendGroupMessage(groupId, r, false)
-		}
+			bot.SendGroupMessage(groupId, sr, false)
+		}*/
 		if groupId == int64(758958532) {
 			push = Push{
 				Bot:     bot,

@@ -1,5 +1,5 @@
-github.com/2mf8/go-pbbot-for-rq v0.0.0-20220614122033-eb6deb72221b h1:OvwLW2gh/s++hFLJLUDfVJkkAmZCRGTjgewj1jrLvn4=
-github.com/2mf8/go-pbbot-for-rq v0.0.0-20220614122033-eb6deb72221b/go.mod h1:imKKKVf8+41tyPI2PkW3EJ6Kz1F/6red3YLBVk+nYFk=
+github.com/2mf8/go-pbbot-for-rq v0.0.0-20220618041028-20a5a72c9368 h1:kdKV77OjYvUJtCu88jTqG6yR8TJxd49HZOcShP85JXY=
+github.com/2mf8/go-pbbot-for-rq v0.0.0-20220618041028-20a5a72c9368/go.mod h1:imKKKVf8+41tyPI2PkW3EJ6Kz1F/6red3YLBVk+nYFk=
 github.com/Azure/azure-sdk-for-go/sdk/azcore v0.19.0/go.mod h1:h6H6c8enJmmocHUbLiiGY6sx7f9i+X3m1CHdd5c6Rdw=
 github.com/Azure/azure-sdk-for-go/sdk/azidentity v0.11.0/go.mod h1:HcM1YX14R7CJcghJGOYCgdezslRSVzqwLf/q+4Y2r/0=
 github.com/Azure/azure-sdk-for-go/sdk/internal v0.7.0/go.mod h1:yqy467j36fJxcRV2TzfVZ1pCb5vxm4BtZPUdYWe/Xo8=

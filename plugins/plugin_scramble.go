@@ -43,7 +43,8 @@ func (scramble *ScramblePlugin) Do(ctx *context.Context, bot *pbbot.Bot, event *
 			gs = strings.Replace(gs, "#", "U'", -1)
 		}
 		imgUrl := "http://localhost:2014/view/" + shor + ".png?scramble=" + url.QueryEscape(strings.Replace(gs, "\n", " ", -1))
-		replyMsg := pbbot.NewMsg().Text(show).Text("\n").Text(gs).Image(imgUrl)
+		sc := show + "\n" + gs
+		replyMsg := pbbot.NewMsg().Text(sc).Image(imgUrl)
 		log.Printf("[INFO] Bot(%v) Group(%v) -> %v\n%v<image url=\"%v\"/>", botId, groupId, show, gs, imgUrl)
 		_, _ = bot.SendGroupMessage(groupId, replyMsg, false)
 		return MESSAGE_BLOCK

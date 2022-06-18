@@ -158,7 +158,6 @@ func (learnPlugin *LearnPlugin) Do(ctx *context.Context, bot *pbbot.Bot, event *
 	}
 	return MESSAGE_IGNORE
 }
-
 func init() {
 	Register("学习", &LearnPlugin{})
 }
