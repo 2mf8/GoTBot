@@ -22,7 +22,7 @@ func (scramble *ScramblePlugin) Do(ctx *context.Context, bot *pbbot.Bot, event *
 	botId := bot.BotId
 
 	s, b := Prefix(rawMsg, ".")
-	if b == false {
+	if !b {
 		return MESSAGE_IGNORE
 	}
 

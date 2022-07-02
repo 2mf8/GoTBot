@@ -31,7 +31,7 @@ func (botSwitch *BotSwitch) Do(ctx *context.Context, bot *pbbot.Bot, event *oneb
 	failure := rand.Intn(101) + 400
 
 	s, b := Prefix(rawMsg, ".")
-	if b == false {
+	if !b {
 		return MESSAGE_IGNORE
 	}
 

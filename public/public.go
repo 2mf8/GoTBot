@@ -1,26 +1,35 @@
 package public
 
 import (
-	"strings"
+	"encoding/json"
+	"fmt"
 	"io"
+	"io/ioutil"
+	"os"
+	"strings"
+
+	"github.com/2mf8/go-pbbot-for-rq"
 	. "github.com/2mf8/go-tbot-for-rq/config"
 	"github.com/BurntSushi/toml"
-	"github.com/2mf8/go-pbbot-for-rq"
 )
 
 type DataBase struct {
-	User string
+	User     string
 	Password string
-	Url string
-	Port int
+	Url      string
+	Port     int
 }
 
 type Redis struct {
-	Url string
-	Port int
+	Url      string
+	Port     int
 	Password string
-	Table int
+	Table    int
 	PoolSize int
+}
+
+type JudgeKeys struct {
+	Keys []string
 }
 
 func StartsWith(s, prefix string) bool {
@@ -63,8 +72,7 @@ func IsBotAdmin(userId int64) bool {
 	return false
 }
 
-
-func DataBaseSet()(dbset DataBase, err error){
+func DataBaseSet() (dbset DataBase, err error) {
 	var user string
 	var password string
 	var url string
@@ -72,30 +80,30 @@ func DataBaseSet()(dbset DataBase, err error){
 	_, err = toml.DecodeFile("conf.toml", Conf)
 	if Conf.DatabaseUser == "" {
 		user = "sa"
-	}else{
+	} else {
 		user = Conf.DatabaseUser
 	}
 	if Conf.DatabasePassword == "" {
 		password = "@#$mima45"
-	}else{
+	} else {
 		password = Conf.DatabasePassword
 	}
 	if Conf.DatabaseServer == "" {
 		url = "127.0.0.1"
-	}else {
+	} else {
 		url = Conf.ScrambleServer
 	}
 	port = Conf.DatabasePort
 	dbset = DataBase{
-		User: user,
+		User:     user,
 		Password: password,
-		Url: url,
-		Port: port,
+		Url:      url,
+		Port:     port,
 	}
 	return
 }
 
-func RedisSet()(dbset Redis, err error){
+func RedisSet() (dbset Redis, err error) {
 	var url string
 	var port int = 0
 	var password string
@@ -104,7 +112,7 @@ func RedisSet()(dbset Redis, err error){
 	_, err = toml.DecodeFile("conf.toml", Conf)
 	if Conf.RedisServer == "" {
 		url = "127.0.0.1"
-	}else {
+	} else {
 		url = Conf.RedisServer
 	}
 	password = Conf.RedisPassword
@@ -112,10 +120,10 @@ func RedisSet()(dbset Redis, err error){
 	table = Conf.RedisTable
 	poolSize = Conf.RedisPoolSize
 	dbset = Redis{
-		Url: url,
-		Port: port,
+		Url:      url,
+		Port:     port,
 		Password: password,
-		Table: table,
+		Table:    table,
 		PoolSize: poolSize,
 	}
 	return
@@ -126,19 +134,19 @@ func RedisSet()(dbset Redis, err error){
 }*/
 
 func IsConnErr(err error) bool {
-	var needNewConn bool       
-	if err == nil {         
-		return false     
-		}       
-	if err == io.EOF {         
-		needNewConn = true     
-		}     
-	if strings.Contains(err.Error(), "use of closed network connection") {         
-		needNewConn = true     
-		}     
-	if strings.Contains(err.Error(), "connect: connection refused") {         
-		needNewConn = true     
-		}     
+	var needNewConn bool
+	if err == nil {
+		return false
+	}
+	if err == io.EOF {
+		needNewConn = true
+	}
+	if strings.Contains(err.Error(), "use of closed network connection") {
+		needNewConn = true
+	}
+	if strings.Contains(err.Error(), "connect: connection refused") {
+		needNewConn = true
+	}
 	return needNewConn
 }
 
@@ -149,4 +157,90 @@ func Prefix(s string, p string) (r string, b bool) {
 	}
 	r = s
 	return r, false
+}
+
+func Judge(str string, key JudgeKeys) string {
+	for _, k := range key.Keys {
+		//if strings.Index(str, k) != -1 {
+		if strings.Contains(str, k) {
+			return k
+		}
+	}
+	return ""
+}
+
+func JudgeIndex(str string, key JudgeKeys) int {
+	for i, k := range key.Keys {
+		//if strings.Index(str, k) != -1 {
+		if strings.Contains(str, k) {
+			return i
+		}
+	}
+	return -1
+}
+
+func GetJudgeKeys() (key JudgeKeys, err error) {
+	key, err = JudgeKeysRead()
+	if err != nil {
+		key.JudgeKeysCreate()
+		return
+	}
+	return
+}
+
+func (k *JudgeKeys) JudgeKeysCreate() error {
+	output, err := json.MarshalIndent(&k, "", "\t")
+	if err != nil {
+		fmt.Println("Error marshalling to JSON:", err)
+		return err
+	}
+	err = ioutil.WriteFile("judgekeys.json", output, 0644)
+	if err != nil {
+		fmt.Println("Error writing JSON to file", err)
+		return err
+	}
+	return nil
+}
+
+func JudgeKeysRead() (k JudgeKeys, err error) {
+	jsonFile, err := os.Open("judgekeys.json")
+	if err != nil {
+		fmt.Println("Error reading JSON File:", err)
+		return
+	}
+	defer jsonFile.Close()
+	jsonData, err := ioutil.ReadAll(jsonFile)
+	if err != nil {
+		fmt.Println("Error reading JSON data:", err)
+		return
+	}
+	json.Unmarshal(jsonData, &k)
+	//fmt.Println(k)
+	return
+}
+
+func (k *JudgeKeys) JudgeKeysUpdate(uk ...string) error {
+	for _, v := range uk {
+		if Judge(v, *k) == "" && v != "" {
+			k.Keys = append(k.Keys, v)
+		}
+	}
+	err := k.JudgeKeysCreate()
+	return err
+}
+
+func (k *JudgeKeys) JudgeKeysDelete(dk ...string) {
+	for _, v := range dk {
+		if v == "" {
+			continue
+		}
+		i := JudgeIndex(v, *k)
+		if i != -1 {
+			if k.Keys[i+2:] != nil {
+				k.Keys = append(k.Keys[:i+1], k.Keys[i+2:]...)
+				i--
+			}
+		}
+		k.JudgeKeysCreate()
+	}
 }

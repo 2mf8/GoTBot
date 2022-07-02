@@ -42,7 +42,7 @@ func (block *Block) Do(ctx *context.Context, bot *pbbot.Bot, event *onebot.Group
 	}
 
 	s, b := Prefix(rawMsg, ".")
-	if b == false {
+	if !b {
 		return MESSAGE_IGNORE
 	}
 	reg1 := regexp.MustCompile("<at qq=\"")

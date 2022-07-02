@@ -9,11 +9,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/2mf8/go-pbbot-for-rq"
+	"github.com/2mf8/go-pbbot-for-rq/proto_gen/onebot"
 	. "github.com/2mf8/go-tbot-for-rq/data"
 	. "github.com/2mf8/go-tbot-for-rq/public"
 	. "github.com/2mf8/go-tbot-for-rq/utils"
-	"github.com/2mf8/go-pbbot-for-rq"
-	"github.com/2mf8/go-pbbot-for-rq/proto_gen/onebot"
 	"gopkg.in/guregu/null.v3"
 )
 
@@ -41,8 +41,18 @@ func (price *PricePlugin) Do(ctx *context.Context, bot *pbbot.Bot, event *onebot
 	str3 := strings.TrimSpace(reg3.ReplaceAllString(str2, "&"))
 
 	s, b := Prefix(str3, "%")
-	if b == false {
+	if !b {
 		return MESSAGE_IGNORE
+	}
+
+	ggk, _ := GetJudgeKeys()
+	containsJudgeKeys := Judge(rawMsg, ggk)
+	if containsJudgeKeys != "" {
+		msg := strconv.Itoa(failure) + " （消息触发守卫，已被拦截）"
+		replyMsg := pbbot.NewMsg().Text(msg)
+		bot.SendGroupMessage(groupId, replyMsg, false)
+		log.Printf("[守卫] Bot(%v) Group(%v) -> %v", botId, groupId, msg)
+		return MESSAGE_BLOCK
 	}
 
 	if StartsWith(s, "#+") && (IsAdmin(bot, groupId, userId) || IsBotAdmin(userId)) {
