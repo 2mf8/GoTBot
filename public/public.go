@@ -236,8 +236,8 @@ func (k *JudgeKeys) JudgeKeysDelete(dk ...string) {
 		}
 		i := JudgeIndex(v, *k)
 		if i != -1 {
-			if k.Keys[i+2:] != nil {
-				k.Keys = append(k.Keys[:i+1], k.Keys[i+2:]...)
+			if k.Keys[i+1:] != nil {
+				k.Keys = append(k.Keys[:i], k.Keys[i+1:]...)
 				i--
 			}
 		}
