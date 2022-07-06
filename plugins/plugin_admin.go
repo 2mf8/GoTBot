@@ -33,6 +33,7 @@ func (admin *Admin) Do(ctx *context.Context, bot *pbbot.Bot, event *onebot.Group
 	//success := rand.Intn(101)
 	//delete := rand.Intn(101) + 200
 	failure := rand.Intn(101) + 400
+	jin_duration := 60 + rand.Intn(28740)
 
 	s, b := Prefix(rawMsg, ".")
 	if !b || !IsAdmin(bot, groupId, botId) {
@@ -48,6 +49,49 @@ func (admin *Admin) Do(ctx *context.Context, bot *pbbot.Bot, event *onebot.Group
 
 	for Contains(str2, "  ") {
 		str2 = strings.TrimSpace(reg3.ReplaceAllString(str2, " "))
+	}
+
+	if s == "抽奖禁言" {
+		if IsAdmin(bot, groupId, userId){
+			msg := strconv.Itoa(failure) + " （失败，您是群主或管理员）"
+			replyMsg := pbbot.NewMsg().Text(msg)
+			bot.SendGroupMessage(groupId, replyMsg, false)
+			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, msg)
+			return utils.MESSAGE_BLOCK
+		}
+		msg := " 恭喜你抽中" + convertJinTime(jin_duration) + "禁言套餐，已发放"
+		reply := pbbot.NewMsg().At(userId, event.Sender.Card).Text(msg)
+		bot.SetGroupBan(groupId, userId, int32(jin_duration))
+		bot.SendGroupMessage(groupId, reply, false)
+		log.Printf("[抽奖禁言] Bot(%v) Group(%v) -> %v", botId, groupId, msg)
+		return utils.MESSAGE_BLOCK
+	}
+
+	if StartsWith(s, "自我禁言") {
+		if IsAdmin(bot, groupId, userId){
+			msg := strconv.Itoa(failure) + " （失败，您是群主或管理员）"
+			replyMsg := pbbot.NewMsg().Text(msg)
+			bot.SendGroupMessage(groupId, replyMsg, false)
+			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, msg)
+			return utils.MESSAGE_BLOCK
+		}
+		s = strings.TrimPrefix(s, "自我禁言")
+		duration := convertTime(s)
+		if duration <= 0 {
+			return utils.MESSAGE_BLOCK
+		}
+		if duration < 30*60*60*24 {
+			replyText := "禁言 " + strconv.Itoa(int(userId)) + " " + strconv.Itoa(int(duration)) + "秒"
+			bot.SetGroupBan(groupId, userId, duration)
+			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
+			return utils.MESSAGE_BLOCK
+		} else {
+			replyText := strconv.Itoa(failure) + " (禁言时间超过最大允许范围)"
+			replyMsg := pbbot.NewMsg().Text(replyText)
+			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
+			_, _ = bot.SendGroupMessage(groupId, replyMsg, false)
+			return utils.MESSAGE_BLOCK
+		}
 	}
 
 	if s == "退群" && IsBotAdmin(userId){
