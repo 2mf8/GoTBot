@@ -1,13 +1,8 @@
 package public
 
 import (
-	"encoding/json"
-	"fmt"
 	"io"
-	"io/ioutil"
-	"os"
 	"strings"
-
 	"github.com/2mf8/go-pbbot-for-rq"
 	. "github.com/2mf8/go-tbot-for-rq/config"
 	"github.com/BurntSushi/toml"
@@ -26,10 +21,6 @@ type Redis struct {
 	Password string
 	Table    int
 	PoolSize int
-}
-
-type JudgeKeys struct {
-	Keys []string
 }
 
 func StartsWith(s, prefix string) bool {
@@ -157,90 +148,4 @@ func Prefix(s string, p string) (r string, b bool) {
 	}
 	r = s
 	return r, false
-}
-
-func Judge(str string, key JudgeKeys) string {
-	for _, k := range key.Keys {
-		//if strings.Index(str, k) != -1 {
-		if strings.Contains(str, k) {
-			return k
-		}
-	}
-	return ""
-}
-
-func JudgeIndex(str string, key JudgeKeys) int {
-	for i, k := range key.Keys {
-		//if strings.Index(str, k) != -1 {
-		if strings.Contains(str, k) {
-			return i
-		}
-	}
-	return -1
-}
-
-func GetJudgeKeys() (key JudgeKeys, err error) {
-	key, err = JudgeKeysRead()
-	if err != nil {
-		key.JudgeKeysCreate()
-		return
-	}
-	return
-}
-
-func (k *JudgeKeys) JudgeKeysCreate() error {
-	output, err := json.MarshalIndent(&k, "", "\t")
-	if err != nil {
-		fmt.Println("Error marshalling to JSON:", err)
-		return err
-	}
-	err = ioutil.WriteFile("judgekeys.json", output, 0644)
-	if err != nil {
-		fmt.Println("Error writing JSON to file", err)
-		return err
-	}
-	return nil
-}
-
-func JudgeKeysRead() (k JudgeKeys, err error) {
-	jsonFile, err := os.Open("judgekeys.json")
-	if err != nil {
-		fmt.Println("Error reading JSON File:", err)
-		return
-	}
-	defer jsonFile.Close()
-	jsonData, err := ioutil.ReadAll(jsonFile)
-	if err != nil {
-		fmt.Println("Error reading JSON data:", err)
-		return
-	}
-	json.Unmarshal(jsonData, &k)
-	//fmt.Println(k)
-	return
-}
-
-func (k *JudgeKeys) JudgeKeysUpdate(uk ...string) error {
-	for _, v := range uk {
-		if Judge(v, *k) == "" && v != "" {
-			k.Keys = append(k.Keys, v)
-		}
-	}
-	err := k.JudgeKeysCreate()
-	return err
-}
-
-func (k *JudgeKeys) JudgeKeysDelete(dk ...string) {
-	for _, v := range dk {
-		if v == "" {
-			continue
-		}
-		i := JudgeIndex(v, *k)
-		if i != -1 {
-			if k.Keys[i+1:] != nil {
-				k.Keys = append(k.Keys[:i], k.Keys[i+1:]...)
-				i--
-			}
-		}
-		k.JudgeKeysCreate()
-	}
 }

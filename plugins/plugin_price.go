@@ -46,7 +46,7 @@ func (price *PricePlugin) Do(ctx *context.Context, bot *pbbot.Bot, event *onebot
 	}
 
 	ggk, _ := GetJudgeKeys()
-	containsJudgeKeys := Judge(rawMsg, ggk)
+	containsJudgeKeys := Judge(rawMsg, *ggk.JudgekeysSync)
 	if containsJudgeKeys != "" {
 		msg := strconv.Itoa(failure) + " （消息触发守卫，已被拦截）"
 		replyMsg := pbbot.NewMsg().Text(msg)

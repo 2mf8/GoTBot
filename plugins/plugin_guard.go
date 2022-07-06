@@ -12,6 +12,7 @@ import (
 	"github.com/2mf8/go-pbbot-for-rq/proto_gen/onebot"
 	. "github.com/2mf8/go-tbot-for-rq/public"
 	. "github.com/2mf8/go-tbot-for-rq/utils"
+	. "github.com/2mf8/go-tbot-for-rq/data"
 )
 
 type Guard struct {
@@ -58,7 +59,7 @@ func (guard *Guard) Do(ctx *context.Context, bot *pbbot.Bot, event *onebot.Group
 		return MESSAGE_BLOCK
 	}
 
-	containsJudgeKeys := Judge(s, ggk)
+	containsJudgeKeys := Judge(s, *ggk.JudgekeysSync)
 	if containsJudgeKeys != "" {
 		if IsAdmin(bot, groupId, userId) {
 			msg := strconv.Itoa(r) + " （消息触发守卫，已被拦截）"

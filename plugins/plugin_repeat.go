@@ -10,6 +10,7 @@ import (
 	"github.com/2mf8/go-pbbot-for-rq/proto_gen/onebot"
 	. "github.com/2mf8/go-tbot-for-rq/public"
 	. "github.com/2mf8/go-tbot-for-rq/utils"
+	. "github.com/2mf8/go-tbot-for-rq/data"
 )
 
 type Repeat struct {
@@ -23,7 +24,7 @@ func (rep *Repeat) Do(ctx *context.Context, bot *pbbot.Bot, event *onebot.GroupM
 	r := rand.Intn(101)
 
 	ggk, _ := GetJudgeKeys()
-	containsJudgeKeys := Judge(rawMsg, ggk)
+	containsJudgeKeys := Judge(rawMsg, *ggk.JudgekeysSync)
 	if containsJudgeKeys != "" {
 		msg := "消息触发守卫，已被拦截"
 		//replyMsg := pbbot.NewMsg().Text(msg)

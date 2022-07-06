@@ -73,6 +73,10 @@ func main() {
 		}*/
 	}
 
+	pbbot.HandleFriendRequest = func(bot *pbbot.Bot, event *onebot.FriendRequestEvent) {
+		bot.SetFriendAddRequest(event.Flag, true, "")
+	}
+
 	pbbot.HandleGroupIncreaseNotice = func(bot *pbbot.Bot, event *onebot.GroupIncreaseNoticeEvent) {
 		groupId := event.GroupId
 		userId := event.UserId
@@ -110,27 +114,12 @@ func main() {
 			reply := pbbot.NewMsg().Text("打卡成功")
 			bot.SendGroupMessage(groupId, reply, false)
 		}
-		if Contains(rawMsg, "url") {
-			url := pbbot.NewMsg().Image("https://image.baidu.com/search/detail?ct=503316480&z=0&ipn=d&word=%E9%AD%94%E6%96%B9&step_word=&hs=0&pn=2&spn=0&di=7108135681917976577&pi=0&rn=1&tn=baiduimagedetail&is=0%2C0&istype=0&ie=utf-8&oe=utf-8&in=&cl=2&lm=-1&st=undefined&cs=3173987706%2C1621133100&os=2921722403%2C2261278415&simid=3357446967%2C16052238&adpicid=0&lpn=0&ln=1873&fr=&fmq=1655904083689_R&fm=&ic=undefined&s=undefined&hd=undefined&latest=undefined&copyright=undefined&se=&sme=&tab=0&width=undefined&height=undefined&face=undefined&ist=&jit=&cg=&bdtype=0&oriquery=&objurl=https%3A%2F%2Fgimg2.baidu.com%2Fimage_search%2Fsrc%3Dhttp%3A%2F%2Fi.qqkou.com%2Fi%2F2a3173987706x1621133100b26.jpg%26refer%3Dhttp%3A%2F%2Fi.qqkou.com%26app%3D2002%26size%3Df9999%2C10000%26q%3Da80%26n%3D0%26g%3D0n%26fmt%3Dauto%3Fsec%3D1658496086%26t%3Dd6b93b7650267d963d28b2cb43b62941&fromurl=ippr_z2C%24qAzdH3FAzdH3Fqqh57_z%26e3Bv54AzdH3Fp57xtwg2AzdH3Fdaammma_z%26e3Bip4s&gsm=3&rpstart=0&rpnum=0&islist=&querylist=&nojc=undefined&dyTabStr=MCwzLDIsNiw0LDEsNSw4LDcsOQ%3D%3D")
-			bot.SendGroupMessage(groupId, url, false)
-		}
-		/*if Contains(rawMsg, "撤回") {
-			log.Println(event.MessageId)
-			bot.DeleteMsg(event.MessageId)
-		}
-		if rawMsg == "at" {
-			log.Println(event.MessageId)
-			r := pbbot.NewMsg().At(event.UserId, event.Sender.Card).Text(" 填写display的")
-			sr := pbbot.NewMsg().At(event.UserId, "").Text(" 未填写display的")
-			bot.SendGroupMessage(groupId, r, false)
-			bot.SendGroupMessage(groupId, sr, false)
-		}*/
+
 		if groupId == int64(758958532) {
 			push = Push{
 				Bot:     bot,
 				GroupId: groupId,
 			}
-			//fmt.Printf("%v %v\n", *push.Bot, push.GroupId)
 			if pushes[groupId] == nil {
 				pushes[groupId] = &push
 			} else {

@@ -2,6 +2,7 @@ package plugins
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"math/rand"
 	"regexp"
@@ -24,6 +25,10 @@ func (admin *Admin) Do(ctx *context.Context, bot *pbbot.Bot, event *onebot.Group
 	userId := event.Sender.UserId
 	botId := bot.BotId
 
+	if groupId == 560820998 || groupId == 189420325 || groupId == 348591755 || groupId == 481097523 || groupId == 176211061 || groupId == 138080634 { 
+		return utils.MESSAGE_IGNORE
+	}
+
 	rand.Seed(time.Now().UnixNano())
 	//success := rand.Intn(101)
 	//delete := rand.Intn(101) + 200
@@ -43,33 +48,6 @@ func (admin *Admin) Do(ctx *context.Context, bot *pbbot.Bot, event *onebot.Group
 
 	for Contains(str2, "  ") {
 		str2 = strings.TrimSpace(reg3.ReplaceAllString(str2, " "))
-	}
-
-	if StartsWith(s, "自我禁言") {
-		if IsAdmin(bot, groupId, userId){
-			msg := strconv.Itoa(failure) + " （失败，您是群主或管理员）"
-			replyMsg := pbbot.NewMsg().Text(msg)
-			bot.SendGroupMessage(groupId, replyMsg, false)
-			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, msg)
-		}
-		s = strings.TrimPrefix(s, "自我禁言")
-		duration := convertTime(s)
-		if duration <= 0 {
-			replyText := "解除 " + strconv.Itoa(int(userId)) + " 的禁言"
-			//bot.SetGroupBan(groupId, userId, 0)
-			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
-		}
-		if duration < 30*60*60*24 {
-			replyText := "禁言 " + strconv.Itoa(int(userId)) + " " + strconv.Itoa(int(duration)) + "秒"
-			bot.SetGroupBan(groupId, userId, duration)
-			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
-		} else {
-			replyText := strconv.Itoa(failure) + " (禁言时间超过最大允许范围)"
-			replyMsg := pbbot.NewMsg().Text(replyText)
-			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
-			_, _ = bot.SendGroupMessage(groupId, replyMsg, false)
-			return utils.MESSAGE_BLOCK
-		}
 	}
 
 	if s == "退群" && IsBotAdmin(userId){
@@ -169,6 +147,24 @@ func convertTime(str string) int32 {
 		}
 	}
 	return int32(duration)
+}
+
+func convertJinTime(i int) string {
+	var timeString string
+	day := i / 86400
+	hour := i % 86400 / 3600
+	min := i % 3600 / 60
+	sec := i % 60
+	if i >= 86400 {
+		timeString = fmt.Sprintf("%v 天 %v 小时 %v 分钟", day, hour, min)
+		return timeString
+	}
+	if i <= 3600 {
+		timeString = fmt.Sprintf("%v 分钟 %v 秒钟", min, sec)
+		return timeString
+	}
+	timeString = fmt.Sprintf("%v 小时 %v 分钟 %v 秒钟", hour, min, sec)
+	return timeString
 }
 
 func init() {
