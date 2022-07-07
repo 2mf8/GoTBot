@@ -33,7 +33,7 @@ func (admin *Admin) Do(ctx *context.Context, bot *pbbot.Bot, event *onebot.Group
 	//success := rand.Intn(101)
 	//delete := rand.Intn(101) + 200
 	failure := rand.Intn(101) + 400
-	jin_duration := 60 + rand.Intn(28740)
+	//jin_duration := 60 + rand.Intn(28740)
 
 	s, b := Prefix(rawMsg, ".")
 	if !b || !IsAdmin(bot, groupId, botId) {
@@ -51,7 +51,7 @@ func (admin *Admin) Do(ctx *context.Context, bot *pbbot.Bot, event *onebot.Group
 		str2 = strings.TrimSpace(reg3.ReplaceAllString(str2, " "))
 	}
 
-	if s == "抽奖禁言" {
+	/*if s == "抽奖禁言" {
 		if IsAdmin(bot, groupId, userId){
 			msg := strconv.Itoa(failure) + " （失败，您是群主或管理员）"
 			replyMsg := pbbot.NewMsg().Text(msg)
@@ -92,7 +92,7 @@ func (admin *Admin) Do(ctx *context.Context, bot *pbbot.Bot, event *onebot.Group
 			_, _ = bot.SendGroupMessage(groupId, replyMsg, false)
 			return utils.MESSAGE_BLOCK
 		}
-	}
+	}*/
 
 	if s == "退群" && IsBotAdmin(userId){
 		bot.SetGroupLeave(groupId, true)

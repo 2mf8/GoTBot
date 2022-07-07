@@ -22,7 +22,7 @@ var redis_url = flag.String("redis_addr", "127.0.0.1", "the redis url")
 var redis_port *int = flag.Int("redis_port", 6379, "the redis port")
 var redis_password = flag.String("redis_password", "", "the redis password")
 var redis_db *int = flag.Int("redis_db", 0, "the redis db")
-var redis_pool_size *int = flag.Int("redis_pool_size", 100, "the redis pool size")
+var redis_pool_size *int = flag.Int("redis_pool_size", 1000, "the redis pool size")
 
 func init() {
 	var err error

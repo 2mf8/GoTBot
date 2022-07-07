@@ -2,7 +2,9 @@ package public
 
 import (
 	"io"
+	"strconv"
 	"strings"
+
 	"github.com/2mf8/go-pbbot-for-rq"
 	. "github.com/2mf8/go-tbot-for-rq/config"
 	"github.com/BurntSushi/toml"
@@ -148,4 +150,15 @@ func Prefix(s string, p string) (r string, b bool) {
 	}
 	r = s
 	return r, false
+}
+
+func ArrayStringToArrayInt64(s []string) (g []int64) {
+	for _, str := range s {
+		i, e := strconv.Atoi(str)
+		if e != nil {
+			continue
+		}
+		g = append(g, int64(i))
+	}
+	return g
 }
