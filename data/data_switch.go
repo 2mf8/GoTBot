@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
-	"time"
 
 	. "github.com/2mf8/go-tbot-for-rq/public"
 	_ "github.com/denisenkom/go-mssqldb"
@@ -13,20 +12,9 @@ import (
 )
 
 type Switch struct {
-	Id          int       `json:"id"`
-	GroupId     int64     `json:"group_id"`
-	PluginName  string    `json:"plugin_name"`
-	GmtModified time.Time `json:"gmt_modified"`
-	Stop        bool      `json:"stop"`
-}
-
-type SwitchStop struct {
-	GroupId    int64 `json:"group_id"`
-	PluginName []string
-}
-
-type Plu struct {
-	PluginName string `json:"plugin_name"`
+	Id             int   `json:"id"`
+	GroupId        int64 `json:"group_id"`
+	IsCloseOrGuard int64 `json:"is_close_or_guard"`
 }
 
 type SwitchSync struct {
@@ -34,30 +22,69 @@ type SwitchSync struct {
 	PluginSwitch *Switch
 }
 
+type intent int
+
+const (
+	PluginGuard intent = 1 << iota
+	PluginBlock
+	PluginSwitch
+	PluginRepeat
+	PluginReply
+	PluginAdmin
+	PluginSubscribe
+	PluginPrice
+	PluginScramble
+	PluginLearn
+)
+
+var IntentMap = map[intent]string{
+	PluginGuard:     "守卫",
+	PluginBlock:     "屏蔽",
+	PluginSwitch:    "开关",
+	PluginRepeat:    "复读",
+	PluginReply:     "回复",
+	PluginAdmin:     "群管",
+	PluginSubscribe: "订阅",
+	PluginPrice:     "查价",
+	PluginScramble:  "打乱",
+	PluginLearn:     "学习",
+}
+
+var SwitchMap = map[string]intent{
+	"守卫": PluginGuard,
+	"屏蔽": PluginBlock,
+	"开关": PluginSwitch,
+	"复读": PluginRepeat,
+	"回复": PluginReply,
+	"群管": PluginAdmin,
+	"订阅": PluginSubscribe,
+	"查价": PluginPrice,
+	"打乱": PluginScramble,
+	"学习": PluginLearn,
+}
+
 var ctx = context.Background()
 
 func (bot_switch *Switch) SwitchCreate() (err error) {
-	statement := "insert into [kequ5060].[dbo].[zbot_plugin_switch] values ($1, $2, $3, $4) select @@identity"
+	statement := "insert into [kequ5060].[dbo].[zbot_plugin_switch] values ($1, $2) select @@identity"
 	stmt, err := Db.Prepare(statement)
 	if err != nil {
 		return err
 	}
 	defer stmt.Close()
-	err = stmt.QueryRow(bot_switch.GroupId, bot_switch.PluginName, bot_switch.GmtModified, bot_switch.Stop).Scan(&bot_switch.Id)
+	err = stmt.QueryRow(bot_switch.GroupId, bot_switch.IsCloseOrGuard).Scan(&bot_switch.Id)
 
 	bot_switch_sync := SwitchSync{
 		IsTrue: true,
 		PluginSwitch: &Switch{
-			Id:          bot_switch.Id,
-			GroupId:     bot_switch.GroupId,
-			PluginName:  bot_switch.PluginName,
-			GmtModified: bot_switch.GmtModified,
-			Stop:        bot_switch.Stop,
+			Id:             bot_switch.Id,
+			GroupId:        bot_switch.GroupId,
+			IsCloseOrGuard: bot_switch.IsCloseOrGuard,
 		},
 	}
 
 	// byte write
-	bw := strconv.Itoa(int(bot_switch.GroupId)) + "_" + bot_switch.PluginName
+	bw := strconv.Itoa(int(bot_switch.GroupId)) + "_switchorguard"
 	var bot_switch_redis []byte
 	bot_switch_redis, err = json.Marshal(&bot_switch_sync)
 	if err != nil {
@@ -76,19 +103,17 @@ func (bot_switch *Switch) SwitchCreate() (err error) {
 	return
 }
 
-func (bot_switch *Switch) SwitchUpdate(stop bool) (err error) {
+func (bot_switch *Switch) SwitchUpdate(isCloseOrGuard int64) (err error) {
 
-	_, err = Db.Exec("update [kequ5060].[dbo].[zbot_plugin_switch] set group_id = $2, plugin_name = $3, gmt_modified = $4, stop = $5 where ID = $1", bot_switch.Id, bot_switch.GroupId, bot_switch.PluginName, bot_switch.GmtModified, stop)
+	_, err = Db.Exec("update [kequ5060].[dbo].[zbot_plugin_switch] set group_id = $2, is_close_or_guard = $3 where ID = $1", bot_switch.Id, bot_switch.GroupId, isCloseOrGuard)
 	if err != nil {
 		return err
 	}
 
 	ubot_switch := Switch{
-		Id:          bot_switch.Id,
-		GroupId:     bot_switch.GroupId,
-		PluginName:  bot_switch.PluginName,
-		GmtModified: bot_switch.GmtModified,
-		Stop:        bool(stop),
+		Id:             bot_switch.Id,
+		GroupId:        bot_switch.GroupId,
+		IsCloseOrGuard: isCloseOrGuard,
 	}
 
 	bot_switch_sync := SwitchSync{
@@ -96,7 +121,7 @@ func (bot_switch *Switch) SwitchUpdate(stop bool) (err error) {
 		PluginSwitch: &ubot_switch,
 	}
 
-	bw := strconv.Itoa(int(bot_switch.GroupId)) + "_" + bot_switch.PluginName
+	bw := strconv.Itoa(int(bot_switch.GroupId)) + "_switchorguard"
 	var bot_switch_redis []byte
 	bot_switch_redis, err = json.Marshal(&bot_switch_sync)
 	if err != nil {
@@ -115,23 +140,27 @@ func (bot_switch *Switch) SwitchUpdate(stop bool) (err error) {
 	return
 }
 
-func SwitchSave(groupId int64, pluginName string, gmtModified time.Time, stop bool) (err error) {
+func SwitchSave(groupId int64, isCloseOrGuard int64, isClose bool) (err error) {
+	var icog int64 = 0
 	bot_switch := Switch{
-		GroupId:     groupId,
-		PluginName:  pluginName,
-		GmtModified: time.Now(),
-		Stop:        bool(stop),
+		GroupId:        groupId,
+		IsCloseOrGuard: isCloseOrGuard,
 	}
 	bot_switch_sync := SwitchSync{
 		IsTrue:       true,
 		PluginSwitch: &bot_switch,
 	}
-	switch_get, err := SGBGIAPN(groupId, pluginName)
-	if err != nil || switch_get.IsTrue == false {
+	switch_get, err := SGBGI(groupId)
+	if err != nil || !switch_get.IsTrue {
 		err = bot_switch_sync.PluginSwitch.SwitchCreate()
 		return err
 	}
-	err = switch_get.PluginSwitch.SwitchUpdate(stop)
+	if isClose {
+		icog = switch_get.PluginSwitch.IsCloseOrGuard | isCloseOrGuard
+	} else {
+		icog = ^isCloseOrGuard & switch_get.PluginSwitch.IsCloseOrGuard
+	}
+	err = switch_get.PluginSwitch.SwitchUpdate(icog)
 	return err
 }
 
@@ -144,36 +173,14 @@ func SDBGI(groupId int64) (err error) {
 	return
 }
 
-//SGBGIAS SwitchGetsByGroupIdAndStop
-//bsss bot_switch_stops
-//bss bot_switch_stop
-func SGBGIAS(groupId int64) (bsss SwitchStop, err error) {
-	bps := make([]string, 0)
-	rows, err := Db.Query("select plugin_name from [kequ5060].[dbo].[zbot_plugin_switch] where group_id = $1 and stop = $2", groupId, true)
-	if err != nil {
-		return
-	}
-	defer rows.Close()
-	var plu Plu
-	for rows.Next() {
-		rows.Scan(&plu.PluginName)
-		bps = append(bps, plu.PluginName)
-	}
-	bsss = SwitchStop{
-		groupId,
-		bps,
-	}
-	return
-}
-
-//SGBGIAPN SwitchGetByGroupIdAndPluginName
-func SGBGIAPN(groupId int64, pluginName string) (bot_switch_sync SwitchSync, err error) {
+//SGBGI SwitchGetByGroupId
+func SGBGI(groupId int64) (bot_switch_sync SwitchSync, err error) {
 	bot_switch := Switch{}
 	bot_switch_sync = SwitchSync{
 		IsTrue:       true,
 		PluginSwitch: &bot_switch,
 	}
-	bw := strconv.Itoa(int(groupId)) + "_" + pluginName
+	bw := strconv.Itoa(int(groupId)) + "_switchorguard"
 	c := Pool.Get()
 	defer c.Close()
 	/*exists, err := redis.Bool(c.Do("exists", bw))
@@ -188,9 +195,9 @@ func SGBGIAPN(groupId int64, pluginName string) (bot_switch_sync SwitchSync, err
 	vb, err = redis.Bytes(c.Receive())
 	if err != nil {
 		fmt.Println("[查询] 首次查询-开关", bw)
-		err = Db.QueryRow("select ID, group_id, plugin_name, gmt_modified, stop from [kequ5060].[dbo].[zbot_plugin_switch] where group_id = $1 and plugin_name = $2", groupId, pluginName).Scan(&bot_switch_sync.PluginSwitch.Id, &bot_switch_sync.PluginSwitch.GroupId, &bot_switch_sync.PluginSwitch.PluginName, &bot_switch_sync.PluginSwitch.GmtModified, &bot_switch_sync.PluginSwitch.Stop)
+		err = Db.QueryRow("select ID, group_id, is_close_or_guard from [kequ5060].[dbo].[zbot_plugin_switch] where group_id = $1", groupId).Scan(&bot_switch_sync.PluginSwitch.Id, &bot_switch_sync.PluginSwitch.GroupId, &bot_switch_sync.PluginSwitch.IsCloseOrGuard)
 		info := fmt.Sprintf("%s", err)
-		if StartsWith(info, "sql") || StartsWith(info, "unable"){
+		if StartsWith(info, "sql") || StartsWith(info, "unable") {
 			if StartsWith(info, "unable") {
 				fmt.Println(info)
 			}
@@ -213,4 +220,20 @@ func SGBGIAPN(groupId int64, pluginName string) (bot_switch_sync SwitchSync, err
 	}
 	//fmt.Println("[Redis] Key(", bw, ") Value(", bot_switch_sync.IsTrue, *bot_switch_sync.PluginSwitch, ")")  //测试用
 	return
+}
+
+func IntentMean(intent intent) string {
+	mean, ok := IntentMap[intent]
+	if !ok {
+		mean = "unknown"
+	}
+	return mean
+}
+
+func PluginNameToIntent(s string) intent {
+	intent, ok := SwitchMap[s]
+	if !ok {
+		intent = 0
+	}
+	return intent
 }

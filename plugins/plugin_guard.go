@@ -2,7 +2,6 @@ package plugins
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"math/rand"
 	"strconv"
@@ -32,37 +31,11 @@ func (guard *Guard) Do(ctx *context.Context, bot *pbbot.Bot, event *onebot.Group
 	if !IsAdmin(bot, groupId, botId) {
 		return MESSAGE_IGNORE
 	}
+	guardIntent := int64(PluginGuard)
+	sg, _ := SGBGI(groupId)
+	isGuard := sg.PluginSwitch.IsCloseOrGuard & guardIntent
 
-	ggg, _ := GetJudgeGroup()
-
-	if StartsWith(rawMsg, ".守卫") && IsBotAdmin(userId) {
-		vocabulary := strings.TrimPrefix(rawMsg, ".守卫")
-		content := strings.Split(vocabulary, " ")
-		err := ggg.JudgeGroupUpdate(ArrayStringToArrayInt64(content)...)
-		if err != nil {
-			log.Panicln(err)
-		}
-		msg := strconv.Itoa(r) + " （守卫群添加成功）"
-		replyMsg := pbbot.NewMsg().Text(msg)
-		bot.SendGroupMessage(groupId, replyMsg, false)
-		log.Printf("[守卫] Bot(%v) Group(%v) -> %v", botId, groupId, msg)
-		return MESSAGE_BLOCK
-	}
-
-	if StartsWith(rawMsg, ".取消守卫") && IsBotAdmin(userId) {
-		vocabulary := strings.TrimPrefix(rawMsg, ".取消守卫")
-		content := strings.Split(vocabulary, " ")
-		ggg.JudgeGroupDelete(ArrayStringToArrayInt64(content)...)
-		msg := strconv.Itoa(delete) + " （守卫群删除成功）"
-		replyMsg := pbbot.NewMsg().Text(msg)
-		bot.SendGroupMessage(groupId, replyMsg, false)
-		log.Printf("[守卫] Bot(%v) Group(%v) -> %v", botId, groupId, msg)
-		return MESSAGE_BLOCK
-	}
-
-	containsGroupId := JudgeGroupId(groupId, *ggg.JudgeGroupSync)
-	fmt.Println(containsGroupId)
-	if containsGroupId == 0 {
+	if isGuard > 0 {
 		return MESSAGE_IGNORE
 	}
 

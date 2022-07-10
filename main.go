@@ -36,7 +36,7 @@ func main() {
 
 	_, err := os.Stat("conf.toml")
 	if err != nil {
-		_ = ioutil.WriteFile("conf.toml", []byte("Plugins = [\"守卫\",\"屏蔽\",\"开关\",\"复读\",\"回复\",\"群管\",\"订阅\",\"魔友价\",\"打乱\",\"学习\"]   #插件管理\nAdmins = [2693678434]   #机器人管理员管理\nDatabaseUser = \"sa\"   #MSSQL数据库用户名\nDatabasePassword = \"wr@#kequ5060\"   #MSSQL数据库密码\nDatabasePort = 1433   #MSSQL数据库服务端口\nDatabaseServer = \"127.0.0.1\"   #MSSQL数据库服务网址\nServerPort = 8081   #服务端口\nScrambleServer = \"http://localhost:2014\"   #打乱服务地址"), 0644)
+		_ = ioutil.WriteFile("conf.toml", []byte("Plugins = [\"守卫\",\"屏蔽\",\"开关\",\"复读\",\"回复\",\"群管\",\"订阅\",\"查价\",\"打乱\",\"学习\"]   #插件管理\nAdmins = [2693678434]   #机器人管理员管理\nDatabaseUser = \"sa\"   #MSSQL数据库用户名\nDatabasePassword = \"wr@#kequ5060\"   #MSSQL数据库密码\nDatabasePort = 1433   #MSSQL数据库服务端口\nDatabaseServer = \"127.0.0.1\"   #MSSQL数据库服务网址\nServerPort = 8081   #服务端口\nScrambleServer = \"http://localhost:2014\"   #打乱服务地址"), 0644)
 	}
 
 	plugin, _ := TbotConf()
@@ -132,17 +132,17 @@ func main() {
 
 		log.Printf("[INFO] Bot(%v) Group(%v) <- %v", botId, groupId, rawMsg)
 		ctx := context.WithValue(context.Background(), "key", "value")
+		sg, _ := SGBGI(groupId)
 		for _, i := range plugin {
-			r, _ := SGBGIAPN(groupId, i)
-			if r.PluginSwitch.PluginName == "回复" && r.PluginSwitch.Stop == true {
+			intent := sg.PluginSwitch.IsCloseOrGuard & int64(PluginNameToIntent(i))
+			if intent == int64(PluginReply){
 				break
 			}
-			if r.PluginSwitch.Stop == true {
+			if intent > 0 {
 				continue
-			} else {
-				if PluginSet[i].Do(&ctx, bot, event) == MESSAGE_BLOCK {
-					break
-				}
+			}
+			if PluginSet[i].Do(&ctx, bot, event) == MESSAGE_BLOCK {
+				break
 			}
 		}
 	}

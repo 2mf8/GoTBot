@@ -65,7 +65,7 @@ func PBlockGet(userId int64) (pblockSync PBlockSync, err error) {
 	if err != nil {
 		fmt.Println("[错误] Unmarshal出错")
 	}
-	fmt.Println("[Redis] Key(", bw, ") Value(", pblockSync.IsTrue, *pblockSync.PBlockSync, ")") //测试用
+	//fmt.Println("[Redis] Key(", bw, ") Value(", pblockSync.IsTrue, *pblockSync.PBlockSync, ")") //测试用
 	return
 }
 

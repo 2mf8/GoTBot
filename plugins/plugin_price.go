@@ -248,5 +248,5 @@ func (price *PricePlugin) Do(ctx *context.Context, bot *pbbot.Bot, event *onebot
 }
 
 func init() {
-	Register("魔友价", &PricePlugin{})
+	Register("查价", &PricePlugin{})
 }

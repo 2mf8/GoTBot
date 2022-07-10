@@ -29,7 +29,7 @@ func (rep *Repeat) Do(ctx *context.Context, bot *pbbot.Bot, event *onebot.GroupM
 		msg := "消息触发守卫，已被拦截"
 		//replyMsg := pbbot.NewMsg().Text(msg)
 		//bot.SendGroupMessage(groupId, replyMsg, false)
-		log.Printf("[守卫] Bot(%v) Group(%v) -> %v", botId, groupId, msg)
+		log.Printf("[复读守卫] Bot(%v) Group(%v) -- %v", botId, groupId, msg)
 		return MESSAGE_BLOCK
 	}
 
