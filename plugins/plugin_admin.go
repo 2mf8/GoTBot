@@ -4,40 +4,47 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"math/rand"
+	"time"
 	"regexp"
 	"strconv"
 	"strings"
-	"time"
-
-	"github.com/2mf8/go-pbbot-for-rq"
-	"github.com/2mf8/go-pbbot-for-rq/proto_gen/onebot"
+	"math/rand"
 	. "github.com/2mf8/go-tbot-for-rq/public"
 	"github.com/2mf8/go-tbot-for-rq/utils"
+	"github.com/2mf8/go-pbbot-for-rq/proto_gen/onebot"
 )
 
 type Admin struct {
 }
 
-func (admin *Admin) Do(ctx *context.Context, bot *pbbot.Bot, event *onebot.GroupMessageEvent) (retval uint) {
-	rawMsg := strings.TrimSpace(event.RawMessage)
-	groupId := event.GroupId
-	userId := event.Sender.UserId
-	botId := bot.BotId
+/*
+* botId 机器人Id
+* groupId 群Id
+* userId 用户Id
+* messageId 消息Id
+* rawMsg 群消息
+* card At展示
+* userRole 用户角色，是否是管理员
+* botRole 机器人角色， 是否是管理员
+* retval 返回值，用于判断是否处理下一个插件
+* replyMsg 待发送消息
+* rs 成功防屏蔽码
+* rd 删除防屏蔽码
+* rf 失败防屏蔽码
+*/
+func (admin *Admin) Do(ctx *context.Context, botId, groupId, userId int64, messageId *onebot.MessageReceipt, rawMsg, card string, botRole, userRole, super bool, rs, rd, rf int) utils.RetStuct {
 
 	if groupId == 560820998 || groupId == 189420325 || groupId == 348591755 || groupId == 481097523 || groupId == 176211061 || groupId == 138080634 { 
-		return utils.MESSAGE_IGNORE
+		return utils.RetStuct{
+			RetVal: utils.MESSAGE_IGNORE,
+		}
 	}
 
-	rand.Seed(time.Now().UnixNano())
-	//success := rand.Intn(101)
-	//delete := rand.Intn(101) + 200
-	failure := rand.Intn(101) + 400
-	//jin_duration := 60 + rand.Intn(28740)
-
 	s, b := Prefix(rawMsg, ".")
-	if !b || !IsAdmin(bot, groupId, botId) {
-		return utils.MESSAGE_IGNORE
+	if !b || !botRole {
+		return utils.RetStuct{
+			RetVal: utils.MESSAGE_IGNORE,
+		}
 	}
 
 	reg1 := regexp.MustCompile("<at qq=\"")
@@ -51,110 +58,163 @@ func (admin *Admin) Do(ctx *context.Context, bot *pbbot.Bot, event *onebot.Group
 		str2 = strings.TrimSpace(reg3.ReplaceAllString(str2, " "))
 	}
 
-	/*if s == "抽奖禁言" {
-		if IsAdmin(bot, groupId, userId){
-			msg := strconv.Itoa(failure) + " （失败，您是群主或管理员）"
-			replyMsg := pbbot.NewMsg().Text(msg)
-			bot.SendGroupMessage(groupId, replyMsg, false)
+	rand.Seed(time.Now().UnixNano())
+	jin_duration := 60 + rand.Intn(28740)
+	if s == "抽奖禁言" {
+		if userRole {
+			msg := strconv.Itoa(rf) + " （失败，您是群主或管理员）"
 			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, msg)
-			return utils.MESSAGE_BLOCK
+			return utils.RetStuct{
+				RetVal: utils.MESSAGE_BLOCK,
+				ReplyMsg: &utils.Msg{
+					Text: msg,
+				},
+				ReqType: utils.GroupBan,
+			}
 		}
 		msg := " 恭喜你抽中" + convertJinTime(jin_duration) + "禁言套餐，已发放"
-		reply := pbbot.NewMsg().At(userId, event.Sender.Card).Text(msg)
-		bot.SetGroupBan(groupId, userId, int32(jin_duration))
-		bot.SendGroupMessage(groupId, reply, false)
 		log.Printf("[抽奖禁言] Bot(%v) Group(%v) -> %v", botId, groupId, msg)
-		return utils.MESSAGE_BLOCK
+		return utils.RetStuct{
+			RetVal: utils.MESSAGE_BLOCK,
+			ReplyMsg: &utils.Msg{
+				Text: msg,
+			},
+			ReqType: utils.GroupBan,
+			Duration: int32(jin_duration),
+		}
 	}
 
 	if StartsWith(s, "自我禁言") {
-		if IsAdmin(bot, groupId, userId){
-			msg := strconv.Itoa(failure) + " （失败，您是群主或管理员）"
-			replyMsg := pbbot.NewMsg().Text(msg)
-			bot.SendGroupMessage(groupId, replyMsg, false)
+		if userRole{
+			msg := strconv.Itoa(rf) + " （失败，您是群主或管理员）"
 			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, msg)
-			return utils.MESSAGE_BLOCK
+			return utils.RetStuct{
+				RetVal: utils.MESSAGE_BLOCK,
+				ReplyMsg: &utils.Msg{
+					Text: msg,
+				},
+				ReqType: utils.GroupBan,
+			}
 		}
 		s = strings.TrimPrefix(s, "自我禁言")
 		duration := convertTime(s)
 		if duration <= 0 {
-			return utils.MESSAGE_BLOCK
+			return utils.RetStuct{}
 		}
 		if duration < 30*60*60*24 {
 			replyText := "禁言 " + strconv.Itoa(int(userId)) + " " + strconv.Itoa(int(duration)) + "秒"
-			bot.SetGroupBan(groupId, userId, duration)
 			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
-			return utils.MESSAGE_BLOCK
+			return utils.RetStuct{
+				RetVal: utils.MESSAGE_BLOCK,
+				ReqType: utils.GroupBan,
+				Duration: duration,
+			}
 		} else {
-			replyText := strconv.Itoa(failure) + " (禁言时间超过最大允许范围)"
-			replyMsg := pbbot.NewMsg().Text(replyText)
+			replyText := strconv.Itoa(rf) + " (禁言时间超过最大允许范围)"
 			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
-			_, _ = bot.SendGroupMessage(groupId, replyMsg, false)
-			return utils.MESSAGE_BLOCK
+			return utils.RetStuct{
+				RetVal: utils.MESSAGE_BLOCK,
+				ReplyMsg: &utils.Msg{
+					Text: replyText,
+				},
+				ReqType: utils.GroupBan,
+			}
 		}
-	}*/
-
-	if s == "退群" && IsBotAdmin(userId){
-		bot.SetGroupLeave(groupId, true)
 	}
 
-	if StartsWith(str2, "jin") && (IsAdmin(bot, groupId, userId) || IsBotAdmin(userId)) {
+	if s == "退群" && super{
+		return utils.RetStuct{
+			RetVal: utils.MESSAGE_BLOCK,
+			ReqType: utils.GroupLeave,
+		}
+	}
+
+	if StartsWith(str2, "jin") && (super || userRole) {
 		str2 = strings.TrimSpace(string([]byte(str2)[len("jin"):]))
 		str3 := strings.Split(str2, " ")
 
 		if len(str3) != 2 {
-			replyText := strconv.Itoa(failure) + "（禁言格式错误）"
-			replyMsg := pbbot.NewMsg().Text(replyText)
+			replyText := strconv.Itoa(rf) + "（禁言格式错误）"
 			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
-			_, _ = bot.SendGroupMessage(groupId, replyMsg, false)
-			return utils.MESSAGE_BLOCK
+			return utils.RetStuct{
+				RetVal: utils.MESSAGE_BLOCK,
+				ReplyMsg: &utils.Msg{
+					Text: replyText,
+				},
+				ReqType: utils.GroupBan,
+			}
 		}
 		jinId, err := strconv.ParseInt(str3[0], 10, 64)
 		if err != nil {
-			replyText := strconv.Itoa(failure) + "（禁言对象错误）"
-			replyMsg := pbbot.NewMsg().Text(replyText)
+			replyText := strconv.Itoa(rf) + "（禁言对象错误）"
 			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
-			_, _ = bot.SendGroupMessage(groupId, replyMsg, false)
-			return utils.MESSAGE_BLOCK
+			return utils.RetStuct{
+				RetVal: utils.MESSAGE_BLOCK,
+				ReplyMsg: &utils.Msg{
+					Text: replyText,
+				},
+				ReqType: utils.GroupBan,
+			}
 		}
 
 		duration := convertTime(str3[1])
 
 		if duration <= 0 {
 			replyText := "解除 " + strconv.Itoa(int(jinId)) + " 的禁言"
-			bot.SetGroupBan(groupId, jinId, 0)
 			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
+			return utils.RetStuct{
+				RetVal: utils.MESSAGE_BLOCK,
+				ReqType: utils.GroupBan,
+				Duration: duration,
+			}
 		}
 		if duration < 30*60*60*24 {
 			replyText := "禁言 " + strconv.Itoa(int(jinId)) + " " + strconv.Itoa(int(duration)) + "秒"
-			bot.SetGroupBan(groupId, jinId, duration)
 			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
+			return utils.RetStuct{
+				RetVal: utils.MESSAGE_BLOCK,
+				ReqType: utils.GroupBan,
+				Duration: duration,
+			}
 		} else {
-			replyText := strconv.Itoa(failure) + "禁言时间超过最大允许范围"
-			replyMsg := pbbot.NewMsg().Text(replyText)
+			replyText := strconv.Itoa(rf) + "禁言时间超过最大允许范围"
 			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
-			_, _ = bot.SendGroupMessage(groupId, replyMsg, false)
-			return utils.MESSAGE_BLOCK
+			return utils.RetStuct{
+				RetVal: utils.MESSAGE_BLOCK,
+				ReplyMsg: &utils.Msg{
+					Text: replyText,
+				},
+				ReqType: utils.GroupBan,
+			}
 		}
 	}
 
-	if (StartsWith(str2, "t") || StartsWith(str2, "T")) && (IsAdmin(bot, groupId, userId) || IsBotAdmin(userId)) {
+	if (StartsWith(str2, "t") || StartsWith(str2, "T")) && (super || userRole) {
 		rejectAddAgain := StartsWith(str2, "T")
 		str2 = strings.TrimSpace(string([]byte(strings.ToLower(str2))[len("t"):]))
 		tId, err := strconv.ParseInt(str2, 10, 64)
 		if err != nil {
-			replyText := strconv.Itoa(int(failure)) + "（踢出对象错误）"
-			replyMsg := pbbot.NewMsg().Text(replyText)
+			replyText := strconv.Itoa(int(rf)) + "（踢出对象错误）"
 			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
-			_, _ = bot.SendGroupMessage(groupId, replyMsg, false)
-			return utils.MESSAGE_BLOCK
+			return utils.RetStuct{
+				RetVal: utils.MESSAGE_BLOCK,
+				ReplyMsg: &utils.Msg{
+					Text: replyText,
+				},
+				ReqType: utils.GroupKick,
+			}
 		}
 		replyText := "踢出 " + strconv.Itoa(int(tId)) + " 成功"
-		bot.SetGroupKick(groupId, tId, rejectAddAgain)
 		log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
-		return utils.MESSAGE_BLOCK
+		return utils.RetStuct{
+			RetVal: utils.MESSAGE_BLOCK,
+			ReqType: utils.GroupKick,
+			RejectAddAgain: rejectAddAgain,
+		}
 	}
-	return utils.MESSAGE_IGNORE
+	return utils.RetStuct{
+		RetVal: utils.MESSAGE_IGNORE,
+	}
 }
 
 func convertTime(str string) int32 {

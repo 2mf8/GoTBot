@@ -4,46 +4,51 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"math/rand"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
-
-	//. "github.com/2mf8/go-tbot-for-rq/config"
+	"github.com/2mf8/go-pbbot-for-rq/proto_gen/onebot"
 	. "github.com/2mf8/go-tbot-for-rq/data"
 	. "github.com/2mf8/go-tbot-for-rq/public"
 	. "github.com/2mf8/go-tbot-for-rq/utils"
-	"github.com/2mf8/go-pbbot-for-rq"
-	"github.com/2mf8/go-pbbot-for-rq/proto_gen/onebot"
-	//"gopkg.in/guregu/null.v3"
 )
 
 type Block struct{}
 
-func (block *Block) Do(ctx *context.Context, bot *pbbot.Bot, event *onebot.GroupMessageEvent) (retval uint) {
-	groupId := event.GroupId
-	userId := event.UserId
-	rawMsg := event.RawMessage
-	botId := bot.BotId
-
-	rand.Seed(time.Now().UnixNano())
-	//success := rand.Intn(101)
-	//delete := rand.Intn(101) + 200
-	failure := rand.Intn(101) + 400
+/*
+* botId 机器人Id
+* groupId 群Id
+* userId 用户Id
+* messageId 消息Id
+* rawMsg 群消息
+* card At展示
+* userRole 用户角色，是否是管理员
+* botRole 机器人角色， 是否是管理员
+* retval 返回值，用于判断是否处理下一个插件
+* replyMsg 待发送消息
+* rs 成功防屏蔽码
+* rd 删除防屏蔽码
+* rf 失败防屏蔽码
+*/
+func (block *Block) Do(ctx *context.Context, botId, groupId, userId int64, messageId *onebot.MessageReceipt, rawMsg, card string, botRole, userRole, super bool, rs, rd, rf int) RetStuct {
 
 	ispblock, err := PBlockGet(userId)
 	//fmt.Println(ispblock)
 	if err != nil {
 		fmt.Println("[INFO] ", err)
 	}
-	if ispblock.PBlockSync.UserId == userId && !IsBotAdmin(userId) {
-		return MESSAGE_BLOCK
+	if ispblock.PBlockSync.UserId == userId && !super {
+		return RetStuct{
+			RetVal: MESSAGE_BLOCK,
+		}
 	}
 
 	s, b := Prefix(rawMsg, ".")
 	if !b {
-		return MESSAGE_IGNORE
+		return RetStuct{
+			RetVal: MESSAGE_IGNORE,
+		}
 	}
 	reg1 := regexp.MustCompile("<at qq=\"")
 	reg2 := regexp.MustCompile("\"/>")
@@ -56,53 +61,79 @@ func (block *Block) Do(ctx *context.Context, bot *pbbot.Bot, event *onebot.Group
 		str2 = strings.TrimSpace(reg3.ReplaceAllString(str2, " "))
 	}
 
-	if StartsWith(s, "屏蔽+") && IsBotAdmin(userId) {
+	if StartsWith(s, "屏蔽+") && super {
 		pUserID, err := strconv.Atoi(strings.TrimSpace(strings.TrimPrefix(str2, "屏蔽+")))
 		if err != nil {
-			replyMsg := strconv.Itoa(failure) + "（用户不存在）"
-			reply := pbbot.NewMsg().Text(replyMsg)
-			bot.SendGroupMessage(groupId, reply, false)
+			replyMsg := strconv.Itoa(rf) + "（用户不存在）"
 			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyMsg)
-			return MESSAGE_BLOCK
+			return RetStuct{
+				RetVal: MESSAGE_BLOCK,
+				ReplyMsg: &Msg{
+					Text: replyMsg,
+				},
+				ReqType: GroupMsg,
+			}
 		}
 		err = PBlockSave(int64(pUserID), true, userId, time.Now())
 		if err != nil {
 			replyMsg := "屏蔽" + strconv.Itoa(int(pUserID)) + "失败"
-			reply := pbbot.NewMsg().Text(replyMsg)
-			bot.SendGroupMessage(groupId, reply, false)
 			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyMsg)
-			return MESSAGE_BLOCK
+			return RetStuct{
+				RetVal: MESSAGE_BLOCK,
+				ReplyMsg: &Msg{
+					Text: replyMsg,
+				},
+				ReqType: GroupMsg,
+			}
 		}
 		replyMsg := "屏蔽" + strconv.Itoa(int(pUserID)) + "成功"
-		reply := pbbot.NewMsg().Text(replyMsg)
-		bot.SendGroupMessage(groupId, reply, false)
 		log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyMsg)
-		return MESSAGE_BLOCK
+		return RetStuct{
+			RetVal: MESSAGE_BLOCK,
+			ReplyMsg: &Msg{
+				Text: replyMsg,
+			},
+			ReqType: GroupMsg,
+		}
 	}
-	if StartsWith(s, "屏蔽-") && IsBotAdmin(userId) {
+	if StartsWith(s, "屏蔽-") && super {
 		pUserID, err := strconv.Atoi(strings.TrimSpace(strings.TrimPrefix(str2, "屏蔽-")))
 		if err != nil {
-			replyMsg := strconv.Itoa(failure) + "（用户不存在）"
-			reply := pbbot.NewMsg().Text(replyMsg)
-			bot.SendGroupMessage(groupId, reply, false)
+			replyMsg := strconv.Itoa(rf) + "（用户不存在）"
 			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyMsg)
-			return MESSAGE_BLOCK
+			return RetStuct{
+				RetVal: MESSAGE_BLOCK,
+				ReplyMsg: &Msg{
+					Text: replyMsg,
+				},
+				ReqType: GroupMsg,
+			}
 		}
 		err = PBlockSave(int64(pUserID), false, userId, time.Now())
 		if err != nil {
 			replyMsg := "解除屏蔽" + strconv.Itoa(int(pUserID)) + "失败"
-			reply := pbbot.NewMsg().Text(replyMsg)
-			bot.SendGroupMessage(groupId, reply, false)
 			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyMsg)
-			return MESSAGE_BLOCK
+			return RetStuct{
+				RetVal: MESSAGE_BLOCK,
+				ReplyMsg: &Msg{
+					Text: replyMsg,
+				},
+				ReqType: GroupMsg,
+			}
 		}
 		replyMsg := "解除屏蔽" + strconv.Itoa(int(pUserID)) + "成功"
-		reply := pbbot.NewMsg().Text(replyMsg)
-		bot.SendGroupMessage(groupId, reply, false)
 		log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyMsg)
-		return MESSAGE_BLOCK
+		return RetStuct{
+				RetVal: MESSAGE_BLOCK,
+				ReplyMsg: &Msg{
+					Text: replyMsg,
+				},
+				ReqType: GroupMsg,
+			}
 	}
-	return MESSAGE_IGNORE
+	return RetStuct{
+		RetVal: MESSAGE_IGNORE,
+	}
 }
 
 func init() {

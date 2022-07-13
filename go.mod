@@ -3,7 +3,7 @@ module github.com/2mf8/go-tbot-for-rq
 go 1.18
 
 require (
-	github.com/2mf8/go-pbbot-for-rq v0.0.0-20220704112712-217a2b0fb83f
+	github.com/2mf8/go-pbbot-for-rq v0.0.0-20220713042503-246c99dc963c
 	github.com/BurntSushi/toml v1.1.0
 	github.com/denisenkom/go-mssqldb v0.12.2
 	github.com/fatih/color v1.13.0

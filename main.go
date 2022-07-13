@@ -106,8 +106,17 @@ func main() {
 	pbbot.HandleGroupMessage = func(bot *pbbot.Bot, event *onebot.GroupMessageEvent) {
 		groupId := event.GroupId
 		rawMsg := event.RawMessage
+		messageId := event.MessageId
 		botId := bot.BotId
 		userId := event.UserId
+		card := event.Sender.Card
+		userRole := IsAdmin(bot, groupId, userId)
+		botRole := IsAdmin(bot, groupId, botId)
+		super := IsBotAdmin(userId)
+		rand.Seed(time.Now().UnixNano())
+		success := rand.Intn(101)
+		delete := rand.Intn(101) + 200
+		failure := rand.Intn(101) + 400
 
 		if IsBotAdmin(userId) && rawMsg == "打卡" {
 			bot.SetGroupSignIn(groupId)
@@ -141,8 +150,61 @@ func main() {
 			if intent > 0 {
 				continue
 			}
-			if PluginSet[i].Do(&ctx, bot, event) == MESSAGE_BLOCK {
-				break
+			retStuct := PluginSet[i].Do(&ctx, botId, groupId, userId, messageId, rawMsg, card, botRole, userRole, super, success, delete, failure)
+			if retStuct.RetVal == MESSAGE_BLOCK {
+				log.Println(retStuct)
+				if retStuct.ReqType == GroupMsg {
+					log.Println(retStuct.ReplyMsg.Text)
+					if retStuct.ReplyMsg != nil {
+						newMsg := pbbot.NewMsg().Text(retStuct.ReplyMsg.Text)
+						if retStuct.ReplyMsg.Image != "" {
+							newMsg = newMsg.Image(retStuct.ReplyMsg.Image)
+						}
+						v, e := bot.SendGroupMessage(groupId, newMsg, false)
+						log.Println(v,e)
+					}
+					break
+				}
+				if retStuct.ReqType == GroupBan {
+					bot.SetGroupBan(groupId, userId, retStuct.Duration)
+					if retStuct.ReplyMsg != nil {
+						newMsg := pbbot.NewMsg().Text(retStuct.ReplyMsg.Text)
+						bot.SendGroupMessage(groupId, newMsg, false)
+					}
+					break
+				}
+				if retStuct.ReqType == GroupKick {
+					bot.SetGroupKick(groupId, userId, retStuct.RejectAddAgain)
+					if retStuct.ReplyMsg != nil {
+						newMsg := pbbot.NewMsg().Text(retStuct.ReplyMsg.Text)
+						bot.SendGroupMessage(groupId, newMsg, false)
+					}
+					break
+				}
+				if retStuct.ReqType == GroupSignIn {
+					bot.SetGroupSignIn(groupId)
+					if retStuct.ReplyMsg != nil {
+						newMsg := pbbot.NewMsg().Text(retStuct.ReplyMsg.Text)
+						bot.SendGroupMessage(groupId, newMsg, false)
+					}
+					break
+				}
+				if retStuct.ReqType == GroupLeave {
+					bot.SetGroupLeave(groupId, false)
+					if retStuct.ReplyMsg != nil {
+						newMsg := pbbot.NewMsg().Text(retStuct.ReplyMsg.Text)
+						bot.SendGroupMessage(groupId, newMsg, false)
+					}
+					break
+				}
+				if retStuct.ReqType == DeleteMsg {
+					bot.DeleteMsg(retStuct.MessageId)
+					if retStuct.ReplyMsg != nil {
+						newMsg := pbbot.NewMsg().Text(retStuct.ReplyMsg.Text)
+						bot.SendGroupMessage(groupId, newMsg, false)
+					}
+					break
+				}
 			}
 		}
 	}

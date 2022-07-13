@@ -3,15 +3,30 @@ package plugins
 import(
 	"context"
 	. "github.com/2mf8/go-tbot-for-rq/utils"
-	"github.com/2mf8/go-pbbot-for-rq"
 	"github.com/2mf8/go-pbbot-for-rq/proto_gen/onebot"
 )
 
 type Reply struct{
 }
-
-func (rep *Reply) Do(ctx *context.Context, bot *pbbot.Bot, event *onebot.GroupMessageEvent) (retval uint) {
-	return MESSAGE_IGNORE
+/*
+* botId 机器人Id
+* groupId 群Id
+* userId 用户Id
+* messageId 消息Id
+* rawMsg 群消息
+* card At展示
+* userRole 用户角色，是否是管理员
+* botRole 机器人角色， 是否是管理员
+* retval 返回值，用于判断是否处理下一个插件
+* replyMsg 待发送消息
+* rs 成功防屏蔽码
+* rd 删除防屏蔽码
+* rf 失败防屏蔽码
+*/
+func (rep *Reply) Do(ctx *context.Context, botId, groupId, userId int64, messageId *onebot.MessageReceipt, rawMsg, card string, botRole, userRole, super bool, rs, rd, rf int) RetStuct {
+	return RetStuct{
+		RetVal: MESSAGE_IGNORE,
+	}
 }
 
 

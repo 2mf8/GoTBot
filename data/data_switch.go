@@ -25,16 +25,16 @@ type SwitchSync struct {
 type intent int
 
 const (
-	PluginGuard intent = 1 << iota
-	PluginBlock
-	PluginSwitch
-	PluginRepeat
-	PluginReply
-	PluginAdmin
-	PluginSubscribe
-	PluginPrice
-	PluginScramble
-	PluginLearn
+	PluginGuard intent = 1 << iota // 守卫
+	PluginBlock // 个人屏蔽
+	PluginSwitch // 开关
+	PluginRepeat // 复读
+	PluginReply // 回复
+	PluginAdmin // 群管
+	PluginSubscribe //查价订阅
+	PluginPrice // 查价
+	PluginScramble // 打乱
+	PluginLearn // 群学习
 )
 
 var IntentMap = map[intent]string{
