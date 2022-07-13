@@ -152,7 +152,6 @@ func main() {
 			}
 			retStuct := PluginSet[i].Do(&ctx, botId, groupId, userId, messageId, rawMsg, card, botRole, userRole, super, success, delete, failure)
 			if retStuct.RetVal == MESSAGE_BLOCK {
-				log.Println(retStuct)
 				if retStuct.ReqType == GroupMsg {
 					log.Println(retStuct.ReplyMsg.Text)
 					if retStuct.ReplyMsg != nil {
