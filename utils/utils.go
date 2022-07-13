@@ -9,6 +9,7 @@ type ReqType int
 
 const(
 	GroupBan ReqType = iota // 群禁言
+	RelieveBan // 禁言解除
 	GroupKick // 群踢人
 	GroupSignIn // 群打卡
 	GroupMsg // 群消息

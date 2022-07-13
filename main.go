@@ -172,6 +172,10 @@ func main() {
 					}
 					break
 				}
+				if retStuct.ReqType == RelieveBan {
+					bot.SetGroupBan(groupId, userId, retStuct.Duration)
+					break
+				}
 				if retStuct.ReqType == GroupKick {
 					bot.SetGroupKick(groupId, userId, retStuct.RejectAddAgain)
 					if retStuct.ReplyMsg != nil {

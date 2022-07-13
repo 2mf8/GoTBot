@@ -164,7 +164,7 @@ func (admin *Admin) Do(ctx *context.Context, botId, groupId, userId int64, messa
 			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
 			return utils.RetStuct{
 				RetVal: utils.MESSAGE_BLOCK,
-				ReqType: utils.GroupBan,
+				ReqType: utils.RelieveBan,
 				Duration: duration,
 			}
 		}
