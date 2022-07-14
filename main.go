@@ -123,6 +123,9 @@ func main() {
 			reply := pbbot.NewMsg().Text("打卡成功")
 			bot.SendGroupMessage(groupId, reply, false)
 		}
+		if rawMsg == "撤回" {
+			bot.DeleteMsg(messageId)
+		}
 
 		if groupId == int64(758958532) {
 			push = Push{
@@ -159,8 +162,7 @@ func main() {
 						if retStuct.ReplyMsg.Image != "" {
 							newMsg = newMsg.Image(retStuct.ReplyMsg.Image)
 						}
-						v, e := bot.SendGroupMessage(groupId, newMsg, false)
-						log.Println(v,e)
+						bot.SendGroupMessage(groupId, newMsg, false)
 					}
 					break
 				}
@@ -228,7 +230,7 @@ func main() {
 
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.New()
-	router.GET("/ws/cq/", func(c *gin.Context) {
+	router.GET("/ws/rq/", func(c *gin.Context) {
 		if err := pbbot.UpgradeWebsocket(c.Writer, c.Request); err != nil {
 			fmt.Println("[失败] 创建机器人失败")
 		}

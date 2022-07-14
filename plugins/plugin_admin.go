@@ -84,7 +84,7 @@ func (admin *Admin) Do(ctx *context.Context, botId, groupId, userId int64, messa
 		}
 	}
 
-	if StartsWith(s, "自我禁言") {
+	/*if StartsWith(s, "自我禁言") {
 		if userRole{
 			msg := strconv.Itoa(rf) + " （失败，您是群主或管理员）"
 			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, msg)
@@ -120,7 +120,7 @@ func (admin *Admin) Do(ctx *context.Context, botId, groupId, userId int64, messa
 				ReqType: utils.GroupBan,
 			}
 		}
-	}
+	}*/
 
 	if s == "退群" && super{
 		return utils.RetStuct{
