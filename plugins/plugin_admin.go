@@ -166,6 +166,7 @@ func (admin *Admin) Do(ctx *context.Context, botId, groupId, userId int64, messa
 				RetVal: utils.MESSAGE_BLOCK,
 				ReqType: utils.RelieveBan,
 				Duration: duration,
+				BanId: jinId,
 			}
 		}
 		if duration < 30*60*60*24 {
@@ -175,6 +176,7 @@ func (admin *Admin) Do(ctx *context.Context, botId, groupId, userId int64, messa
 				RetVal: utils.MESSAGE_BLOCK,
 				ReqType: utils.GroupBan,
 				Duration: duration,
+				BanId: jinId,
 			}
 		} else {
 			replyText := strconv.Itoa(rf) + "禁言时间超过最大允许范围"

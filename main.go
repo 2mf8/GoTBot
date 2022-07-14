@@ -117,7 +117,7 @@ func main() {
 		success := rand.Intn(101)
 		delete := rand.Intn(101) + 200
 		failure := rand.Intn(101) + 400
-
+		
 		if IsBotAdmin(userId) && rawMsg == "打卡" {
 			bot.SetGroupSignIn(groupId)
 			reply := pbbot.NewMsg().Text("打卡成功")
@@ -165,16 +165,30 @@ func main() {
 					break
 				}
 				if retStuct.ReqType == GroupBan {
-					bot.SetGroupBan(groupId, userId, retStuct.Duration)
-					if retStuct.ReplyMsg != nil {
-						newMsg := pbbot.NewMsg().Text(retStuct.ReplyMsg.Text)
-						bot.SendGroupMessage(groupId, newMsg, false)
+					if retStuct.BanId == 0 {
+						if retStuct.ReplyMsg != nil {
+							newMsg := pbbot.NewMsg().Text(retStuct.ReplyMsg.Text)
+							bot.SendGroupMessage(groupId, newMsg, false)
+							break
+						}
+						break
+					}else{
+						bot.SetGroupBan(groupId, retStuct.BanId, retStuct.Duration)
+						if retStuct.ReplyMsg != nil {
+							newMsg := pbbot.NewMsg().Text(retStuct.ReplyMsg.Text)
+							bot.SendGroupMessage(groupId, newMsg, false)
+							break
+						}
+						break
 					}
-					break
 				}
 				if retStuct.ReqType == RelieveBan {
-					bot.SetGroupBan(groupId, userId, retStuct.Duration)
-					break
+					if retStuct.BanId == 0 {
+						break
+					}else{
+						bot.SetGroupBan(groupId, retStuct.BanId, retStuct.Duration)
+						break
+					}
 				}
 				if retStuct.ReqType == GroupKick {
 					bot.SetGroupKick(groupId, userId, retStuct.RejectAddAgain)
@@ -214,7 +228,7 @@ func main() {
 
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.New()
-	router.GET("/ws/rq/", func(c *gin.Context) {
+	router.GET("/ws/cq/", func(c *gin.Context) {
 		if err := pbbot.UpgradeWebsocket(c.Writer, c.Request); err != nil {
 			fmt.Println("[失败] 创建机器人失败")
 		}
