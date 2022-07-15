@@ -38,9 +38,11 @@ func (block *Block) Do(ctx *context.Context, botId, groupId, userId int64, messa
 	if err != nil {
 		fmt.Println("[INFO] ", err)
 	}
-	if ispblock.PBlockSync.UserId == userId && !super {
-		return RetStuct{
-			RetVal: MESSAGE_BLOCK,
+	if ispblock.PBlockSync.UserId == userId && ispblock.PBlockSync.IsPBlock {
+		if !super {
+			return RetStuct{
+				RetVal: MESSAGE_BLOCK,
+			}
 		}
 	}
 
