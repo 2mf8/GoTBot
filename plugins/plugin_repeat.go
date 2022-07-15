@@ -5,10 +5,10 @@ import (
 	"log"
 	"math/rand"
 	"time"
-	"github.com/2mf8/go-pbbot-for-rq/proto_gen/onebot"
-	. "github.com/2mf8/go-tbot-for-rq/public"
-	. "github.com/2mf8/go-tbot-for-rq/utils"
-	. "github.com/2mf8/go-tbot-for-rq/data"
+	"github.com/2mf8/GoPbBot/proto_gen/onebot"
+	. "github.com/2mf8/GoTBot/public"
+	. "github.com/2mf8/GoTBot/utils"
+	. "github.com/2mf8/GoTBot/data"
 )
 
 type Repeat struct {

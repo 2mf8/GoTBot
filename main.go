@@ -10,12 +10,12 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/2mf8/go-pbbot-for-rq"
-	"github.com/2mf8/go-pbbot-for-rq/proto_gen/onebot"
-	. "github.com/2mf8/go-tbot-for-rq/data"
-	_ "github.com/2mf8/go-tbot-for-rq/plugins"
-	. "github.com/2mf8/go-tbot-for-rq/public"
-	. "github.com/2mf8/go-tbot-for-rq/utils"
+	"github.com/2mf8/GoPbBot"
+	"github.com/2mf8/GoPbBot/proto_gen/onebot"
+	. "github.com/2mf8/GoTBot/data"
+	_ "github.com/2mf8/GoTBot/plugins"
+	. "github.com/2mf8/GoTBot/public"
+	. "github.com/2mf8/GoTBot/utils"
 	"github.com/fatih/color"
 	"github.com/gin-gonic/gin"
 	cron "github.com/robfig/cron"
@@ -32,7 +32,7 @@ var pushes = make(map[int64]*Push)
 
 func main() {
 
-	color.Cyan("[INFO] 欢迎您使用go-tbot-for-rq")
+	color.Cyan("[INFO] 欢迎您使用GoTBot")
 
 	_, err := os.Stat("conf.toml")
 	if err != nil {
@@ -103,6 +103,13 @@ func main() {
 	timer.AddFunc(start, wholeBan)
 	timer.Start()
 
+	pbbot.HandlePrivateMessage = func(bot *pbbot.Bot, event *onebot.PrivateMessageEvent) {
+		if event.RawMessage == "poke" {
+			poke := pbbot.NewMsg().Poke(event.UserId)
+			bot.SendPrivateMessage(event.UserId, poke, false)
+		}
+	}
+
 	pbbot.HandleGroupMessage = func(bot *pbbot.Bot, event *onebot.GroupMessageEvent) {
 		groupId := event.GroupId
 		rawMsg := event.RawMessage
@@ -117,14 +124,15 @@ func main() {
 		success := rand.Intn(101)
 		delete := rand.Intn(101) + 200
 		failure := rand.Intn(101) + 400
-		
+
 		if IsBotAdmin(userId) && rawMsg == "打卡" {
 			bot.SetGroupSignIn(groupId)
 			reply := pbbot.NewMsg().Text("打卡成功")
 			bot.SendGroupMessage(groupId, reply, false)
 		}
-		if rawMsg == "撤回" {
-			bot.DeleteMsg(messageId)
+		if rawMsg == "poke" && super {
+			poke := pbbot.NewMsg().Poke(userId)
+			bot.SendGroupMessage(groupId, poke, false)
 		}
 
 		if groupId == int64(758958532) {
@@ -147,7 +155,7 @@ func main() {
 		sg, _ := SGBGI(groupId)
 		for _, i := range plugin {
 			intent := sg.PluginSwitch.IsCloseOrGuard & int64(PluginNameToIntent(i))
-			if intent == int64(PluginReply){
+			if intent == int64(PluginReply) {
 				break
 			}
 			if intent > 0 {
@@ -174,7 +182,7 @@ func main() {
 							break
 						}
 						break
-					}else{
+					} else {
 						bot.SetGroupBan(groupId, retStuct.BanId, retStuct.Duration)
 						if retStuct.ReplyMsg != nil {
 							newMsg := pbbot.NewMsg().Text(retStuct.ReplyMsg.Text)
@@ -187,7 +195,7 @@ func main() {
 				if retStuct.ReqType == RelieveBan {
 					if retStuct.BanId == 0 {
 						break
-					}else{
+					} else {
 						bot.SetGroupBan(groupId, retStuct.BanId, retStuct.Duration)
 						break
 					}

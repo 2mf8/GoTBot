@@ -3,7 +3,7 @@ package utils
 import (
 	"context"
 
-	"github.com/2mf8/go-pbbot-for-rq/proto_gen/onebot"
+	"github.com/2mf8/GoPbBot/proto_gen/onebot"
 )
 
 type ReqType int

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strconv"
 	"time"
-	. "github.com/2mf8/go-tbot-for-rq/public"
+	. "github.com/2mf8/GoTBot/public"
 	_ "github.com/denisenkom/go-mssqldb"
 	"github.com/gomodule/redigo/redis"
 	"gopkg.in/guregu/null.v3"

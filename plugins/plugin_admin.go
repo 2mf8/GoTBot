@@ -4,14 +4,14 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"time"
+	"math/rand"
 	"regexp"
 	"strconv"
 	"strings"
-	"math/rand"
-	. "github.com/2mf8/go-tbot-for-rq/public"
-	"github.com/2mf8/go-tbot-for-rq/utils"
-	"github.com/2mf8/go-pbbot-for-rq/proto_gen/onebot"
+	"time"
+	"github.com/2mf8/GoPbBot/proto_gen/onebot"
+	. "github.com/2mf8/GoTBot/public"
+	"github.com/2mf8/GoTBot/utils"
 )
 
 type Admin struct {
@@ -81,46 +81,9 @@ func (admin *Admin) Do(ctx *context.Context, botId, groupId, userId int64, messa
 			},
 			ReqType: utils.GroupBan,
 			Duration: int32(jin_duration),
+			BanId: userId,
 		}
 	}
-
-	/*if StartsWith(s, "自我禁言") {
-		if userRole{
-			msg := strconv.Itoa(rf) + " （失败，您是群主或管理员）"
-			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, msg)
-			return utils.RetStuct{
-				RetVal: utils.MESSAGE_BLOCK,
-				ReplyMsg: &utils.Msg{
-					Text: msg,
-				},
-				ReqType: utils.GroupBan,
-			}
-		}
-		s = strings.TrimPrefix(s, "自我禁言")
-		duration := convertTime(s)
-		if duration <= 0 {
-			return utils.RetStuct{}
-		}
-		if duration < 30*60*60*24 {
-			replyText := "禁言 " + strconv.Itoa(int(userId)) + " " + strconv.Itoa(int(duration)) + "秒"
-			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
-			return utils.RetStuct{
-				RetVal: utils.MESSAGE_BLOCK,
-				ReqType: utils.GroupBan,
-				Duration: duration,
-			}
-		} else {
-			replyText := strconv.Itoa(rf) + " (禁言时间超过最大允许范围)"
-			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
-			return utils.RetStuct{
-				RetVal: utils.MESSAGE_BLOCK,
-				ReplyMsg: &utils.Msg{
-					Text: replyText,
-				},
-				ReqType: utils.GroupBan,
-			}
-		}
-	}*/
 
 	if s == "退群" && super{
 		return utils.RetStuct{

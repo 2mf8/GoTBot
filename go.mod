@@ -1,9 +1,9 @@
-module github.com/2mf8/go-tbot-for-rq
+module github.com/2mf8/GoTBot
 
 go 1.18
 
 require (
-	github.com/2mf8/go-pbbot-for-rq v0.0.0-20220713124638-b5720b6d092b
+	github.com/2mf8/GoPbBot v0.0.0-20220714133255-4705428d545f
 	github.com/BurntSushi/toml v1.1.0
 	github.com/denisenkom/go-mssqldb v0.12.2
 	github.com/fatih/color v1.13.0

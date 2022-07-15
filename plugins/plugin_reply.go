@@ -2,8 +2,8 @@ package plugins
 
 import(
 	"context"
-	. "github.com/2mf8/go-tbot-for-rq/utils"
-	"github.com/2mf8/go-pbbot-for-rq/proto_gen/onebot"
+	. "github.com/2mf8/GoTBot/utils"
+	"github.com/2mf8/GoPbBot/proto_gen/onebot"
 )
 
 type Reply struct{

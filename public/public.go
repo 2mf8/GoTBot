@@ -5,8 +5,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/2mf8/go-pbbot-for-rq"
-	. "github.com/2mf8/go-tbot-for-rq/config"
+	"github.com/2mf8/GoPbBot"
+	. "github.com/2mf8/GoTBot/config"
 	"github.com/BurntSushi/toml"
 )
 
