@@ -130,7 +130,7 @@ func main() {
 			reply := pbbot.NewMsg().Text("打卡成功")
 			bot.SendGroupMessage(groupId, reply, false)
 		}
-		if rawMsg == "poke" && super {
+		if rawMsg == "poke me" && super {
 			poke := pbbot.NewMsg().Poke(userId)
 			bot.SendGroupMessage(groupId, poke, false)
 		}
