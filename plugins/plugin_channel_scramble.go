@@ -3,7 +3,6 @@ package plugins
 import (
 	"context"
 	"log"
-	"net/url"
 	"strings"
 
 	. "github.com/2mf8/GoTBot/data"
@@ -43,14 +42,12 @@ func (scramble *CScramblePlugin) ChannelDo(ctx *context.Context, botId, botChann
 			gs = strings.Replace(gs, "U ", "U\n", -1)
 			gs = strings.Replace(gs, "#", "U'", -1)
 		}
-		imgUrl := "http://localhost:2014/view/" + shor + ".png?scramble=" + url.QueryEscape(strings.Replace(gs, "\n", " ", -1))
 		sc := show + "\n" + gs
-		log.Printf("[INFO] Bot(%v) GuildId(%v) ChannelId(%v) -> %v\n%v<image url=\"%v\"/>", botId, guildId, channelId, show, gs, imgUrl)
+		log.Printf("[INFO] Bot(%v) GuildId(%v) ChannelId(%v) -> %v\n%v", botId, guildId, channelId, show, gs)
 		return RetChannelStuct{
 			RetVal: MESSAGE_BLOCK,
 			ReplyMsg: &Msg{
 				Text: sc,
-				Image: imgUrl,
 			},
 			ReqType: GroupMsg,
 		}
