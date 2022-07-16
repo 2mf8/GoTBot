@@ -25,6 +25,11 @@ type Redis struct {
 	PoolSize int
 }
 
+type PluginConfig struct{
+	Conf []string
+	ChannelConf []string
+}
+
 func StartsWith(s, prefix string) bool {
 	return len(s) >= len(prefix) && s[:len(prefix)] == prefix
 }
@@ -50,9 +55,13 @@ func IsAdmin(bot *pbbot.Bot, groupId, userId int64) bool {
 	return false
 }
 
-func TbotConf() (conf []string, err error) {
+func TbotConf() (c PluginConfig, err error) {
 	_, err = toml.DecodeFile("conf.toml", Conf)
-	return Conf.Plugins, err
+	pc := PluginConfig{
+		Conf: Conf.Plugins,
+		ChannelConf: Conf.ChannelPlugins,
+	}
+	return pc, err
 }
 
 func IsBotAdmin(userId int64) bool {

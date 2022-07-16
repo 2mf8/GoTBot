@@ -36,12 +36,14 @@ func main() {
 
 	_, err := os.Stat("conf.toml")
 	if err != nil {
-		_ = ioutil.WriteFile("conf.toml", []byte("Plugins = [\"守卫\",\"屏蔽\",\"开关\",\"复读\",\"回复\",\"群管\",\"订阅\",\"查价\",\"打乱\",\"学习\"]   #插件管理\nAdmins = [2693678434]   #机器人管理员管理\nDatabaseUser = \"sa\"   #MSSQL数据库用户名\nDatabasePassword = \"wr@#kequ5060\"   #MSSQL数据库密码\nDatabasePort = 1433   #MSSQL数据库服务端口\nDatabaseServer = \"127.0.0.1\"   #MSSQL数据库服务网址\nServerPort = 8081   #服务端口\nScrambleServer = \"http://localhost:2014\"   #打乱服务地址"), 0644)
+		_ = ioutil.WriteFile("conf.toml", []byte("Plugins = [\"守卫\",\"屏蔽\",\"开关\",\"复读\",\"回复\",\"群管\",\"订阅\",\"查价\",\"打乱\",\"学习\"]   #插件管理\nChannelPlugins = [\"守卫\",\"屏蔽\",\"开关\",\"复读\",\"回复\",\"订阅\",\"查价\",\"打乱\",\"学习\"]   #频道插件管理\nAdmins = [2693678434]   #机器人管理员管理\nDatabaseUser = \"sa\"   #MSSQL数据库用户名\nDatabasePassword = \"wr@#kequ5060\"   #MSSQL数据库密码\nDatabasePort = 1433   #MSSQL数据库服务端口\nDatabaseServer = \"127.0.0.1\"   #MSSQL数据库服务网址\nServerPort = 8081   #服务端口\nScrambleServer = \"http://localhost:2014\"   #打乱服务地址"), 0644)
 	}
 
 	plugin, _ := TbotConf()
-	pluginString := fmt.Sprintf("%s", plugin)
+	pluginString := fmt.Sprintf("%s", plugin.Conf)
+	channelPluginString := fmt.Sprintf("%s", plugin.ChannelConf)
 	fmt.Fprintf(color.Output, "%s %s", color.CyanString("[INFO] 已加载插件"), color.HiMagentaString(pluginString))
+	fmt.Fprintf(color.Output, "%s %s", color.CyanString("\n[INFO] 已加载频道插件"), color.HiMagentaString(channelPluginString))
 
 	pbbot.HandleConnect = func(bot *pbbot.Bot) {
 		fmt.Printf("\n[连接] 新机器人已连接：%d\n", bot.BotId)
@@ -110,6 +112,49 @@ func main() {
 		}
 	}
 
+	pbbot.HandleChannelMessage = func(bot *pbbot.Bot, event *onebot.ChannelMessageEvent) {
+		rand.Seed(time.Now().UnixNano())
+		guildId := event.GuildId
+		channelId := event.ChannelId
+		rawMsg := event.RawMessage
+		botId := bot.BotId
+		botChannelId := event.SelfId
+		userId := event.Sender.TinyId
+		card := event.Sender.Nickname
+		super := IsBotAdmin(int64(event.Sender.TinyId))
+		success := rand.Intn(101)
+		delete := rand.Intn(101) + 200
+		failure := rand.Intn(101) + 400
+
+		log.Printf("[INFO] Bot(%v) GuildId(%v) ChannelId(%v) <- %v", botId, guildId, channelId, rawMsg)
+
+		log.Println(int64(userId))
+
+		ctx := context.WithValue(context.Background(), "key", "value")
+		sg, _ := SGBGI(int64(channelId))
+		for _, i := range plugin.ChannelConf {
+			intent := sg.PluginSwitch.IsCloseOrGuard & int64(PluginNameToIntent(i))
+			if intent == int64(PluginReply) {
+				break
+			}
+			if intent > 0 {
+				continue
+			}
+			retStuct := ChannelPluginSet[i].ChannelDo(&ctx, botId, botChannelId, guildId, channelId, userId, rawMsg, card, super, success, delete, failure)
+			if retStuct.RetVal == MESSAGE_BLOCK {
+				log.Println(retStuct.ReplyMsg.Text)
+				if retStuct.ReplyMsg != nil {
+					newMsg := pbbot.NewMsg().Text(retStuct.ReplyMsg.Text)
+					if retStuct.ReplyMsg.Image != "" {
+						newMsg = newMsg.Image(retStuct.ReplyMsg.Image)
+					}
+					bot.SendChannelMessage(guildId, channelId, newMsg, false)
+				}
+				break
+			}
+		}
+	}
+
 	pbbot.HandleGroupMessage = func(bot *pbbot.Bot, event *onebot.GroupMessageEvent) {
 		groupId := event.GroupId
 		rawMsg := event.RawMessage
@@ -153,7 +198,7 @@ func main() {
 		log.Printf("[INFO] Bot(%v) Group(%v) <- %v", botId, groupId, rawMsg)
 		ctx := context.WithValue(context.Background(), "key", "value")
 		sg, _ := SGBGI(groupId)
-		for _, i := range plugin {
+		for _, i := range plugin.Conf {
 			intent := sg.PluginSwitch.IsCloseOrGuard & int64(PluginNameToIntent(i))
 			if intent == int64(PluginReply) {
 				break

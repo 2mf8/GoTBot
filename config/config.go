@@ -2,6 +2,7 @@ package config
 
 type Config struct {
 	Plugins          []string
+	ChannelPlugins   []string
 	Admins           []int64
 	DatabaseUser     string
 	DatabasePassword string
