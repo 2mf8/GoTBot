@@ -151,13 +151,11 @@ func main() {
 			}
 			retStuct := utils.ChannelPluginSet[i].ChannelDo(&ctx, botId, botChannelId, guildId, channelId, userId, rawMsg, card, super, userRole, success, delete, failure)
 			if retStuct.RetVal == utils.MESSAGE_BLOCK {
-				log.Println(retStuct.ReplyMsg.Text)
 				if retStuct.ReplyMsg != nil {
 					newMsg := pbbot.NewMsg().Text(retStuct.ReplyMsg.Text)
 					if retStuct.ReplyMsg.Image != "" {
 						newMsg = newMsg.Image(retStuct.ReplyMsg.Image)
 					}
-					log.Println(newMsg)
 					bot.SendChannelMessage(guildId, channelId, newMsg, false)
 				}
 				break

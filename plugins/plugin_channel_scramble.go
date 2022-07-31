@@ -43,7 +43,7 @@ func (scramble *CScramblePlugin) ChannelDo(ctx *context.Context, botId, botChann
 			gs = strings.Replace(gs, "U ", "U\n", -1)
 			gs = strings.Replace(gs, "#", "U'", -1)
 		}
-		imgUrl := "http://www.2mf8.cn:2014/view/" + shor + ".png?scramble=" + url.QueryEscape(strings.Replace(gs, "\n", " ", -1))
+		imgUrl := "http://localhost:2014/view/" + shor + ".png?scramble=" + url.QueryEscape(strings.Replace(gs, "\n", " ", -1))
 		sc := show + "\n" + gs
 		log.Printf("[INFO] Bot(%v) GuildId(%v) ChannelId(%v) -> %v\n%v\n<guild_image file=\"%v\" url=\"%v\" />", botId, guildId, channelId, show, gs, shor+".png", imgUrl)
 		return RetChannelStuct{
