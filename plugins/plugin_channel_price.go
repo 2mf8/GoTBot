@@ -13,7 +13,7 @@ import (
 
 type CPricePlugin struct {
 }
-func (price *CPricePlugin) ChannelDo(ctx *context.Context, botId, botChannelId int64, guildId, channelId, userId uint64, rawMsg, card string, super bool, rs, rd, rf int) (retStuct RetChannelStuct){
+func (price *CPricePlugin) ChannelDo(ctx *context.Context, botId, botChannelId int64, guildId, channelId, userId uint64, rawMsg, card string, super, userRole bool, rs, rd, rf int) (retStuct RetChannelStuct){
 
 	reg1 := regexp.MustCompile("％")
 	reg2 := regexp.MustCompile("＃")
@@ -56,7 +56,7 @@ func (price *CPricePlugin) ChannelDo(ctx *context.Context, botId, botChannelId i
 		log.Printf("[INFO] Bot(%v) GuildId(%v) ChannelId(%v) -> %v", botId, guildId, channelId, replyText)
 		return RetChannelStuct{
 			RetVal: MESSAGE_BLOCK,
-			ReplyMsg: &Msg{
+			ReplyMsg: &ChannelMsg{
 					Text: replyText,
 				},
 			ReqType: GroupMsg,
@@ -66,7 +66,7 @@ func (price *CPricePlugin) ChannelDo(ctx *context.Context, botId, botChannelId i
 		log.Printf("[INFO] Bot(%v) GuildId(%v) ChannelId(%v) -> %v", botId, guildId, channelId, psc)
 		return RetChannelStuct{
 			RetVal: MESSAGE_BLOCK,
-			ReplyMsg: &Msg{
+			ReplyMsg: &ChannelMsg{
 					Text: psc,
 				},
 			ReqType: GroupMsg,

@@ -12,10 +12,10 @@ import (
 
 	"github.com/2mf8/GoPbBot"
 	"github.com/2mf8/GoPbBot/proto_gen/onebot"
-	. "github.com/2mf8/GoTBot/data"
+	"github.com/2mf8/GoTBot/data"
 	_ "github.com/2mf8/GoTBot/plugins"
-	. "github.com/2mf8/GoTBot/public"
-	. "github.com/2mf8/GoTBot/utils"
+	"github.com/2mf8/GoTBot/public"
+	"github.com/2mf8/GoTBot/utils"
 	"github.com/fatih/color"
 	"github.com/gin-gonic/gin"
 	cron "github.com/robfig/cron"
@@ -39,7 +39,7 @@ func main() {
 		_ = ioutil.WriteFile("conf.toml", []byte("Plugins = [\"守卫\",\"屏蔽\",\"开关\",\"复读\",\"回复\",\"群管\",\"订阅\",\"查价\",\"打乱\",\"学习\"]   #插件管理\nChannelPlugins = [\"守卫\",\"屏蔽\",\"开关\",\"复读\",\"回复\",\"订阅\",\"查价\",\"打乱\",\"学习\"]   #频道插件管理\nAdmins = [2693678434]   #机器人管理员管理\nDatabaseUser = \"sa\"   #MSSQL数据库用户名\nDatabasePassword = \"wr@#kequ5060\"   #MSSQL数据库密码\nDatabasePort = 1433   #MSSQL数据库服务端口\nDatabaseServer = \"127.0.0.1\"   #MSSQL数据库服务网址\nServerPort = 8081   #服务端口\nScrambleServer = \"http://localhost:2014\"   #打乱服务地址"), 0644)
 	}
 
-	plugin, _ := TbotConf()
+	plugin, _ := public.TbotConf()
 	pluginString := fmt.Sprintf("%s", plugin.Conf)
 	channelPluginString := fmt.Sprintf("%s", plugin.ChannelConf)
 	fmt.Fprintf(color.Output, "%s %s", color.CyanString("[INFO] 已加载插件"), color.HiMagentaString(pluginString))
@@ -65,7 +65,7 @@ func main() {
 		//userId := event.UserId
 		invitor_uin, _ := strconv.Atoi(event.Extra["invitor_uin"])
 		botId := bot.BotId
-		if IsBotAdmin(int64(invitor_uin)) {
+		if public.IsBotAdmin(int64(invitor_uin)) {
 			bot.SetGroupAddRequest(event.Flag, event.SubType, true, "")
 			log.Printf("[INFO] Bot(%v) Invitor(%v) -- 机器人加群 %v", botId, invitor_uin, true)
 		}
@@ -110,6 +110,16 @@ func main() {
 			poke := pbbot.NewMsg().Poke(event.UserId)
 			bot.SendPrivateMessage(event.UserId, poke, false)
 		}
+		if event.RawMessage == "延时撤回" {
+			resp, err := bot.SendPrivateMessage(event.UserId, pbbot.NewMsg().Text("撤回测试"), false)
+			if err != nil {
+				fmt.Println(err)
+			}
+			if resp != nil {
+				time.Sleep(10 * time.Second)
+			}
+			bot.DeleteMsg(resp.MessageId)
+		}
 	}
 
 	pbbot.HandleChannelMessage = func(bot *pbbot.Bot, event *onebot.ChannelMessageEvent) {
@@ -121,33 +131,33 @@ func main() {
 		botChannelId := event.SelfId
 		userId := event.Sender.TinyId
 		card := event.Sender.Nickname
-		super := IsBotAdmin(int64(event.Sender.TinyId))
+		userRole := public.IsGuildAdmin(event.Sender.RoleNames)
+		super := public.IsBotAdmin(int64(event.Sender.TinyId))
 		success := rand.Intn(101)
 		delete := rand.Intn(101) + 200
 		failure := rand.Intn(101) + 400
 
 		log.Printf("[INFO] Bot(%v) GuildId(%v) ChannelId(%v) <- %v", botId, guildId, channelId, rawMsg)
 
-		log.Println(int64(userId))
-
 		ctx := context.WithValue(context.Background(), "key", "value")
-		sg, _ := SGBGI(int64(channelId))
+		sg, _ := data.SGBGI(int64(channelId))
 		for _, i := range plugin.ChannelConf {
-			intent := sg.PluginSwitch.IsCloseOrGuard & int64(PluginNameToIntent(i))
-			if intent == int64(PluginReply) {
+			intent := sg.PluginSwitch.IsCloseOrGuard & int64(data.PluginNameToIntent(i))
+			if intent == int64(data.PluginReply) {
 				break
 			}
 			if intent > 0 {
 				continue
 			}
-			retStuct := ChannelPluginSet[i].ChannelDo(&ctx, botId, botChannelId, guildId, channelId, userId, rawMsg, card, super, success, delete, failure)
-			if retStuct.RetVal == MESSAGE_BLOCK {
+			retStuct := utils.ChannelPluginSet[i].ChannelDo(&ctx, botId, botChannelId, guildId, channelId, userId, rawMsg, card, super, userRole, success, delete, failure)
+			if retStuct.RetVal == utils.MESSAGE_BLOCK {
 				log.Println(retStuct.ReplyMsg.Text)
 				if retStuct.ReplyMsg != nil {
 					newMsg := pbbot.NewMsg().Text(retStuct.ReplyMsg.Text)
 					if retStuct.ReplyMsg.Image != "" {
 						newMsg = newMsg.Image(retStuct.ReplyMsg.Image)
 					}
+					log.Println(newMsg)
 					bot.SendChannelMessage(guildId, channelId, newMsg, false)
 				}
 				break
@@ -162,18 +172,25 @@ func main() {
 		botId := bot.BotId
 		userId := event.UserId
 		card := event.Sender.Card
-		userRole := IsAdmin(bot, groupId, userId)
-		botRole := IsAdmin(bot, groupId, botId)
-		super := IsBotAdmin(userId)
+		userRole := public.IsAdmin(bot, groupId, userId)
+		botRole := public.IsAdmin(bot, groupId, botId)
+		super := public.IsBotAdmin(userId)
 		rand.Seed(time.Now().UnixNano())
 		success := rand.Intn(101)
 		delete := rand.Intn(101) + 200
 		failure := rand.Intn(101) + 400
 
-		if IsBotAdmin(userId) && rawMsg == "打卡" {
-			bot.SetGroupSignIn(groupId)
+		if public.IsBotAdmin(userId) && rawMsg == "撤回打卡" {
+			//bot.SetGroupSignIn(groupId)
 			reply := pbbot.NewMsg().Text("打卡成功")
-			bot.SendGroupMessage(groupId, reply, false)
+			resp, err := bot.SendGroupMessage(groupId, reply, false)
+			if err != nil {
+				fmt.Println(err)
+			}
+			if resp != nil {
+				time.Sleep(20 * time.Second)
+			}
+			bot.DeleteMsg(resp.MessageId)
 		}
 		if rawMsg == "poke me" && super {
 			poke := pbbot.NewMsg().Poke(userId)
@@ -197,18 +214,18 @@ func main() {
 
 		log.Printf("[INFO] Bot(%v) Group(%v) <- %v", botId, groupId, rawMsg)
 		ctx := context.WithValue(context.Background(), "key", "value")
-		sg, _ := SGBGI(groupId)
+		sg, _ := data.SGBGI(groupId)
 		for _, i := range plugin.Conf {
-			intent := sg.PluginSwitch.IsCloseOrGuard & int64(PluginNameToIntent(i))
-			if intent == int64(PluginReply) {
+			intent := sg.PluginSwitch.IsCloseOrGuard & int64(data.PluginNameToIntent(i))
+			if intent == int64(data.PluginReply) {
 				break
 			}
 			if intent > 0 {
 				continue
 			}
-			retStuct := PluginSet[i].Do(&ctx, botId, groupId, userId, messageId, rawMsg, card, botRole, userRole, super, success, delete, failure)
-			if retStuct.RetVal == MESSAGE_BLOCK {
-				if retStuct.ReqType == GroupMsg {
+			retStuct := utils.PluginSet[i].Do(&ctx, botId, groupId, userId, messageId, rawMsg, card, botRole, userRole, super, success, delete, failure)
+			if retStuct.RetVal == utils.MESSAGE_BLOCK {
+				if retStuct.ReqType == utils.GroupMsg {
 					log.Println(retStuct.ReplyMsg.Text)
 					if retStuct.ReplyMsg != nil {
 						newMsg := pbbot.NewMsg().Text(retStuct.ReplyMsg.Text)
@@ -219,7 +236,7 @@ func main() {
 					}
 					break
 				}
-				if retStuct.ReqType == GroupBan {
+				if retStuct.ReqType == utils.GroupBan {
 					if retStuct.BanId == 0 {
 						if retStuct.ReplyMsg != nil {
 							newMsg := pbbot.NewMsg().Text(retStuct.ReplyMsg.Text)
@@ -237,7 +254,7 @@ func main() {
 						break
 					}
 				}
-				if retStuct.ReqType == RelieveBan {
+				if retStuct.ReqType == utils.RelieveBan {
 					if retStuct.BanId == 0 {
 						break
 					} else {
@@ -245,7 +262,7 @@ func main() {
 						break
 					}
 				}
-				if retStuct.ReqType == GroupKick {
+				if retStuct.ReqType == utils.GroupKick {
 					bot.SetGroupKick(groupId, userId, retStuct.RejectAddAgain)
 					if retStuct.ReplyMsg != nil {
 						newMsg := pbbot.NewMsg().Text(retStuct.ReplyMsg.Text)
@@ -253,7 +270,7 @@ func main() {
 					}
 					break
 				}
-				if retStuct.ReqType == GroupSignIn {
+				if retStuct.ReqType == utils.GroupSignIn {
 					bot.SetGroupSignIn(groupId)
 					if retStuct.ReplyMsg != nil {
 						newMsg := pbbot.NewMsg().Text(retStuct.ReplyMsg.Text)
@@ -261,7 +278,7 @@ func main() {
 					}
 					break
 				}
-				if retStuct.ReqType == GroupLeave {
+				if retStuct.ReqType == utils.GroupLeave {
 					bot.SetGroupLeave(groupId, false)
 					if retStuct.ReplyMsg != nil {
 						newMsg := pbbot.NewMsg().Text(retStuct.ReplyMsg.Text)
@@ -269,7 +286,7 @@ func main() {
 					}
 					break
 				}
-				if retStuct.ReqType == DeleteMsg {
+				if retStuct.ReqType == utils.DeleteMsg {
 					bot.DeleteMsg(retStuct.MessageId)
 					if retStuct.ReplyMsg != nil {
 						newMsg := pbbot.NewMsg().Text(retStuct.ReplyMsg.Text)

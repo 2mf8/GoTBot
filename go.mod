@@ -3,7 +3,7 @@ module github.com/2mf8/GoTBot
 go 1.18
 
 require (
-	github.com/2mf8/GoPbBot v0.0.0-20220715153642-65aa46ad1202
+	github.com/2mf8/GoPbBot v0.0.0-20220731085848-13dc690e26a1
 	github.com/BurntSushi/toml v1.1.0
 	github.com/denisenkom/go-mssqldb v0.12.2
 	github.com/fatih/color v1.13.0

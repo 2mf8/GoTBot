@@ -16,7 +16,7 @@ import (
 type CLearnPlugin struct {
 }
 
-func (learnPlugin *CLearnPlugin) ChannelDo(ctx *context.Context, botId, botChannelId int64, guildId, channelId, userId uint64, rawMsg, card string, super bool, rs, rd, rf int) (retStuct RetChannelStuct) {
+func (learnPlugin *CLearnPlugin) ChannelDo(ctx *context.Context, botId, botChannelId int64, guildId, channelId, userId uint64, rawMsg, card string, super, userRole bool, rs, rd, rf int) (retStuct RetChannelStuct) {
 
 	s, b := Prefix(rawMsg, ".")
 	if !b {
@@ -31,7 +31,7 @@ func (learnPlugin *CLearnPlugin) ChannelDo(ctx *context.Context, botId, botChann
 		log.Printf("[守卫] Bot(%v) GuildId(%v) ChannelId(%v) -> %v", botId, guildId, channelId, msg)
 		return RetChannelStuct{
 			RetVal: MESSAGE_BLOCK,
-			ReplyMsg: &Msg{
+			ReplyMsg: &ChannelMsg{
 					Text: msg,
 				},
 			ReqType: GroupMsg,
@@ -39,7 +39,7 @@ func (learnPlugin *CLearnPlugin) ChannelDo(ctx *context.Context, botId, botChann
 	}
 	reg1 := regexp.MustCompile("＃")
 	str1 := strings.TrimSpace(reg1.ReplaceAllString(s, "#"))
-	if StartsWith(str1, "#+") && super {
+	if StartsWith(str1, "#+") && (super || userRole) {
 		//if StartsWith(str1, "#+") && super {
 		str2 := strings.TrimSpace(strings.TrimPrefix(str1, "#+"))
 		str3 := strings.Split(str2, "##")
@@ -49,7 +49,7 @@ func (learnPlugin *CLearnPlugin) ChannelDo(ctx *context.Context, botId, botChann
 				log.Printf("[INFO] Bot(%v) GuildId(%v) ChannelId(%v) -> %v", botId, guildId, channelId, replyText)		
 				return RetChannelStuct{
 					RetVal: MESSAGE_BLOCK,
-					ReplyMsg: &Msg{
+					ReplyMsg: &ChannelMsg{
 					Text: replyText,
 				},
 					ReqType: GroupMsg,
@@ -61,7 +61,7 @@ func (learnPlugin *CLearnPlugin) ChannelDo(ctx *context.Context, botId, botChann
 				log.Printf("[INFO] Bot(%v) GuildId(%v) ChannelId(%v) -> %v", botId, guildId, channelId, replyText)
 				return RetChannelStuct{
 					RetVal: MESSAGE_BLOCK,
-					ReplyMsg: &Msg{
+					ReplyMsg: &ChannelMsg{
 					Text: replyText,
 				},
 					ReqType: GroupMsg,
@@ -71,7 +71,7 @@ func (learnPlugin *CLearnPlugin) ChannelDo(ctx *context.Context, botId, botChann
 			log.Printf("[INFO] Bot(%v) GuildId(%v) ChannelId(%v) -> %v", botId, guildId, channelId, replyText)
 			return RetChannelStuct{
 				RetVal: MESSAGE_BLOCK,
-				ReplyMsg: &Msg{
+				ReplyMsg: &ChannelMsg{
 					Text: replyText,
 				},
 				ReqType: GroupMsg,
@@ -82,7 +82,7 @@ func (learnPlugin *CLearnPlugin) ChannelDo(ctx *context.Context, botId, botChann
 			log.Printf("[INFO] Bot(%v) GuildId(%v) ChannelId(%v) -> %v", botId, guildId, channelId, replyText)
 			return RetChannelStuct{
 				RetVal: MESSAGE_BLOCK,
-				ReplyMsg: &Msg{
+				ReplyMsg: &ChannelMsg{
 					Text: replyText,
 				},
 				ReqType: GroupMsg,
@@ -94,7 +94,7 @@ func (learnPlugin *CLearnPlugin) ChannelDo(ctx *context.Context, botId, botChann
 			log.Printf("[INFO] Bot(%v) GuildId(%v) ChannelId(%v) -> %v", botId, guildId, channelId, replyText)
 			return RetChannelStuct{
 				RetVal: MESSAGE_BLOCK,
-				ReplyMsg: &Msg{
+				ReplyMsg: &ChannelMsg{
 					Text: replyText,
 				},
 				ReqType: GroupMsg,
@@ -104,7 +104,7 @@ func (learnPlugin *CLearnPlugin) ChannelDo(ctx *context.Context, botId, botChann
 		log.Printf("[INFO] Bot(%v) GuildId(%v) ChannelId(%v) -> %v", botId, guildId, channelId, replyText)
 		return RetChannelStuct{
 			RetVal: MESSAGE_BLOCK,
-			ReplyMsg: &Msg{
+			ReplyMsg: &ChannelMsg{
 					Text: replyText,
 				},
 			ReqType: GroupMsg,
@@ -119,7 +119,7 @@ func (learnPlugin *CLearnPlugin) ChannelDo(ctx *context.Context, botId, botChann
 				log.Printf("[INFO] Bot(%v) GuildId(%v) ChannelId(%v) -> %v", botId, guildId, channelId, replyText)
 				return RetChannelStuct{
 					RetVal: MESSAGE_BLOCK,
-					ReplyMsg: &Msg{
+					ReplyMsg: &ChannelMsg{
 					Text: replyText,
 				},
 					ReqType: GroupMsg,
@@ -131,7 +131,7 @@ func (learnPlugin *CLearnPlugin) ChannelDo(ctx *context.Context, botId, botChann
 				log.Printf("[INFO] Bot(%v) GuildId(%v) ChannelId(%v) -> %v", botId, guildId, channelId, replyText)
 				return RetChannelStuct{
 					RetVal: MESSAGE_BLOCK,
-					ReplyMsg: &Msg{
+					ReplyMsg: &ChannelMsg{
 					Text: replyText,
 				},
 					ReqType: GroupMsg,
@@ -141,7 +141,7 @@ func (learnPlugin *CLearnPlugin) ChannelDo(ctx *context.Context, botId, botChann
 			log.Printf("[INFO] Bot(%v) GuildId(%v) ChannelId(%v) -> %v", botId, guildId, channelId, replyText)
 			return RetChannelStuct{
 				RetVal: MESSAGE_BLOCK,
-				ReplyMsg: &Msg{
+				ReplyMsg: &ChannelMsg{
 					Text: replyText,
 				},
 				ReqType: GroupMsg,
@@ -152,7 +152,7 @@ func (learnPlugin *CLearnPlugin) ChannelDo(ctx *context.Context, botId, botChann
 			log.Printf("[INFO] Bot(%v) GuildId(%v) ChannelId(%v) -> %v", botId, guildId, channelId, replyText)
 			return RetChannelStuct{
 				RetVal: MESSAGE_BLOCK,
-				ReplyMsg: &Msg{
+				ReplyMsg: &ChannelMsg{
 					Text: replyText,
 				},
 				ReqType: GroupMsg,
@@ -164,7 +164,7 @@ func (learnPlugin *CLearnPlugin) ChannelDo(ctx *context.Context, botId, botChann
 			log.Printf("[INFO] Bot(%v) GuildId(%v) ChannelId(%v) -> %v", botId, guildId, channelId, replyText)
 			return RetChannelStuct{
 				RetVal: MESSAGE_BLOCK,
-				ReplyMsg: &Msg{
+				ReplyMsg: &ChannelMsg{
 					Text: replyText,
 				},
 				ReqType: GroupMsg,
@@ -174,7 +174,7 @@ func (learnPlugin *CLearnPlugin) ChannelDo(ctx *context.Context, botId, botChann
 		log.Printf("[INFO] Bot(%v) GuildId(%v) ChannelId(%v) -> %v", botId, guildId, channelId, replyText)
 		return RetChannelStuct{
 			RetVal: MESSAGE_BLOCK,
-			ReplyMsg: &Msg{
+			ReplyMsg: &ChannelMsg{
 					Text: replyText,
 				},
 			ReqType: GroupMsg,
@@ -185,7 +185,7 @@ func (learnPlugin *CLearnPlugin) ChannelDo(ctx *context.Context, botId, botChann
 		log.Printf("[INFO] Bot(%v) GuildId(%v) ChannelId(%v) -> %v", botId, guildId, channelId, replyText)
 		return RetChannelStuct{
 			RetVal: MESSAGE_BLOCK,
-			ReplyMsg: &Msg{
+			ReplyMsg: &ChannelMsg{
 					Text: replyText,
 				},
 			ReqType: GroupMsg,
@@ -199,7 +199,7 @@ func (learnPlugin *CLearnPlugin) ChannelDo(ctx *context.Context, botId, botChann
 			log.Printf("[INFO] Bot(%v) GuildId(%v) ChannelId(%v) -> %v", botId, guildId, channelId, sys_learn_get.LearnSync.Answer.String)
 			return RetChannelStuct{
 				RetVal: MESSAGE_BLOCK,
-				ReplyMsg: &Msg{
+				ReplyMsg: &ChannelMsg{
 					Text: sys_learn_get.LearnSync.Answer.String,
 				},
 				ReqType: GroupMsg,
@@ -210,7 +210,7 @@ func (learnPlugin *CLearnPlugin) ChannelDo(ctx *context.Context, botId, botChann
 		log.Printf("[INFO] Bot(%v) GuildId(%v) ChannelId(%v) -> %v", botId, guildId, channelId, learn_get.LearnSync.Answer.String)
 		return RetChannelStuct{
 			RetVal: MESSAGE_BLOCK,
-			ReplyMsg: &Msg{
+			ReplyMsg: &ChannelMsg{
 					Text: learn_get.LearnSync.Answer.String,
 				},
 			ReqType: GroupMsg,

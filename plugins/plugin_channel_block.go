@@ -15,7 +15,7 @@ import (
 
 type ChannelBlock struct{}
 
-func (block *ChannelBlock) ChannelDo(ctx *context.Context, botId, botChannelId int64, guildId, channelId, userId uint64, rawMsg, card string, super bool, rs, rd, rf int) (retStuct RetChannelStuct){
+func (block *ChannelBlock) ChannelDo(ctx *context.Context, botId, botChannelId int64, guildId, channelId, userId uint64, rawMsg, card string, super, userRole bool, rs, rd, rf int) (retStuct RetChannelStuct){
 
 	ispblock, err := PBlockGet(int64(userId))
 	//fmt.Println(ispblock)
@@ -54,7 +54,7 @@ func (block *ChannelBlock) ChannelDo(ctx *context.Context, botId, botChannelId i
 			log.Printf("[INFO] Bot(%v) GuildId(%v) ChannelId(%v) -> %v", botId, guildId, channelId, replyMsg)
 			return RetChannelStuct{
 				RetVal: MESSAGE_BLOCK,
-				ReplyMsg: &Msg{
+				ReplyMsg: &ChannelMsg{
 					Text: replyMsg,
 				},
 				ReqType: GroupMsg,
@@ -66,7 +66,7 @@ func (block *ChannelBlock) ChannelDo(ctx *context.Context, botId, botChannelId i
 			log.Printf("[INFO] Bot(%v) GuildId(%v) ChannelId(%v) -> %v", botId, guildId, channelId, replyMsg)
 			return RetChannelStuct{
 				RetVal: MESSAGE_BLOCK,
-				ReplyMsg: &Msg{
+				ReplyMsg: &ChannelMsg{
 					Text: replyMsg,
 				},
 				ReqType: GroupMsg,
@@ -76,7 +76,7 @@ func (block *ChannelBlock) ChannelDo(ctx *context.Context, botId, botChannelId i
 		log.Printf("[INFO] Bot(%v) GuildId(%v) ChannelId(%v) -> %v", botId, guildId, channelId, replyMsg)
 		return RetChannelStuct{
 			RetVal: MESSAGE_BLOCK,
-			ReplyMsg: &Msg{
+			ReplyMsg: &ChannelMsg{
 				Text: replyMsg,
 			},
 			ReqType: GroupMsg,
@@ -89,7 +89,7 @@ func (block *ChannelBlock) ChannelDo(ctx *context.Context, botId, botChannelId i
 			log.Printf("[INFO] Bot(%v) GuildId(%v) ChannelId(%v) -> %v", botId, guildId, channelId, replyMsg)
 			return RetChannelStuct{
 				RetVal: MESSAGE_BLOCK,
-				ReplyMsg: &Msg{
+				ReplyMsg: &ChannelMsg{
 					Text: replyMsg,
 				},
 				ReqType: GroupMsg,
@@ -101,7 +101,7 @@ func (block *ChannelBlock) ChannelDo(ctx *context.Context, botId, botChannelId i
 			log.Printf("[INFO] Bot(%v) GuildId(%v) ChannelId(%v) -> %v", botId, guildId, channelId, replyMsg)
 			return RetChannelStuct{
 				RetVal: MESSAGE_BLOCK,
-				ReplyMsg: &Msg{
+				ReplyMsg: &ChannelMsg{
 					Text: replyMsg,
 				},
 				ReqType: GroupMsg,
@@ -111,7 +111,7 @@ func (block *ChannelBlock) ChannelDo(ctx *context.Context, botId, botChannelId i
 		log.Printf("[INFO] Bot(%v) GuildId(%v) ChannelId(%v) -> %v", botId, guildId, channelId, replyMsg)
 		return RetChannelStuct{
 				RetVal: MESSAGE_BLOCK,
-				ReplyMsg: &Msg{
+				ReplyMsg: &ChannelMsg{
 					Text: replyMsg,
 				},
 				ReqType: GroupMsg,

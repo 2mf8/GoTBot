@@ -55,6 +55,14 @@ func IsAdmin(bot *pbbot.Bot, groupId, userId int64) bool {
 	return false
 }
 
+func IsGuildAdmin(role []string) bool {
+	if role == nil {
+		return false
+	} else {
+		return true
+	}
+}
+
 func TbotConf() (c PluginConfig, err error) {
 	_, err = toml.DecodeFile("conf.toml", Conf)
 	pc := PluginConfig{

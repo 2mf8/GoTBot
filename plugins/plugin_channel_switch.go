@@ -13,7 +13,7 @@ import (
 type CBotSwitch struct {
 }
 
-func (botSwitch *CBotSwitch) ChannelDo(ctx *context.Context, botId, botChannelId int64, guildId, channelId, userId uint64, rawMsg, card string, super bool, rs, rd, rf int) (retStuct RetChannelStuct){
+func (botSwitch *CBotSwitch) ChannelDo(ctx *context.Context, botId, botChannelId int64, guildId, channelId, userId uint64, rawMsg, card string, super, userRole bool, rs, rd, rf int) (retStuct RetChannelStuct){
 
 	s, b := Prefix(rawMsg, ".")
 	if !b {
@@ -22,7 +22,7 @@ func (botSwitch *CBotSwitch) ChannelDo(ctx *context.Context, botId, botChannelId
 		}
 	}
 
-	if StartsWith(s, "开启") && super {
+	if StartsWith(s, "开启") && (super || userRole) {
 		s = strings.TrimSpace(strings.TrimPrefix(s, "开启"))
 		if s == "开关" {
 			log.Println("[开关] 不支持开启或关闭")
@@ -38,7 +38,7 @@ func (botSwitch *CBotSwitch) ChannelDo(ctx *context.Context, botId, botChannelId
 			
 			return RetChannelStuct{
 				RetVal: MESSAGE_BLOCK,
-				ReplyMsg: &Msg{
+				ReplyMsg: &ChannelMsg{
 					Text: reply,
 				},
 				ReqType: GroupMsg,
@@ -51,7 +51,7 @@ func (botSwitch *CBotSwitch) ChannelDo(ctx *context.Context, botId, botChannelId
 			
 			return RetChannelStuct{
 				RetVal: MESSAGE_BLOCK,
-				ReplyMsg: &Msg{
+				ReplyMsg: &ChannelMsg{
 					Text: reply,
 				},
 				ReqType: GroupMsg,
@@ -62,7 +62,7 @@ func (botSwitch *CBotSwitch) ChannelDo(ctx *context.Context, botId, botChannelId
 			
 			return RetChannelStuct{
 				RetVal: MESSAGE_BLOCK,
-				ReplyMsg: &Msg{
+				ReplyMsg: &ChannelMsg{
 					Text: reply,
 				},
 				ReqType: GroupMsg,
@@ -70,7 +70,7 @@ func (botSwitch *CBotSwitch) ChannelDo(ctx *context.Context, botId, botChannelId
 		}
 	}
 
-	if StartsWith(s, "关闭") && super {
+	if StartsWith(s, "关闭") && (super || userRole) {
 		s = strings.TrimSpace(strings.TrimPrefix(s, "关闭"))
 		if s == "开关" {
 			log.Println("[开关] 不支持开启或关闭")
@@ -85,7 +85,7 @@ func (botSwitch *CBotSwitch) ChannelDo(ctx *context.Context, botId, botChannelId
 			log.Printf("[INFO] Bot(%v) GuildId(%v) ChannelId(%v) -> %v", botId, guildId, channelId, rawMsg)
 			return RetChannelStuct{
 				RetVal: MESSAGE_BLOCK,
-				ReplyMsg: &Msg{
+				ReplyMsg: &ChannelMsg{
 					Text: reply,
 				},
 				ReqType: GroupMsg,
@@ -97,7 +97,7 @@ func (botSwitch *CBotSwitch) ChannelDo(ctx *context.Context, botId, botChannelId
 			log.Printf("[INFO] Bot(%v) GuildId(%v) ChannelId(%v) -> %v", botId, guildId, channelId, rawMsg)
 			return RetChannelStuct{
 				RetVal: MESSAGE_BLOCK,
-				ReplyMsg: &Msg{
+				ReplyMsg: &ChannelMsg{
 					Text: reply,
 				},
 				ReqType: GroupMsg,
@@ -108,7 +108,7 @@ func (botSwitch *CBotSwitch) ChannelDo(ctx *context.Context, botId, botChannelId
 			
 			return RetChannelStuct{
 				RetVal: MESSAGE_BLOCK,
-				ReplyMsg: &Msg{
+				ReplyMsg: &ChannelMsg{
 					Text: reply,
 				},
 				ReqType: GroupMsg,

@@ -13,7 +13,7 @@ import (
 type ChannelGuard struct {
 }
 
-func (guard *ChannelGuard) ChannelDo(ctx *context.Context, botId, botChannelId int64, guildId, channelId, userId uint64, rawMsg, card string, super bool, rs, rd, rf int) (retStuct RetChannelStuct){
+func (guard *ChannelGuard) ChannelDo(ctx *context.Context, botId, botChannelId int64, guildId, channelId, userId uint64, rawMsg, card string, super, userRole bool, rs, rd, rf int) (retStuct RetChannelStuct){
 
 	ggk, _ := GetJudgeKeys()
 
@@ -28,7 +28,7 @@ func (guard *ChannelGuard) ChannelDo(ctx *context.Context, botId, botChannelId i
 		log.Printf("[守卫] Bot(%v) GuildId(%v) ChannelId(%v) -> %v", botId, guildId, channelId, msg)
 		return RetChannelStuct{
 			RetVal:   MESSAGE_BLOCK,
-			ReplyMsg: &Msg{
+			ReplyMsg: &ChannelMsg{
 					Text: msg,
 				},
 			ReqType:  GroupMsg,
@@ -43,7 +43,7 @@ func (guard *ChannelGuard) ChannelDo(ctx *context.Context, botId, botChannelId i
 		log.Printf("[守卫] Bot(%v) GuildId(%v) ChannelId(%v) -> %v", botId, guildId, channelId, msg)
 		return RetChannelStuct{
 			RetVal:   MESSAGE_BLOCK,
-			ReplyMsg: &Msg{
+			ReplyMsg: &ChannelMsg{
 					Text: msg,
 				},
 			ReqType:  GroupMsg,

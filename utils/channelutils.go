@@ -6,7 +6,7 @@ import (
 
 type RetChannelStuct struct {
 	RetVal    uint
-	ReplyMsg  *Msg
+	ReplyMsg  *ChannelMsg
 	ReqType   ReqType
 	MessageId uint64
 }
@@ -15,10 +15,11 @@ type ChannelMsg struct {
 	Text  string
 	At    bool
 	Image string
+	File  string
 }
 
 type ChannelPlugin interface {
-	ChannelDo(ctx *context.Context, botId, botChannelId int64, guildId, channelId, userId uint64, rawMsg, card string, super bool, rs, rd, rf int) (retStuct RetChannelStuct)
+	ChannelDo(ctx *context.Context, botId, botChannelId int64, guildId, channelId, userId uint64, rawMsg, card string, super, userRole bool, rs, rd, rf int) (retStuct RetChannelStuct)
 }
 
 var ChannelPluginSet map[string]ChannelPlugin

@@ -27,7 +27,7 @@ type CRepeat struct {
 * rd 删除防屏蔽码
 * rf 失败防屏蔽码
 */
-func (rep *CRepeat) ChannelDo(ctx *context.Context, botId, botChannelId int64, guildId, channelId, userId uint64, rawMsg, card string, super bool, rs, rd, rf int) (retStuct RetChannelStuct) {
+func (rep *CRepeat) ChannelDo(ctx *context.Context, botId, botChannelId int64, guildId, channelId, userId uint64, rawMsg, card string, super, userRole bool, rs, rd, rf int) (retStuct RetChannelStuct) {
 
 	rand.Seed(time.Now().UnixNano())
 	r := rand.Intn(101)
@@ -46,7 +46,7 @@ func (rep *CRepeat) ChannelDo(ctx *context.Context, botId, botChannelId int64, g
 		log.Printf("[INFO] Bot(%v) GuildId(%v) ChannelId(%v) -> %v", botId, guildId, channelId, rawMsg)
 		return RetChannelStuct{
 			RetVal: MESSAGE_BLOCK,
-			ReplyMsg: &Msg{
+			ReplyMsg: &ChannelMsg{
 				Text: rawMsg,
 			},
 			ReqType: GroupMsg,

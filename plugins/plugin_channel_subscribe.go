@@ -15,7 +15,7 @@ import (
 type CSub struct {
 }
 
-func (sub *CSub) ChannelDo(ctx *context.Context, botId, botChannelId int64, guildId, channelId, userId uint64, rawMsg, card string, super bool, rs, rd, rf int) (retStuct RetChannelStuct) {
+func (sub *CSub) ChannelDo(ctx *context.Context, botId, botChannelId int64, guildId, channelId, userId uint64, rawMsg, card string, super, userRole bool, rs, rd, rf int) (retStuct RetChannelStuct) {
 
 	s, b := Prefix(rawMsg, ".")
 	if !b {
@@ -32,7 +32,7 @@ func (sub *CSub) ChannelDo(ctx *context.Context, botId, botChannelId int64, guil
 		log.Printf("[INFO] Bot(%v) GuildId(%v) ChannelId(%v) -> %v", botId, guildId, channelId, reply)
 		return RetChannelStuct{
 				RetVal: MESSAGE_BLOCK,
-				ReplyMsg: &Msg{
+				ReplyMsg: &ChannelMsg{
 					Text: reply,
 				},
 				ReqType: GroupMsg,
@@ -44,7 +44,7 @@ func (sub *CSub) ChannelDo(ctx *context.Context, botId, botChannelId int64, guil
 		log.Printf("[INFO] Bot(%v) GuildId(%v) ChannelId(%v) -> %v", botId, guildId, channelId, reply)
 		return RetChannelStuct{
 				RetVal: MESSAGE_BLOCK,
-				ReplyMsg: &Msg{
+				ReplyMsg: &ChannelMsg{
 					Text: reply,
 				},
 				ReqType: GroupMsg,

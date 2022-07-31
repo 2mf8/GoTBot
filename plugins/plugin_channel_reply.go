@@ -8,7 +8,7 @@ import(
 type CReply struct{
 }
 
-func (rep *CReply) ChannelDo(ctx *context.Context, botId, botChannelId int64, guildId, channelId, userId uint64, rawMsg, card string, super bool, rs, rd, rf int) (retStuct RetChannelStuct) {
+func (rep *CReply) ChannelDo(ctx *context.Context, botId, botChannelId int64, guildId, channelId, userId uint64, rawMsg, card string, super, userRole bool, rs, rd, rf int) (retStuct RetChannelStuct) {
 	return RetChannelStuct{
 		RetVal: MESSAGE_IGNORE,
 	}
