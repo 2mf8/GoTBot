@@ -261,7 +261,10 @@ func main() {
 					}
 				}
 				if retStuct.ReqType == utils.GroupKick {
-					bot.SetGroupKick(groupId, userId, retStuct.RejectAddAgain)
+					if retStuct.BanId == 0 {
+						break
+					}
+					bot.SetGroupKick(groupId, retStuct.BanId, retStuct.RejectAddAgain)
 					if retStuct.ReplyMsg != nil {
 						newMsg := pbbot.NewMsg().Text(retStuct.ReplyMsg.Text)
 						bot.SendGroupMessage(groupId, newMsg, false)
