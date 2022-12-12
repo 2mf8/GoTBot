@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+
 	. "github.com/2mf8/GoTBot/data"
 	. "github.com/2mf8/GoTBot/public"
 	. "github.com/2mf8/GoTBot/utils"
@@ -13,13 +14,14 @@ import (
 
 type CPricePlugin struct {
 }
-func (price *CPricePlugin) ChannelDo(ctx *context.Context, botId, botChannelId int64, guildId, channelId, userId uint64, rawMsg, card string, super, userRole bool, rs, rd, rf int) (retStuct RetChannelStuct){
+
+func (price *CPricePlugin) ChannelDo(ctx *context.Context, botId, botChannelId int64, guildId, channelId, userId uint64, rawMsg, card string, super, userRole bool, rs, rd, rf int) (retStuct RetChannelStuct) {
 
 	reg1 := regexp.MustCompile("％")
 	reg2 := regexp.MustCompile("＃")
 	reg3 := regexp.MustCompile("＆")
 	reg4 := regexp.MustCompile("10001")
-	reg5 := regexp.MustCompile("560820998")
+	reg5 := regexp.MustCompile("10002")
 	str1 := strings.TrimSpace(reg1.ReplaceAllString(rawMsg, "%"))
 	str2 := strings.TrimSpace(reg2.ReplaceAllString(str1, "#"))
 	str3 := strings.TrimSpace(reg3.ReplaceAllString(str2, "&"))
@@ -38,7 +40,7 @@ func (price *CPricePlugin) ChannelDo(ctx *context.Context, botId, botChannelId i
 	from := ""
 	sub, _ := GetSubscribe(int64(channelId))
 	from = strings.TrimSpace(reg5.ReplaceAllString(reg4.ReplaceAllString(strconv.Itoa(int(sub.SubSync.ReplaceGroupId)), "黄小姐的魔方店"), "奇乐魔方坊"))
-	cps, _ = GetItems(sub.SubSync.ReplaceGroupId, s)
+	cps, _ = GetItems(strconv.Itoa(int(sub.SubSync.ReplaceGroupId)), strconv.Itoa(int(sub.SubSync.ReplaceGroupId)), s)
 	for _, i := range cps {
 		if i.Shipping.String == "" {
 			ps += "\n" + i.Item + " | " + i.Price.String
@@ -57,8 +59,8 @@ func (price *CPricePlugin) ChannelDo(ctx *context.Context, botId, botChannelId i
 		return RetChannelStuct{
 			RetVal: MESSAGE_BLOCK,
 			ReplyMsg: &ChannelMsg{
-					Text: replyText,
-				},
+				Text: replyText,
+			},
 			ReqType: GroupMsg,
 		}
 	} else {
@@ -67,8 +69,8 @@ func (price *CPricePlugin) ChannelDo(ctx *context.Context, botId, botChannelId i
 		return RetChannelStuct{
 			RetVal: MESSAGE_BLOCK,
 			ReplyMsg: &ChannelMsg{
-					Text: psc,
-				},
+				Text: psc,
+			},
 			ReqType: GroupMsg,
 		}
 	}

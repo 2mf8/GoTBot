@@ -10,23 +10,24 @@ import (
 
 type CuberPrice struct {
 	Id          int64       `json:"id"`
-	GroupId     int64       `json:"group_id"`
+	GuildId     string      `json:"guild_id"`
+	ChannelId   string      `json:"channel_id"`
 	Brand       null.String `json:"brand"`
 	Item        string      `json:"item"`
 	Price       null.String `json:"price"`
 	Shipping    null.String `json:"shipping"`
-	Updater     int64       `json:"updater"`
+	Updater     string      `json:"updater"`
 	GmtModified null.Time   `json:"gmt_modified"`
 }
 
-func GetItem(groupId int64, item string) (cp CuberPrice, err error) {
+func GetItem(guildId, channelId string, item string) (cp CuberPrice, err error) {
 	cp = CuberPrice{}
-	err = Db.QueryRow("select * from [kequ5060].[dbo].[zbot_price] where group_id = $1 and item = $2", groupId, item).Scan(&cp.Id, &cp.GroupId, &cp.Brand, &cp.Item, &cp.Price, &cp.Shipping, &cp.Updater, &cp.GmtModified)
+	err = Db.QueryRow("select ID, guild_id, channel_id, brand, item, price, shipping, updater, gmt_modified from [kequ5060].[dbo].[guild_price] where guild_id = $1 and channel_id = $3 and item = $2", guildId, item, channelId).Scan(&cp.Id, &cp.GuildId, &cp.ChannelId, &cp.Brand, &cp.Item, &cp.Price, &cp.Shipping, &cp.Updater, &cp.GmtModified)
 	return
 }
 
-func GetItems(groupId int64, key string) (cps []CuberPrice, err error) {
-	statment := fmt.Sprintf("select * from [kequ5060].[dbo].[zbot_price] where group_id = %d and item like '%%%s%%'", groupId, key)
+func GetItems(guildId, channelId string, key string) (cps []CuberPrice, err error) {
+	statment := fmt.Sprintf("select ID, guild_id, channel_id, brand, item, price, shipping, updater, gmt_modified from [kequ5060].[dbo].[guild_price] where guild_id = %s and channel_id = %s and item like '%%%s%%'", guildId, channelId, key)
 	rows, err := Db.Query(statment)
 	if err != nil {
 		return
@@ -34,41 +35,37 @@ func GetItems(groupId int64, key string) (cps []CuberPrice, err error) {
 	defer rows.Close()
 	for rows.Next() {
 		cp := CuberPrice{}
-		err = rows.Scan(&cp.Id, &cp.GroupId, &cp.Brand, &cp.Item, &cp.Price, &cp.Shipping, &cp.Updater, &cp.GmtModified)
+		err = rows.Scan(&cp.Id, &cp.GuildId, &cp.ChannelId, &cp.Brand, &cp.Item, &cp.Price, &cp.Shipping, &cp.Updater, &cp.GmtModified)
 		cps = append(cps, cp)
 	}
 	return
 }
 
 func (cp *CuberPrice) ItemCreate() (err error) {
-	statement := "insert into [kequ5060].[dbo].[zbot_price] values ($1, $2, $3, $4, $5, $6, $7) select @@identity"
+	statement := "insert into [kequ5060].[dbo].[guild_price] values ($1, $2, $3, $4, $5, $6, $7, $8) select @@identity"
 	stmt, err := Db.Prepare(statement)
 	if err != nil {
 		return
 	}
 	defer stmt.Close()
-	err = stmt.QueryRow(cp.GroupId, cp.Brand, cp.Item, cp.Price, cp.Shipping, cp.Updater, cp.GmtModified).Scan(&cp.Id)
+	err = stmt.QueryRow(cp.GuildId, cp.ChannelId, cp.ChannelId, cp.Brand, cp.Item, cp.Price, cp.Shipping, cp.Updater, cp.GmtModified).Scan(&cp.Id)
 	return
 }
 
 func (cp *CuberPrice) ItemUpdate(price null.String, shipping null.String) (err error) {
-	_, err = Db.Exec("update [kequ5060].[dbo].[zbot_price] set group_id = $2, brand = $3, item = $4, price = $5, shipping = $6, updater = $7, gmt_modified = $8 where ID = $1", cp.Id, cp.GroupId, cp.Brand, cp.Item, price.String, shipping.String, cp.Updater, cp.GmtModified)
-	return
-}
-
-func (cp *CuberPrice) ItemDeleteByGroupIdAndName() (err error) {
-	_, err = Db.Exec("delete from [kequ5060].[dbo].[zbot_price] where group_id = $1 and item = $2", cp.GroupId, cp.Item)
+	_, err = Db.Exec("update [kequ5060].[dbo].[guild_price] set guild_id = $2, channel_id = $9, brand = $3, item = $4, price = $5, shipping = $6, updater = $7, gmt_modified = $8 where ID = $1", cp.Id, cp.GuildId, cp.Brand, cp.Item, price.String, shipping.String, cp.Updater, cp.GmtModified, cp.ChannelId)
 	return
 }
 
 func (cp *CuberPrice) ItemDeleteById() (err error) {
-	_, err = Db.Exec("delete from [kequ5060].[dbo].[zbot_price] where ID = $1", cp.Id)
+	_, err = Db.Exec("delete from [kequ5060].[dbo].[guild_price] where ID = $1", cp.Id)
 	return
 }
 
-func ItemSave(groupId int64, brand null.String, item string, price null.String, shipping null.String, updater int64, gmtModified null.Time) (err error) {
+func ItemSave(guildId, channelId string, brand null.String, item string, price null.String, shipping null.String, updater string, gmtModified null.Time) (err error) {
 	cp := CuberPrice{
-		GroupId:     groupId,
+		GuildId:     guildId,
+		ChannelId:   channelId,
 		Brand:       brand,
 		Item:        item,
 		Price:       price,
@@ -76,7 +73,7 @@ func ItemSave(groupId int64, brand null.String, item string, price null.String, 
 		Updater:     updater,
 		GmtModified: gmtModified,
 	}
-	cp_get, err := GetItem(groupId, item)
+	cp_get, err := GetItem(guildId, channelId, item)
 	if err != nil {
 		err = cp.ItemCreate()
 		return
@@ -85,12 +82,12 @@ func ItemSave(groupId int64, brand null.String, item string, price null.String, 
 	return
 }
 
-//ItemDeleteByGroupIdAndName
-func IDBGAN(groupId int64,item string) (err error){
-	cp_get_d, err := GetItem(groupId, item)
+// ItemDeleteByGuildIdAndName
+func IDBGAN(guildId, channelId, item string) (err error) {
+	cp_get_d, err := GetItem(guildId, channelId, item)
 	if err != nil {
 		return
 	}
-	err = cp_get_d.ItemDeleteByGroupIdAndName()
+	err = cp_get_d.ItemDeleteById()
 	return
 }

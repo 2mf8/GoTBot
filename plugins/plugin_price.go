@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
 	"github.com/2mf8/GoPbBot/proto_gen/onebot"
 	. "github.com/2mf8/GoTBot/data"
 	. "github.com/2mf8/GoTBot/public"
@@ -16,6 +17,7 @@ import (
 
 type PricePlugin struct {
 }
+
 /*
 * botId 机器人Id
 * groupId 群Id
@@ -30,7 +32,7 @@ type PricePlugin struct {
 * rs 成功防屏蔽码
 * rd 删除防屏蔽码
 * rf 失败防屏蔽码
-*/
+ */
 func (price *PricePlugin) Do(ctx *context.Context, botId, groupId, userId int64, messageId *onebot.MessageReceipt, rawMsg, card string, botRole, userRole, super bool, rs, rd, rf int) RetStuct {
 
 	reg1 := regexp.MustCompile("％")
@@ -57,8 +59,8 @@ func (price *PricePlugin) Do(ctx *context.Context, botId, groupId, userId int64,
 		return RetStuct{
 			RetVal: MESSAGE_BLOCK,
 			ReplyMsg: &Msg{
-					Text: msg,
-				},
+				Text: msg,
+			},
 			ReqType: GroupMsg,
 		}
 	}
@@ -73,13 +75,13 @@ func (price *PricePlugin) Do(ctx *context.Context, botId, groupId, userId int64,
 				return RetStuct{
 					RetVal: MESSAGE_BLOCK,
 					ReplyMsg: &Msg{
-					Text: replyText,
-				},
+						Text: replyText,
+					},
 					ReqType: GroupMsg,
 				}
 			}
 			if groupId == 481097523 || groupId == 176211061 || groupId == 138080634 {
-				err := IDBGAN(int64(10001), str5[0])
+				err := IDBGAN("10001", "10001", str5[0])
 				if err != nil {
 					replyText := strconv.Itoa(rf) + "（删除失败）"
 					log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
@@ -96,13 +98,13 @@ func (price *PricePlugin) Do(ctx *context.Context, botId, groupId, userId int64,
 				return RetStuct{
 					RetVal: MESSAGE_BLOCK,
 					ReplyMsg: &Msg{
-					Text: replyText,
-				},
+						Text: replyText,
+					},
 					ReqType: GroupMsg,
 				}
 			}
 			if groupId == 560820998 || groupId == 189420325 || groupId == 348591755 {
-				err := IDBGAN(int64(560820998), str5[0])
+				err := IDBGAN("10002", "10002", str5[0])
 				if err != nil {
 					replyText := strconv.Itoa(rf) + "（删除失败）"
 					log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
@@ -119,20 +121,20 @@ func (price *PricePlugin) Do(ctx *context.Context, botId, groupId, userId int64,
 				return RetStuct{
 					RetVal: MESSAGE_BLOCK,
 					ReplyMsg: &Msg{
-					Text: replyText,
-				},
+						Text: replyText,
+					},
 					ReqType: GroupMsg,
 				}
 			}
-			err := IDBGAN(groupId, str5[0])
+			err := IDBGAN(strconv.Itoa(int(groupId)), strconv.Itoa(int(groupId)), str5[0])
 			if err != nil {
 				replyText := strconv.Itoa(rf) + "（删除失败）"
 				log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
 				return RetStuct{
 					RetVal: MESSAGE_BLOCK,
 					ReplyMsg: &Msg{
-					Text: replyText,
-				},
+						Text: replyText,
+					},
 					ReqType: GroupMsg,
 				}
 			}
@@ -160,11 +162,11 @@ func (price *PricePlugin) Do(ctx *context.Context, botId, groupId, userId int64,
 		str6 := strings.Split(str5[1], "#&")
 		if len(str6) != 2 {
 			if groupId == 481097523 || groupId == 176211061 || groupId == 138080634 {
-				err := ItemSave(int64(10001), null.String{}, str5[0], null.NewString(str6[0], true), null.String{}, userId, null.NewTime(time.Now(), true))
+				err := ItemSave("10001", "10001", null.String{}, str5[0], null.NewString(str6[0], true), null.String{}, strconv.Itoa(int(userId)), null.NewTime(time.Now(), true))
 				if err != nil {
 					replyText := strconv.Itoa(rf) + "（添加失败）"
 					log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
-					
+
 					return RetStuct{
 						RetVal: MESSAGE_BLOCK,
 						ReplyMsg: &Msg{
@@ -175,7 +177,7 @@ func (price *PricePlugin) Do(ctx *context.Context, botId, groupId, userId int64,
 				}
 				replyText := strconv.Itoa(rs) + "（添加成功）"
 				log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
-				
+
 				return RetStuct{
 					RetVal: MESSAGE_BLOCK,
 					ReplyMsg: &Msg{
@@ -185,11 +187,11 @@ func (price *PricePlugin) Do(ctx *context.Context, botId, groupId, userId int64,
 				}
 			}
 			if groupId == 560820998 || groupId == 189420325 || groupId == 348591755 {
-				err := ItemSave(int64(560820998), null.String{}, str5[0], null.NewString(str6[0], true), null.String{}, userId, null.NewTime(time.Now(), true))
+				err := ItemSave("10002", "10002", null.String{}, str5[0], null.NewString(str6[0], true), null.String{}, strconv.Itoa(int(userId)), null.NewTime(time.Now(), true))
 				if err != nil {
 					replyText := strconv.Itoa(rf) + "（添加失败）"
 					log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
-					
+
 					return RetStuct{
 						RetVal: MESSAGE_BLOCK,
 						ReplyMsg: &Msg{
@@ -208,22 +210,22 @@ func (price *PricePlugin) Do(ctx *context.Context, botId, groupId, userId int64,
 					ReqType: GroupMsg,
 				}
 			}
-			err := ItemSave(groupId, null.String{}, str5[0], null.NewString(str6[0], true), null.String{}, userId, null.NewTime(time.Now(), true))
+			err := ItemSave(strconv.Itoa(int(groupId)), strconv.Itoa(int(groupId)), null.String{}, str5[0], null.NewString(str6[0], true), null.String{}, strconv.Itoa(int(userId)), null.NewTime(time.Now(), true))
 			if err != nil {
 				replyText := strconv.Itoa(rf) + "（添加失败）"
 				log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
-				
+
 				return RetStuct{
 					RetVal: MESSAGE_BLOCK,
 					ReplyMsg: &Msg{
-					Text: replyText,
-				},
+						Text: replyText,
+					},
 					ReqType: GroupMsg,
 				}
 			}
 			replyText := strconv.Itoa(rs) + "（添加成功）"
 			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
-			
+
 			return RetStuct{
 				RetVal: MESSAGE_BLOCK,
 				ReplyMsg: &Msg{
@@ -233,40 +235,40 @@ func (price *PricePlugin) Do(ctx *context.Context, botId, groupId, userId int64,
 			}
 		}
 		if groupId == 481097523 || groupId == 176211061 || groupId == 138080634 {
-			err := ItemSave(int64(10001), null.String{}, str5[0], null.NewString(str6[0], true), null.NewString(str6[1], true), userId, null.NewTime(time.Now(), true))
+			err := ItemSave("10001", "10001", null.String{}, str5[0], null.NewString(str6[0], true), null.NewString(str6[1], true), strconv.Itoa(int(userId)), null.NewTime(time.Now(), true))
 			if err != nil {
 				replyText := strconv.Itoa(rf) + "（添加失败）"
 				log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
 				return RetStuct{
 					RetVal: MESSAGE_BLOCK,
 					ReplyMsg: &Msg{
-					Text: replyText,
-				},
+						Text: replyText,
+					},
 					ReqType: GroupMsg,
 				}
 			}
 			replyText := strconv.Itoa(rs) + "（添加成功）"
 			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
-			
+
 			return RetStuct{
-					RetVal: MESSAGE_BLOCK,
-					ReplyMsg: &Msg{
+				RetVal: MESSAGE_BLOCK,
+				ReplyMsg: &Msg{
 					Text: replyText,
 				},
-					ReqType: GroupMsg,
+				ReqType: GroupMsg,
 			}
 		}
 		if groupId == 560820998 || groupId == 189420325 || groupId == 348591755 {
-			err := ItemSave(int64(560820998), null.String{}, str5[0], null.NewString(str6[0], true), null.NewString(str6[1], true), userId, null.NewTime(time.Now(), true))
+			err := ItemSave("10002", "10002", null.String{}, str5[0], null.NewString(str6[0], true), null.NewString(str6[1], true), strconv.Itoa(int(userId)), null.NewTime(time.Now(), true))
 			if err != nil {
 				replyText := strconv.Itoa(rf) + "（添加失败）"
 				log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
-				
+
 				return RetStuct{
 					RetVal: MESSAGE_BLOCK,
 					ReplyMsg: &Msg{
-					Text: replyText,
-				},
+						Text: replyText,
+					},
 					ReqType: GroupMsg,
 				}
 			}
@@ -280,11 +282,11 @@ func (price *PricePlugin) Do(ctx *context.Context, botId, groupId, userId int64,
 				ReqType: GroupMsg,
 			}
 		}
-		err := ItemSave(groupId, null.String{}, str5[0], null.NewString(str6[0], true), null.NewString(str6[1], true), userId, null.NewTime(time.Now(), true))
+		err := ItemSave(strconv.Itoa(int(groupId)), strconv.Itoa(int(groupId)), null.String{}, str5[0], null.NewString(str6[0], true), null.NewString(str6[1], true), strconv.Itoa(int(userId)), null.NewTime(time.Now(), true))
 		if err != nil {
 			replyText := strconv.Itoa(rf) + "（添加失败）"
 			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
-			
+
 			return RetStuct{
 				RetVal: MESSAGE_BLOCK,
 				ReplyMsg: &Msg{
@@ -298,8 +300,8 @@ func (price *PricePlugin) Do(ctx *context.Context, botId, groupId, userId int64,
 		return RetStuct{
 			RetVal: MESSAGE_BLOCK,
 			ReplyMsg: &Msg{
-					Text: replyText,
-				},
+				Text: replyText,
+			},
 			ReqType: GroupMsg,
 		}
 	}
@@ -311,10 +313,10 @@ func (price *PricePlugin) Do(ctx *context.Context, botId, groupId, userId int64,
 	sub, err := GetSubscribe(groupId)
 	if err != nil {
 		from = strconv.Itoa(int(groupId))
-		cps, _ = GetItems(groupId, s)
+		cps, _ = GetItems(strconv.Itoa(int(groupId)), strconv.Itoa(int(groupId)), s)
 	} else {
 		from = strings.TrimSpace(reg5.ReplaceAllString(reg4.ReplaceAllString(strconv.Itoa(int(sub.SubSync.ReplaceGroupId)), "黄小姐的魔方店"), "奇乐魔方坊"))
-		cps, _ = GetItems(sub.SubSync.ReplaceGroupId, s)
+		cps, _ = GetItems(strconv.Itoa(int(sub.SubSync.ReplaceGroupId)), strconv.Itoa(int(sub.SubSync.ReplaceGroupId)), s)
 	}
 	for _, i := range cps {
 		if i.Shipping.String == "" {
@@ -331,12 +333,12 @@ func (price *PricePlugin) Do(ctx *context.Context, botId, groupId, userId int64,
 	if len(cps) == 0 {
 		replyText := strconv.Itoa(rs) + "（暂无相关记录）"
 		log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
-		
+
 		return RetStuct{
 			RetVal: MESSAGE_BLOCK,
 			ReplyMsg: &Msg{
-					Text: replyText,
-				},
+				Text: replyText,
+			},
 			ReqType: GroupMsg,
 		}
 	} else {
@@ -345,8 +347,8 @@ func (price *PricePlugin) Do(ctx *context.Context, botId, groupId, userId int64,
 		return RetStuct{
 			RetVal: MESSAGE_BLOCK,
 			ReplyMsg: &Msg{
-					Text: psc,
-				},
+				Text: psc,
+			},
 			ReqType: GroupMsg,
 		}
 	}
