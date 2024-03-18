@@ -251,7 +251,7 @@ func main() {
 								Permission: &keyboard.Permission{
 									Type: keyboard.PermissionTypAll,
 								},
-								Data:                 "https://2mf8.cn/",
+								Data:                 "http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=5vLUePWP-bVT3zyjLCier6K7aH8-de1J&authKey=uE97P94%2FMqRn%2FUYVM0IGF2UbkgpEP7NiJIHRUt79Y3QgGQfwsZUxZdT3AMf49901&noverify=0&group_code=758958532",
 								Reply:                true,
 								Enter:                true,
 								AtBotShowChannelList: true,
