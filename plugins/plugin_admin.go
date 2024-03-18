@@ -32,7 +32,6 @@ type Admin struct {
 * rf 失败防屏蔽码
 */
 func (admin *Admin) Do(ctx *context.Context, botId, groupId, userId int64, groupName string, messageId int64, rawMsg, card string, botRole, userRole, super bool) utils.RetStuct {
-
 	if groupId == 560820998 || groupId == 189420325 || groupId == 348591755 || groupId == 481097523 || groupId == 176211061 || groupId == 138080634 { 
 		return utils.RetStuct{
 			RetVal: utils.MESSAGE_IGNORE,
@@ -45,18 +44,14 @@ func (admin *Admin) Do(ctx *context.Context, botId, groupId, userId int64, group
 			RetVal: utils.MESSAGE_IGNORE,
 		}
 	}
-
 	reg1 := regexp.MustCompile("<at qq=\"")
 	reg2 := regexp.MustCompile("\"/>")
 	reg3 := regexp.MustCompile("  ")
-
 	str1 := strings.TrimSpace(reg1.ReplaceAllString(s, ""))
 	str2 := strings.TrimSpace(reg2.ReplaceAllString(str1, " "))
-
-	for Contains(str2, " ") {
+	for Contains(str2, "  ") {
 		str2 = strings.TrimSpace(reg3.ReplaceAllString(str2, " "))
 	}
-
 	rand.Seed(time.Now().UnixNano())
 	jin_duration := 60 + rand.Intn(28740)
 	if s == "抽奖禁言" {
@@ -83,14 +78,12 @@ func (admin *Admin) Do(ctx *context.Context, botId, groupId, userId int64, group
 			BanId: userId,
 		}
 	}
-
 	if s == "退群" && super{
 		return utils.RetStuct{
 			RetVal: utils.MESSAGE_BLOCK,
 			ReqType: utils.GroupLeave,
 		}
 	}
-
 	if StartsWith(str2, "jin") && (super || userRole) {
 		str2 = strings.TrimSpace(string([]byte(str2)[len("jin"):]))
 		str3 := strings.Split(str2, " ")
@@ -152,7 +145,6 @@ func (admin *Admin) Do(ctx *context.Context, botId, groupId, userId int64, group
 			}
 		}
 	}
-
 	if (StartsWith(str2, "t") || StartsWith(str2, "T")) && (super || userRole) {
 		rejectAddAgain := StartsWith(str2, "T")
 		str2 = strings.TrimSpace(string([]byte(strings.ToLower(str2))[len("t"):]))

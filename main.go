@@ -37,8 +37,6 @@ func main() {
 
 	InitLog()
 
-	fmt.Println(public.RandomString(6))
-
 	tomlData := `
 	Plugins = ["守卫","开关","复读","服务号","WCA","回复","频道管理","赛季","查价","打乱","学习"]   # 插件管理
 	AppId = 0 # 机器人AppId
@@ -109,12 +107,19 @@ func main() {
 
 		fmt.Println("权限测试", super, botIsAdmin, userRole, gi.Data.GroupName)
 		reg := regexp.MustCompile(`\[CQ:at,qq=[0-9]+\]`)
+		reg1 := regexp.MustCompile(`\[CQ:reply,id=[0-9]+\]`)
+		
 		ss := reg.FindAllString(rawMsg, -1)
+		s1 := reg1.FindAllString(rawMsg, -1)
 		ns := ""
 		if len(ss) == 0 {
 			ns = rawMsg
 		} else {
-			ns = strings.ReplaceAll(strings.ReplaceAll(rawMsg, ss[0], "."), " ", "")
+			if len(s1) > 0{
+				ns = strings.ReplaceAll(strings.ReplaceAll(strings.ReplaceAll(strings.ReplaceAll(rawMsg, ss[0], "."), " ", ""), s1[0], ""), "..", ".")
+			}else{
+				ns = strings.ReplaceAll(strings.ReplaceAll(rawMsg, ss[0], "."), " ", "")
+			}
 		}
 		fmt.Println(ns)
 
@@ -242,7 +247,7 @@ func main() {
 								Style:        1,
 							},
 							Action: &keyboard.Action{
-								Type: 1,
+								Type: 0,
 								Permission: &keyboard.Permission{
 									Type: keyboard.PermissionTypAll,
 								},

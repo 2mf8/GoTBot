@@ -35,9 +35,10 @@ const (
 	PluginRepeat                      // 复读
 	PluginWCA                         // WCA
 	PluginReply                       // 回复
-	PluginAdmin                       // 频道管理
+	PluginAdmin                       // 群管
 	PluginPrice                       // 查价
 	PluginScramble                    // 打乱
+	PluginRank                        // Rank
 	PluginLearn                       // 频道学习
 )
 
@@ -48,9 +49,10 @@ var IntentMap = map[intent]string{
 	PluginRepeat:   "复读",
 	PluginWCA:      "WCA",
 	PluginReply:    "回复",
-	PluginAdmin:    "频道管理",
+	PluginAdmin:    "群管",
 	PluginPrice:    "查价",
 	PluginScramble: "打乱",
+	PluginRank:     "Rank",
 	PluginLearn:    "学习",
 }
 
@@ -61,9 +63,10 @@ var SwitchMap = map[string]intent{
 	"复读":   PluginRepeat,
 	"WCA":  PluginWCA,
 	"回复":   PluginReply,
-	"频道管理": PluginAdmin,
+	"群管":   PluginAdmin,
 	"查价":   PluginPrice,
 	"打乱":   PluginScramble,
+	"Rank": PluginRank,
 	"学习":   PluginLearn,
 }
 
@@ -236,7 +239,7 @@ func SGBGIACI(guildId, channelId string) (bot_switch_sync SwitchSync, err error)
 	if err != nil {
 		fmt.Println("[错误] Unmarshal出错")
 	}
-	fmt.Println("[Redis] Key(", bw, ") Value(", bot_switch_sync.IsTrue, *bot_switch_sync.PluginSwitch, ")")  //测试用
+	fmt.Println("[Redis] Key(", bw, ") Value(", bot_switch_sync.IsTrue, *bot_switch_sync.PluginSwitch, ")") //测试用
 	return
 }
 

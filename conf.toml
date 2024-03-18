@@ -1,5 +1,5 @@
 
-	Plugins = ["守卫","开关","复读","WCA","回复","群管","赛季","查价","打乱","学习"]   # 插件管理
+	Plugins = ["守卫","开关","复读","WCA","回复","群管","赛季","查价","打乱","Rank","学习"]   # 插件管理
 	AppId = 102070767 # 机器人AppId
 	AccessToken = "sIA7q1O8C9SFtrZjgk2FVUjzJYXXnQed" # 机器人AccessToken
 	ClientSecret = "EH5f06ycbMs9ByWp" # 机器人ClientSecret
@@ -7,7 +7,7 @@
 	DatabaseUser = "sa"   # MSSQL数据库用户名
 	DatabasePassword = "wr@#2mf8"   # MSSQL数据库密码
 	DatabasePort = 1433   # MSSQL数据库服务端口
-	DatabaseServer = "127.0.0.1"   # MSSQL数据库服务网址
+	DatabaseServer = "116.62.13.42"   # MSSQL数据库服务网址
 	DatabaseName = "kequ5060"
 	ServerPort = 8081   # 服务端口
 	ScrambleServer = "http://2mf8.cn:2014"   # 打乱服务地址

@@ -43,7 +43,6 @@ func (price *PricePlugin) Do(ctx *context.Context, botId, groupId, userId int64,
 	str1 := strings.TrimSpace(reg1.ReplaceAllString(rawMsg, "%"))
 	str2 := strings.TrimSpace(reg2.ReplaceAllString(str1, "#"))
 	str3 := strings.TrimSpace(reg3.ReplaceAllString(str2, "&"))
-
 	isMagnetism := strings.Contains(rawMsg, "磁")
 
 	s, b := Prefix(str3, "%")

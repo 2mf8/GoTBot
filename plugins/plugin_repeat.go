@@ -5,14 +5,15 @@ import (
 	"log"
 	"math/rand"
 	"time"
-	
-	. "github.com/2mf8/GoTBot/public"
-	 "github.com/2mf8/GoTBot/utils"
+
 	. "github.com/2mf8/GoTBot/data"
+	. "github.com/2mf8/GoTBot/public"
+	"github.com/2mf8/GoTBot/utils"
 )
 
 type Repeat struct {
 }
+
 /*
 * botId 机器人Id
 * groupId 群Id
@@ -27,9 +28,8 @@ type Repeat struct {
 * rs 成功防屏蔽码
 * rd 删除防屏蔽码
 * rf 失败防屏蔽码
-*/
+ */
 func (rep *Repeat) Do(ctx *context.Context, botId, groupId, userId int64, groupName string, messageId int64, rawMsg, card string, botRole, userRole, super bool) utils.RetStuct {
-
 	rand.Seed(time.Now().UnixNano())
 	r := rand.Intn(101)
 

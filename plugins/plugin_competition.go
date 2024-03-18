@@ -29,7 +29,6 @@ type ItmeAndBestAndAverage struct {
 
 func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, groupName string, messageId int64, rawMsg, card string, botRole, userRole, super bool) utils.RetStuct {
 	var sic []string
-
 	s, b := public.Prefix(rawMsg, ".")
 	if !b {
 		return utils.RetStuct{

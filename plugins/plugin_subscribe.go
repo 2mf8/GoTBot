@@ -32,7 +32,6 @@ type Sub struct {
 * rf 失败防屏蔽码
  */
 func (sub *Sub) Do(ctx *context.Context, botId, groupId, userId int64, groupName string, messageId int64, rawMsg, card string, botRole, userRole, super bool) utils.RetStuct {
-
 	s, b := Prefix(rawMsg, ".")
 	if !b {
 		return utils.RetStuct{
