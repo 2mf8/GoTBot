@@ -1,11 +1,12 @@
-package data
+package database
 
-import(
-	"strings"
+import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
+	"strings"
+
 	"github.com/gomodule/redigo/redis"
 )
 
@@ -41,7 +42,7 @@ func JudgeIndex(str string, key JudgeKeys) int {
 func GetJudgeKeys() (key JudgekeysSync, err error) {
 	judgekeys := JudgeKeys{}
 	key = JudgekeysSync{
-		IsTrue: true,
+		IsTrue:        true,
 		JudgekeysSync: &judgekeys,
 	}
 	var vb []byte
@@ -53,13 +54,15 @@ func GetJudgeKeys() (key JudgekeysSync, err error) {
 	c.Send("Get", bw)
 	c.Flush()
 	vb, err = redis.Bytes(c.Receive())
+	//fmt.Println(string(vb))
 	if err != nil {
 		fmt.Println("[查询] 首次查询-守卫", bw)
 		jk, err := JudgeKeysRead()
+		//fmt.Println(jk, err)
 		key.JudgekeysSync = &jk
 		if err != nil {
 			key = JudgekeysSync{
-				IsTrue: false,
+				IsTrue:        false,
 				JudgekeysSync: &judgekeys,
 			}
 			key.JudgekeysSync.JudgeKeysCreate()
@@ -75,7 +78,7 @@ func GetJudgeKeys() (key JudgekeysSync, err error) {
 	if err != nil {
 		fmt.Println("[错误] Unmarshal出错")
 	}
-	//fmt.Println("[Redis] Key(", bw, ") Value(", key.IsTrue, *key.JudgekeysSync, ")")  //测试用
+	//fmt.Println("[Redis] Key(", bw, ") Value(", key.IsTrue, *key.JudgekeysSync, ")") //测试用
 	return
 }
 
@@ -85,7 +88,7 @@ func (k *JudgeKeys) JudgeKeysCreate() error {
 		fmt.Println("Error marshalling to JSON:", err)
 		return err
 	}
-	err = ioutil.WriteFile("judgekeys.json", output, 0644)
+	err = os.WriteFile("judgekeys.json", output, 0644)
 	if err != nil {
 		fmt.Println("Error writing JSON to file", err)
 		return err
@@ -100,7 +103,7 @@ func JudgeKeysRead() (k JudgeKeys, err error) {
 		return
 	}
 	defer jsonFile.Close()
-	jsonData, err := ioutil.ReadAll(jsonFile)
+	jsonData, err := io.ReadAll(jsonFile)
 	if err != nil {
 		fmt.Println("Error reading JSON data:", err)
 		return
@@ -119,7 +122,7 @@ func (k *JudgekeysSync) JudgeKeysUpdate(uk ...string) error {
 	bw := "judgekeys"
 	var bw_set []byte
 	judgekeysSync := JudgekeysSync{
-		IsTrue: true,
+		IsTrue:        true,
 		JudgekeysSync: k.JudgekeysSync,
 	}
 	bw_set, _ = json.Marshal(&judgekeysSync)
@@ -131,7 +134,7 @@ func (k *JudgekeysSync) JudgeKeysUpdate(uk ...string) error {
 	if err != nil {
 		fmt.Println("[错误] Receive出错")
 	}
-	fmt.Sprintf("%#v", v)
+	_ = fmt.Sprintf("%#v", v)
 	err = k.JudgekeysSync.JudgeKeysCreate()
 	return err
 }
@@ -146,12 +149,15 @@ func (k *JudgekeysSync) JudgeKeysDelete(dk ...string) {
 			if k.JudgekeysSync.Keys[i+1:] != nil {
 				k.JudgekeysSync.Keys = append(k.JudgekeysSync.Keys[:i], k.JudgekeysSync.Keys[i+1:]...)
 				i--
+			} else {
+				k.JudgekeysSync.Keys = k.JudgekeysSync.Keys[:i]
+				i--
 			}
 		}
 		bw := "judgekeys"
 		var bw_set []byte
 		judgekeysSync := JudgekeysSync{
-			IsTrue: true,
+			IsTrue:        true,
 			JudgekeysSync: k.JudgekeysSync,
 		}
 		bw_set, _ = json.Marshal(&judgekeysSync)
@@ -163,7 +169,7 @@ func (k *JudgekeysSync) JudgeKeysDelete(dk ...string) {
 		if err != nil {
 			fmt.Println("[错误] Receive出错")
 		}
-		fmt.Sprintf("%#v", v)
+		_ = fmt.Sprintf("%#v", v)
 		k.JudgekeysSync.JudgeKeysCreate()
 	}
 }

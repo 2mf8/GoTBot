@@ -1,13 +1,14 @@
-package data
+package database
 
 import (
-	"strconv"
-	"fmt"
 	"encoding/json"
+	"fmt"
+	"strconv"
+
+	. "github.com/2mf8/GoTBot/public"
 	_ "github.com/denisenkom/go-mssqldb"
 	"github.com/gomodule/redigo/redis"
 	_ "gopkg.in/guregu/null.v3/zero"
-	. "github.com/2mf8/GoTBot/public"
 )
 
 type Subscribe struct {
@@ -18,14 +19,14 @@ type Subscribe struct {
 }
 
 type SubscribeSync struct {
-	IsTrue        bool
+	IsTrue  bool
 	SubSync *Subscribe
 }
 
 func GetSubscribe(groupId int64) (sub_sync SubscribeSync, err error) {
 	sub := Subscribe{}
 	sub_sync = SubscribeSync{
-		IsTrue: true,
+		IsTrue:  true,
 		SubSync: &sub,
 	}
 
@@ -42,12 +43,12 @@ func GetSubscribe(groupId int64) (sub_sync SubscribeSync, err error) {
 		fmt.Println("[查询] 首次查询-魔友价", bw)
 		err = Db.QueryRow("select * from [kequ5060].[dbo].[zbot_replace] where orgin_group_id = $1", groupId).Scan(&sub_sync.SubSync.Id, &sub_sync.SubSync.OriginGroupId, &sub_sync.SubSync.ReplaceGroupId, &sub_sync.SubSync.AdminId)
 		info := fmt.Sprintf("%s", err)
-		if StartsWith(info, "sql") || StartsWith(info, "unable"){
+		if StartsWith(info, "sql") || StartsWith(info, "unable") {
 			if StartsWith(info, "unable") {
 				fmt.Println(info)
 			}
 			sub_sync = SubscribeSync{
-				IsTrue:       false,
+				IsTrue:  false,
 				SubSync: &sub,
 			}
 		}
@@ -79,10 +80,10 @@ func (sub *Subscribe) SubCreate() (err error) {
 	sub_sync := SubscribeSync{
 		IsTrue: true,
 		SubSync: &Subscribe{
-			Id: sub.Id,
-			OriginGroupId: sub.OriginGroupId,
+			Id:             sub.Id,
+			OriginGroupId:  sub.OriginGroupId,
 			ReplaceGroupId: sub.ReplaceGroupId,
-			AdminId: sub.AdminId,
+			AdminId:        sub.AdminId,
 		},
 	}
 
@@ -107,16 +108,16 @@ func (sub *Subscribe) SubCreate() (err error) {
 
 func (sub *Subscribe) SubUpdate(replace_group_id int64) (err error) {
 	_, err = Db.Exec("update [kequ5060].[dbo].[zbot_replace] set orgin_group_id = $2, replace_group_id = $3, admin_id = $4 where ID = $1", sub.Id, sub.OriginGroupId, replace_group_id, sub.AdminId)
-	
+
 	u_sub := Subscribe{
-		Id: sub.Id,
-		OriginGroupId: sub.OriginGroupId,
+		Id:             sub.Id,
+		OriginGroupId:  sub.OriginGroupId,
 		ReplaceGroupId: replace_group_id,
-		AdminId: sub.AdminId,
+		AdminId:        sub.AdminId,
 	}
 
 	sub_sync := SubscribeSync{
-		IsTrue: true,
+		IsTrue:  true,
 		SubSync: &u_sub,
 	}
 
@@ -160,12 +161,13 @@ func SubSave(orgin_group_id int64, replace_group_id int64, admin_id int64) (err 
 }
 
 func SubDeleteByGroupId(groupId int64) (err error) {
+	s := Subscribe{}
 	sub_get, _ := GetSubscribe(groupId)
 	sub_get.SubSync.SubDelete()
-	
+
 	sub_sync := SubscribeSync{
-		IsTrue: false,
-		SubSync: &Subscribe{},
+		IsTrue:  false,
+		SubSync: &s,
 	}
 
 	bw := strconv.Itoa(int(groupId)) + "_sub"

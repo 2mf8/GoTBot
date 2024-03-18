@@ -9,7 +9,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	"github.com/2mf8/GoPbBot/proto_gen/onebot"
 	. "github.com/2mf8/GoTBot/public"
 	"github.com/2mf8/GoTBot/utils"
 )
@@ -32,7 +31,7 @@ type Admin struct {
 * rd 删除防屏蔽码
 * rf 失败防屏蔽码
 */
-func (admin *Admin) Do(ctx *context.Context, botId, groupId, userId int64, messageId *onebot.MessageReceipt, rawMsg, card string, botRole, userRole, super bool, rs, rd, rf int) utils.RetStuct {
+func (admin *Admin) Do(ctx *context.Context, botId, groupId, userId int64, groupName string, messageId int64, rawMsg, card string, botRole, userRole, super bool) utils.RetStuct {
 
 	if groupId == 560820998 || groupId == 189420325 || groupId == 348591755 || groupId == 481097523 || groupId == 176211061 || groupId == 138080634 { 
 		return utils.RetStuct{
@@ -54,7 +53,7 @@ func (admin *Admin) Do(ctx *context.Context, botId, groupId, userId int64, messa
 	str1 := strings.TrimSpace(reg1.ReplaceAllString(s, ""))
 	str2 := strings.TrimSpace(reg2.ReplaceAllString(str1, " "))
 
-	for Contains(str2, "  ") {
+	for Contains(str2, " ") {
 		str2 = strings.TrimSpace(reg3.ReplaceAllString(str2, " "))
 	}
 
@@ -62,7 +61,7 @@ func (admin *Admin) Do(ctx *context.Context, botId, groupId, userId int64, messa
 	jin_duration := 60 + rand.Intn(28740)
 	if s == "抽奖禁言" {
 		if userRole {
-			msg := strconv.Itoa(rf) + " （失败，您是群主或管理员）"
+			msg := "失败，您是群主或管理员"
 			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, msg)
 			return utils.RetStuct{
 				RetVal: utils.MESSAGE_BLOCK,
@@ -80,7 +79,7 @@ func (admin *Admin) Do(ctx *context.Context, botId, groupId, userId int64, messa
 				Text: msg,
 			},
 			ReqType: utils.GroupBan,
-			Duration: int32(jin_duration),
+			Duration: int64(jin_duration),
 			BanId: userId,
 		}
 	}
@@ -97,7 +96,7 @@ func (admin *Admin) Do(ctx *context.Context, botId, groupId, userId int64, messa
 		str3 := strings.Split(str2, " ")
 
 		if len(str3) != 2 {
-			replyText := strconv.Itoa(rf) + "（禁言格式错误）"
+			replyText := "禁言格式错误"
 			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
 			return utils.RetStuct{
 				RetVal: utils.MESSAGE_BLOCK,
@@ -109,7 +108,7 @@ func (admin *Admin) Do(ctx *context.Context, botId, groupId, userId int64, messa
 		}
 		jinId, err := strconv.ParseInt(str3[0], 10, 64)
 		if err != nil {
-			replyText := strconv.Itoa(rf) + "（禁言对象错误）"
+			replyText := "禁言对象错误"
 			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
 			return utils.RetStuct{
 				RetVal: utils.MESSAGE_BLOCK,
@@ -128,7 +127,7 @@ func (admin *Admin) Do(ctx *context.Context, botId, groupId, userId int64, messa
 			return utils.RetStuct{
 				RetVal: utils.MESSAGE_BLOCK,
 				ReqType: utils.RelieveBan,
-				Duration: duration,
+				Duration: int64(duration),
 				BanId: jinId,
 			}
 		}
@@ -138,11 +137,11 @@ func (admin *Admin) Do(ctx *context.Context, botId, groupId, userId int64, messa
 			return utils.RetStuct{
 				RetVal: utils.MESSAGE_BLOCK,
 				ReqType: utils.GroupBan,
-				Duration: duration,
+				Duration: int64(duration),
 				BanId: jinId,
 			}
 		} else {
-			replyText := strconv.Itoa(rf) + "禁言时间超过最大允许范围"
+			replyText := "禁言时间超过最大允许范围"
 			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
 			return utils.RetStuct{
 				RetVal: utils.MESSAGE_BLOCK,
@@ -159,7 +158,7 @@ func (admin *Admin) Do(ctx *context.Context, botId, groupId, userId int64, messa
 		str2 = strings.TrimSpace(string([]byte(strings.ToLower(str2))[len("t"):]))
 		tId, err := strconv.ParseInt(str2, 10, 64)
 		if err != nil {
-			replyText := strconv.Itoa(int(rf)) + "（踢出对象错误）"
+			replyText :=  "踢出对象错误"
 			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
 			return utils.RetStuct{
 				RetVal: utils.MESSAGE_BLOCK,

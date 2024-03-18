@@ -1,9 +1,21 @@
-Plugins = ["守卫","屏蔽","开关","复读","回复","群管","订阅","查价","打乱","学习"]   #插件管理
-ChannelPlugins = ["守卫","屏蔽","开关","复读","回复","订阅","查价","打乱","学习"]   #频道插件管理
-Admins = [2693678434, 144115218677529987]   #机器人管理员管理
-DatabaseUser = "sa"   #MSSQL数据库用户名
-DatabasePassword = "wr@#kequ5060"   #MSSQL数据库密码
-DatabasePort = 1433   #MSSQL数据库服务端口
-DatabaseServer = "127.0.0.1"   #MSSQL数据库服务网址
-ServerPort = 8081   #服务端口
-ScrambleServer = "http://localhost:2014"   #打乱服务地址
+
+	Plugins = ["守卫","开关","复读","WCA","回复","群管","赛季","查价","打乱","学习"]   # 插件管理
+	AppId = 102070767 # 机器人AppId
+	AccessToken = "sIA7q1O8C9SFtrZjgk2FVUjzJYXXnQed" # 机器人AccessToken
+	ClientSecret = "EH5f06ycbMs9ByWp" # 机器人ClientSecret
+	Admins = ["2693678434"]   # 机器人管理员管理
+	DatabaseUser = "sa"   # MSSQL数据库用户名
+	DatabasePassword = "wr@#2mf8"   # MSSQL数据库密码
+	DatabasePort = 1433   # MSSQL数据库服务端口
+	DatabaseServer = "127.0.0.1"   # MSSQL数据库服务网址
+	DatabaseName = "kequ5060"
+	ServerPort = 8081   # 服务端口
+	ScrambleServer = "http://2mf8.cn:2014"   # 打乱服务地址
+	RedisServer = "127.0.0.1" # Redis服务网址
+	RedisPort = 6379 # Redis端口
+	RedisPassword = "@#*5896Djkd_Sn." # Redis密码
+	RedisTable = 0 # Redis数据表
+	RedisPoolSize = 1000 # Redis连接池数量
+	JwtKey = "%^#$8784hjd.p"
+	RefreshKey = "dfs674_kjk@#$"
+	

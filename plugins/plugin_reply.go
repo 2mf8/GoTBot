@@ -3,7 +3,7 @@ package plugins
 import(
 	"context"
 	. "github.com/2mf8/GoTBot/utils"
-	"github.com/2mf8/GoPbBot/proto_gen/onebot"
+	
 )
 
 type Reply struct{
@@ -23,7 +23,7 @@ type Reply struct{
 * rd 删除防屏蔽码
 * rf 失败防屏蔽码
 */
-func (rep *Reply) Do(ctx *context.Context, botId, groupId, userId int64, messageId *onebot.MessageReceipt, rawMsg, card string, botRole, userRole, super bool, rs, rd, rf int) RetStuct {
+func (rep *Reply) Do(ctx *context.Context, botId, groupId, userId int64, groupName string, messageId int64, rawMsg, card string, botRole, userRole, super bool) RetStuct {
 	return RetStuct{
 		RetVal: MESSAGE_IGNORE,
 	}

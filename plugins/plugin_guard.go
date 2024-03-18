@@ -2,13 +2,13 @@ package plugins
 
 import (
 	"context"
+	"fmt"
 	"log"
-	"strconv"
 	"strings"
-	"github.com/2mf8/GoPbBot/proto_gen/onebot"
+
 	. "github.com/2mf8/GoTBot/data"
 	. "github.com/2mf8/GoTBot/public"
-	. "github.com/2mf8/GoTBot/utils"
+	"github.com/2mf8/GoTBot/utils"
 )
 
 type Guard struct {
@@ -29,19 +29,20 @@ type Guard struct {
 * rd 删除防屏蔽码
 * rf 失败防屏蔽码
  */
-func (guard *Guard) Do(ctx *context.Context, botId, groupId, userId int64, messageId *onebot.MessageReceipt, rawMsg, card string, botRole, userRole, super bool, rs, rd, rf int) RetStuct {
+func (guard *Guard) Do(ctx *context.Context, botId, groupId, userId int64, groupName string, messageId int64, rawMsg, card string, botRole, userRole, super bool) utils.RetStuct {
 	if !botRole {
-		return RetStuct{
-			RetVal: MESSAGE_IGNORE,
+		return utils.RetStuct{
+			RetVal: utils.MESSAGE_IGNORE,
 		}
 	}
+	gid := fmt.Sprintf("%v", groupId)
 	guardIntent := int64(PluginGuard)
-	sg, _ := SGBGI(groupId)
+	sg, _ := SGBGIACI(gid, gid)
 	isGuard := sg.PluginSwitch.IsCloseOrGuard & guardIntent
 
 	if isGuard > 0 {
-		return RetStuct{
-			RetVal: MESSAGE_IGNORE,
+		return utils.RetStuct{
+			RetVal: utils.MESSAGE_IGNORE,
 		}
 	}
 
@@ -54,14 +55,14 @@ func (guard *Guard) Do(ctx *context.Context, botId, groupId, userId int64, messa
 		if err != nil {
 			log.Panicln(err)
 		}
-		msg := strconv.Itoa(rs) + " （拦截词汇添加成功）"
+		msg := "拦截词汇添加成功"
 		log.Printf("[守卫] Bot(%v) Group(%v) -> %v", botId, groupId, msg)
-		return RetStuct{
-			RetVal:   MESSAGE_BLOCK,
-			ReplyMsg: &Msg{
-					Text: msg,
-				},
-			ReqType:  GroupMsg,
+		return utils.RetStuct{
+			RetVal: utils.MESSAGE_BLOCK,
+			ReplyMsg: &utils.Msg{
+				Text: msg,
+			},
+			ReqType: utils.GroupMsg,
 		}
 	}
 
@@ -69,47 +70,47 @@ func (guard *Guard) Do(ctx *context.Context, botId, groupId, userId int64, messa
 		vocabulary := strings.TrimPrefix(rawMsg, ".取消拦截")
 		content := strings.Split(vocabulary, " ")
 		ggk.JudgeKeysDelete(content...)
-		msg := strconv.Itoa(rd) + " （拦截词汇删除成功）"
+		msg := "拦截词汇删除成功"
 		log.Printf("[守卫] Bot(%v) Group(%v) -> %v", botId, groupId, msg)
-		return RetStuct{
-			RetVal:   MESSAGE_BLOCK,
-			ReplyMsg: &Msg{
-					Text: msg,
-				},
-			ReqType:  GroupMsg,
+		return utils.RetStuct{
+			RetVal: utils.MESSAGE_BLOCK,
+			ReplyMsg: &utils.Msg{
+				Text: msg,
+			},
+			ReqType: utils.GroupMsg,
 		}
 	}
 
 	containsJudgeKeys := Judge(rawMsg, *ggk.JudgekeysSync)
 	if containsJudgeKeys != "" {
 		if userRole {
-			msg := strconv.Itoa(rs) + " （消息触发守卫，已被拦截）"
+			msg := "消息触发守卫，已被拦截"
 			log.Printf("[守卫] Bot(%v) Group(%v) -> %v", botId, groupId, msg)
-			return RetStuct{
-				RetVal:   MESSAGE_BLOCK,
-				ReplyMsg: &Msg{
+			return utils.RetStuct{
+				RetVal: utils.MESSAGE_BLOCK,
+				ReplyMsg: &utils.Msg{
 					Text: msg,
 				},
-				ReqType:  GroupMsg,
+				ReqType: utils.GroupMsg,
 			}
 		}
-		msg := strconv.Itoa(rs) + " （消息触发守卫，已撤回消息并禁言该用户两分钟, 请文明发言）"
+		msg := "消息触发守卫，已撤回消息并禁言该用户两分钟, 请文明发言"
 		log.Printf("[守卫] Bot(%v) Group(%v) -> %v", botId, groupId, msg)
-		return RetStuct{
-			RetVal:    MESSAGE_BLOCK,
-			ReplyMsg:  &Msg{
-					Text: msg,
-				},
-			ReqType:   DeleteMsg,
-			Duration:  int32(120),
-			MessageId: messageId,
+		return utils.RetStuct{
+			RetVal: utils.MESSAGE_BLOCK,
+			ReplyMsg: &utils.Msg{
+				Text: msg,
+			},
+			ReqType:  utils.DeleteMsg,
+			Duration: int64(120),
+			MsgId:    messageId,
 		}
 	}
-	return RetStuct{
-		RetVal: MESSAGE_IGNORE,
+	return utils.RetStuct{
+		RetVal: utils.MESSAGE_IGNORE,
 	}
 }
 
 func init() {
-	Register("守卫", &Guard{})
+	utils.Register("守卫", &Guard{})
 }

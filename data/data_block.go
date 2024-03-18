@@ -1,150 +1,70 @@
-package data
+package database
 
 import (
-	"encoding/json"
 	"fmt"
-	"strconv"
 	"time"
 
-	. "github.com/2mf8/GoTBot/public"
+	"github.com/2mf8/GoTBot/config"
+	"github.com/2mf8/GoTBot/public"
 	_ "github.com/denisenkom/go-mssqldb"
-	"github.com/gomodule/redigo/redis"
+	"github.com/tencent-connect/botgo/log"
 	_ "gopkg.in/guregu/null.v3/zero"
 )
 
 type PBlock struct {
-	Id          int
-	UserId      int64
-	IsPBlock    bool
-	AdminId     int64
-	GmtModified time.Time
+	Id          int       `json:"id"`
+	GuildId     string    `json:"guild_id"`
+	UserId      string    `json:"user_id"`
+	IsPBlock    bool      `json:"ispblock"`
+	AdminId     string    `json:"admin_id"`
+	GmtModified time.Time `json:"gmt_modified"`
 }
 
-type PBlockSync struct {
-	IsTrue     bool
-	PBlockSync *PBlock
-}
-
-func PBlockGet(userId int64) (pblockSync PBlockSync, err error) {
+func PBlockGet(guildId, userId string) (p PBlock, err error) {
 	pblock := PBlock{}
-	pblockSync = PBlockSync{
-		IsTrue: true,
-		PBlockSync: &pblock,
-	}
-
-	bw := "pblock_" + strconv.Itoa(int(userId))
-	c := Pool.Get()
-	defer c.Close()
-	c.Send("Get", bw)
-	c.Flush()
-
-	var vb []byte
-	vb, err = redis.Bytes(c.Receive())
-	if err != nil {
-		fmt.Println("[查询] 首次查询-个人屏蔽", bw)
-		err = Db.QueryRow("select * from [kequ5060].[dbo].[zbot_pblock] where user_id = $1 and ispblock = $2", userId, true).Scan(&pblock.Id, &pblock.UserId, &pblock.AdminId, &pblock.GmtModified, &pblock.IsPBlock)
-		info := fmt.Sprintf("%s", err)
-		if StartsWith(info, "sql") || StartsWith(info, "unable") {
-			if StartsWith(info, "unable") {
-				fmt.Println(info)
-			}
-			pblockSync = PBlockSync{
-				IsTrue:     false,
-				PBlockSync: &pblock,
-			}
+	statment := fmt.Sprintf("select ID, guild_id, user_id, admin_id, gmt_modified, ispblock from [%s].[dbo].[guild_pblock] where user_id = $1 and ispblock = $2 and guild_id = $3", config.Conf.DatabaseName)
+	err = Db.QueryRow(statment, userId, true, guildId).Scan(&pblock.Id, &pblock.GuildId, &pblock.UserId, &pblock.AdminId, &pblock.GmtModified, &pblock.IsPBlock)
+	info := fmt.Sprintf("%s", err)
+	if public.StartsWith(info, "sql") || public.StartsWith(info, "unable") {
+		if public.StartsWith(info, "unable") {
+			log.Warn(info)
 		}
-		var bw_set []byte
-		bw_set, _ = json.Marshal(&pblockSync)
-		c.Send("Set", bw, bw_set)
-		c.Flush()
-		v, _ := c.Receive()
-		fmt.Printf("[收到] %#v\n", v)
 		return
 	}
-	err = json.Unmarshal(vb, &pblockSync)
-	if err != nil {
-		fmt.Println("[错误] Unmarshal出错")
-	}
-	//fmt.Println("[Redis] Key(", bw, ") Value(", pblockSync.IsTrue, *pblockSync.PBlockSync, ")") //测试用
 	return
 }
 
 func (pBlock *PBlock) PBlockCreate() (err error) {
-	statement := "insert into [kequ5060].[dbo].[zbot_pblock] (user_id, admin_id, gmt_modified, ispblock) values ($1, $2, $3, $4) select @@identity"
+	statement := fmt.Sprintf("insert into [%s].[dbo].[guild_pblock] values ($1, $2, $3, $4, $5) select @@identity", config.Conf.DatabaseName)
 	stmt, err := Db.Prepare(statement)
 	if err != nil {
 		return
 	}
 	defer stmt.Close()
-	err = stmt.QueryRow(pBlock.UserId, pBlock.AdminId, pBlock.GmtModified, pBlock.IsPBlock).Scan(&pBlock.Id)
-
-	pblockSync := PBlockSync{
-		IsTrue: true,
-		PBlockSync: &PBlock{
-			Id:          pBlock.Id,
-			UserId:      pBlock.UserId,
-			IsPBlock:    pBlock.IsPBlock,
-			AdminId:     pBlock.AdminId,
-			GmtModified: pBlock.GmtModified,
-		},
-	}
-
-	bw := "pblock_" + strconv.Itoa(int(pBlock.UserId))
-	var bw_set []byte
-	bw_set, _ = json.Marshal(&pblockSync)
-	c := Pool.Get()
-	defer c.Close()
-	c.Send("Set", bw, bw_set)
-	c.Flush()
-	v, err := c.Receive()
-	if err != nil {
-		fmt.Println("[错误] Receive出错")
-	}
-	fmt.Sprintf("%#v", v)
+	err = stmt.QueryRow(pBlock.GuildId, pBlock.UserId, pBlock.AdminId, pBlock.GmtModified, pBlock.IsPBlock).Scan(&pBlock.Id)
 	return
 }
 
-func (pBlock *PBlock) PBlockUpdate(ispblock bool) (err error) {
-	_, err = Db.Exec("update [kequ5060].[dbo].[zbot_pblock] set user_id = $2, ispblock = $3, admin_id = $4, gmt_modified = $5 where ID = $1", pBlock.Id, pBlock.UserId, pBlock.IsPBlock, pBlock.AdminId, pBlock.GmtModified)
-
-	pblockSync := PBlockSync{
-		IsTrue: true,
-		PBlockSync: &PBlock{
-			Id:          pBlock.Id,
-			UserId:      pBlock.UserId,
-			IsPBlock:    ispblock,
-			AdminId:     pBlock.AdminId,
-			GmtModified: pBlock.GmtModified,
-		},
-	}
-
-	bw := "pblock_" + strconv.Itoa(int(pBlock.UserId))
-	var bw_set []byte
-	bw_set, _ = json.Marshal(&pblockSync)
-	c := Pool.Get()
-	defer c.Close()
-	c.Send("Set", bw, bw_set)
-	c.Flush()
-	v, err := c.Receive()
-	if err != nil {
-		fmt.Println("[错误] Receive出错")
-	}
-	fmt.Sprintf("%#v", v)
+func (pBlock *PBlock) PBlockUpdate() (err error) {
+	statment := fmt.Sprintf("update [%s].[dbo].[guild_pblock] set guild_id = $2, user_id = $3, ispblock = $4, admin_id = $5, gmt_modified = $6 where ID = $1", config.Conf.DatabaseName)
+	_, err = Db.Exec(statment, pBlock.Id, pBlock.GuildId, pBlock.UserId, pBlock.IsPBlock, pBlock.AdminId, pBlock.GmtModified)
 	return
 }
 
-func PBlockSave(userId int64, ispblock bool, adminId int64, gmtModified time.Time) (err error) {
+func PBlockSave(guildId, userId, adminId string, ispblock bool, gmtModified time.Time) (err error) {
 	pblock := PBlock{
+		GuildId:     guildId,
 		UserId:      userId,
 		IsPBlock:    ispblock,
 		AdminId:     adminId,
 		GmtModified: gmtModified,
 	}
-	pblock_get, err := PBlockGet(userId)
-	if err != nil || pblock_get.IsTrue == false {
+	pblock_get, err := PBlockGet(guildId, userId)
+	if err != nil {
 		pblock.PBlockCreate()
 		return
 	}
-	pblock_get.PBlockSync.PBlockUpdate(ispblock)
+	pblock_get.IsPBlock = ispblock
+	pblock_get.PBlockUpdate()
 	return
 }

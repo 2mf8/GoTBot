@@ -8,10 +8,10 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	"github.com/2mf8/GoPbBot/proto_gen/onebot"
+
 	. "github.com/2mf8/GoTBot/data"
 	. "github.com/2mf8/GoTBot/public"
-	. "github.com/2mf8/GoTBot/utils"
+	"github.com/2mf8/GoTBot/utils"
 )
 
 type Block struct{}
@@ -30,26 +30,28 @@ type Block struct{}
 * rs 成功防屏蔽码
 * rd 删除防屏蔽码
 * rf 失败防屏蔽码
-*/
-func (block *Block) Do(ctx *context.Context, botId, groupId, userId int64, messageId *onebot.MessageReceipt, rawMsg, card string, botRole, userRole, super bool, rs, rd, rf int) RetStuct {
+ */
+func (block *Block) Do(ctx *context.Context, botId, groupId, userId int64, groupName string, messageId int64, rawMsg, card string, botRole, userRole, super bool) utils.RetStuct {
 
-	ispblock, err := PBlockGet(userId)
+	gid := fmt.Sprintf("%v", groupId)
+	uid := fmt.Sprintf("%v", userId)
+	ispblock, err := PBlockGet(gid, uid)
 	//fmt.Println(ispblock)
 	if err != nil {
 		fmt.Println("[INFO] ", err)
 	}
-	if ispblock.PBlockSync.UserId == userId && ispblock.PBlockSync.IsPBlock {
+	if ispblock.UserId == strconv.Itoa(int(userId)) && ispblock.IsPBlock {
 		if !super {
-			return RetStuct{
-				RetVal: MESSAGE_BLOCK,
+			return utils.RetStuct{
+				RetVal: utils.MESSAGE_BLOCK,
 			}
 		}
 	}
 
 	s, b := Prefix(rawMsg, ".")
 	if !b {
-		return RetStuct{
-			RetVal: MESSAGE_IGNORE,
+		return utils.RetStuct{
+			RetVal: utils.MESSAGE_IGNORE,
 		}
 	}
 	reg1 := regexp.MustCompile("<at qq=\"")
@@ -64,80 +66,81 @@ func (block *Block) Do(ctx *context.Context, botId, groupId, userId int64, messa
 	}
 
 	if StartsWith(s, "屏蔽+") && super {
-		pUserID, err := strconv.Atoi(strings.TrimSpace(strings.TrimPrefix(str2, "屏蔽+")))
+		pUserID := strings.TrimSpace(strings.TrimPrefix(str2, "屏蔽+"))
 		if err != nil {
-			replyMsg := strconv.Itoa(rf) + "（用户不存在）"
+			replyMsg := "用户不存在"
 			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyMsg)
-			return RetStuct{
-				RetVal: MESSAGE_BLOCK,
-				ReplyMsg: &Msg{
+			return utils.RetStuct{
+				RetVal: utils.MESSAGE_BLOCK,
+				ReplyMsg: &utils.Msg{
 					Text: replyMsg,
 				},
-				ReqType: GroupMsg,
+				ReqType: utils.GroupMsg,
 			}
 		}
-		err = PBlockSave(int64(pUserID), true, userId, time.Now())
+		pid := fmt.Sprintf("%v", pUserID)
+		err = PBlockSave(gid, pid, uid, true, time.Now())
 		if err != nil {
-			replyMsg := "屏蔽" + strconv.Itoa(int(pUserID)) + "失败"
+			replyMsg := "屏蔽" + pUserID + "失败"
 			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyMsg)
-			return RetStuct{
-				RetVal: MESSAGE_BLOCK,
-				ReplyMsg: &Msg{
+			return utils.RetStuct{
+				RetVal: utils.MESSAGE_BLOCK,
+				ReplyMsg: &utils.Msg{
 					Text: replyMsg,
 				},
-				ReqType: GroupMsg,
+				ReqType: utils.GroupMsg,
 			}
 		}
-		replyMsg := "屏蔽" + strconv.Itoa(int(pUserID)) + "成功"
+		replyMsg := "屏蔽" + pUserID + "成功"
 		log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyMsg)
-		return RetStuct{
-			RetVal: MESSAGE_BLOCK,
-			ReplyMsg: &Msg{
+		return utils.RetStuct{
+			RetVal: utils.MESSAGE_BLOCK,
+			ReplyMsg: &utils.Msg{
 				Text: replyMsg,
 			},
-			ReqType: GroupMsg,
+			ReqType: utils.GroupMsg,
 		}
 	}
 	if StartsWith(s, "屏蔽-") && super {
-		pUserID, err := strconv.Atoi(strings.TrimSpace(strings.TrimPrefix(str2, "屏蔽-")))
+		pUserID := strings.TrimSpace(strings.TrimPrefix(str2, "屏蔽-"))
 		if err != nil {
-			replyMsg := strconv.Itoa(rf) + "（用户不存在）"
+			replyMsg := "用户不存在"
 			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyMsg)
-			return RetStuct{
-				RetVal: MESSAGE_BLOCK,
-				ReplyMsg: &Msg{
+			return utils.RetStuct{
+				RetVal: utils.MESSAGE_BLOCK,
+				ReplyMsg: &utils.Msg{
 					Text: replyMsg,
 				},
-				ReqType: GroupMsg,
+				ReqType: utils.GroupMsg,
 			}
 		}
-		err = PBlockSave(int64(pUserID), false, userId, time.Now())
+		err = PBlockSave(gid, pUserID, uid, false, time.Now())
 		if err != nil {
-			replyMsg := "解除屏蔽" + strconv.Itoa(int(pUserID)) + "失败"
+			replyMsg := "解除屏蔽" + pUserID + "失败"
 			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyMsg)
-			return RetStuct{
-				RetVal: MESSAGE_BLOCK,
-				ReplyMsg: &Msg{
+			return utils.RetStuct{
+				RetVal: utils.MESSAGE_BLOCK,
+				ReplyMsg: &utils.Msg{
 					Text: replyMsg,
 				},
-				ReqType: GroupMsg,
+				ReqType: utils.GroupMsg,
 			}
 		}
-		replyMsg := "解除屏蔽" + strconv.Itoa(int(pUserID)) + "成功"
+		replyMsg := "解除屏蔽" + pUserID + "成功"
 		log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyMsg)
-		return RetStuct{
-				RetVal: MESSAGE_BLOCK,
-				ReplyMsg: &Msg{
-					Text: replyMsg,
-				},
-				ReqType: GroupMsg,
-			}
+		return utils.RetStuct{
+			RetVal: utils.MESSAGE_BLOCK,
+			ReplyMsg: &utils.Msg{
+				Text: replyMsg,
+			},
+			ReqType: utils.GroupMsg,
+		}
 	}
-	return RetStuct{
-		RetVal: MESSAGE_IGNORE,
+	return utils.RetStuct{
+		RetVal: utils.MESSAGE_IGNORE,
 	}
 }
 
 func init() {
-	Register("屏蔽", &Block{})
+	utils.Register("屏蔽", &Block{})
 }

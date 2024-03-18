@@ -1,0 +1,86 @@
+syntax = "proto3";
+package dto;
+
+message UserInfo{
+    string user_id = 1;
+    string user_name = 2;
+    int32 user_role = 3;
+    string user_avatar = 4;
+    string server_number = 5;
+    string email = 6;
+    string qq_union_id = 7;
+    string weixin_union_id = 8;
+}
+
+message Item {
+    int64 id = 1;
+    string guild_id = 2;
+    string channel_id = 3;
+    string brand = 4;
+    string item = 5;
+    string price = 6;
+    string shipping = 7;
+    string updater = 8;
+    int64 gmt_modified = 9;
+    bool is_magnetism = 10;
+    string magnetism_type = 11;
+}
+
+message CodeLoginReq{
+    string code = 1;
+}
+
+message CodeLoginResp{
+    int32 code = 1;
+    string msg = 2;
+    string token = 3;
+    string refresh_token = 4;
+    UserInfo user_info = 5;
+}
+
+message LogoutReq{
+    string user_id = 1;
+}
+
+message LogoutResp{
+    int32 code = 1;
+    string msg = 2;
+}
+
+message GetShopItemAllReq{}
+
+message GetShopItemAllResp{
+    int32 code = 1;
+    string msg = 2;
+    repeated Item store = 3;
+    string shop_name = 4;
+    string qq_guild = 5;
+}
+
+message DeleteShopItemReq{
+    int64 id = 1;
+    string item = 2;
+}
+
+message DeleteShopItemResp{
+    int32 code = 1;
+    string msg = 2;
+}
+
+message AddAndUpdateShopItemByItemReq{
+    Item item = 1;
+}
+
+message AddAndUpdateShopItemByItemResp{
+    int32 code = 1;
+    string msg = 2;
+    int64 id = 3;
+}
+
+service HttpService{
+    rpc Login (CodeLoginReq) returns (CodeLoginResp);
+    rpc Logout (LogoutReq) returns (LogoutResp);
+    rpc GetShopItemAll (GetShopItemAllReq) returns (GetShopItemAllResp);
+    rpc DeleteShopItem (DeleteShopItemReq) returns (DeleteShopItemResp);
+    rpc AddAndUpdateShopItemByItem (AddAndUpdateShopItemByItemReq) returns (AddAndUpdateShopItemByItemResp);
+}

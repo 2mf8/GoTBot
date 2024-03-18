@@ -2,66 +2,44 @@ package utils
 
 import (
 	"context"
+	"runtime"
+	"time"
 
-	"github.com/2mf8/GoPbBot/proto_gen/onebot"
+	log "github.com/sirupsen/logrus"
 )
 
 type ReqType int
 
 const (
-	GroupBan    ReqType = iota // 群禁言
-	RelieveBan                 // 禁言解除
-	GroupKick                  // 群踢人
-	GroupSignIn                // 群打卡
-	GroupMsg                   // 群消息
-	GroupLeave                 // 退群
-	DeleteMsg                  // 消息撤回
-	Undefined                  // 未定义
+	GroupBan   ReqType = iota // 频道禁言
+	RelieveBan                // 禁言解除
+	GroupKick                 // 频道踢人
+	GroupMsg                  // 频道消息
+	GroupLeave                // 退频道
+	DeleteMsg                 // 消息撤回
+	Undefined                 // 未定义
 )
 
 type RetStuct struct {
 	RetVal         uint
 	ReplyMsg       *Msg
 	ReqType        ReqType
-	Duration       int32
+	Duration       int64
 	BanId          int64
 	RejectAddAgain bool
-	MessageId      *onebot.MessageReceipt
+	Retract        int
+	MsgId          int64
 }
 
 type Msg struct {
-	Text  string
-	At    bool
-	Image string
-}
-
-/*
-* userId 用户Id
-* groupId 群Id
-* rawMsg 群消息
-* userRole 用户角色，是否是管理员
-* botRole 机器人角色， 是否是管理员
-* retval 返回值，用于判断是否处理下一个插件
-* replyMsg 待发送消息
-* rs 成功防屏蔽码
-* rd 删除防屏蔽码
-* rf 失败防屏蔽码
- */
-type InputStruct struct {
-	BotId     int64
-	GroupId   int64
-	UserId    int64
-	RawMsg    string
-	UserRole  bool
-	BotRole   bool
-	SuperRole bool
-	RS        int
-	RD        int
-	RF        int
+	Text   string
+	At     bool
+	Image  string
+	Images []string
 }
 
 type Plugin interface {
-	Do(ctx *context.Context, botId, groupId, userId int64, messageId *onebot.MessageReceipt, rawMsg, card string, botRole, userRole, super bool, rs, rd, rf int) (retStuct RetStuct)
+	Do(ctx *context.Context, botId, groupId, userId int64, groupName string, messageId int64, rawMsg, card string, botRole, userRole, super bool) (retStuct RetStuct)
 }
 
 var PluginSet map[string]Plugin
@@ -77,4 +55,14 @@ func init() {
 
 func Register(k string, v Plugin) {
 	PluginSet[k] = v
+}
+
+func FatalError(err error) {
+	log.Errorf(err.Error())
+	buf := make([]byte, 64<<10)
+	buf = buf[:runtime.Stack(buf, false)]
+	sBuf := string(buf)
+	log.Errorf(sBuf)
+	time.Sleep(5 * time.Second)
+	panic(err)
 }

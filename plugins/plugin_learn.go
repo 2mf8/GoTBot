@@ -2,20 +2,21 @@ package plugins
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"regexp"
-	"strconv"
 	"strings"
 	"time"
-	"github.com/2mf8/GoPbBot/proto_gen/onebot"
+
 	. "github.com/2mf8/GoTBot/data"
 	. "github.com/2mf8/GoTBot/public"
-	. "github.com/2mf8/GoTBot/utils"
+	"github.com/2mf8/GoTBot/utils"
 	"gopkg.in/guregu/null.v3"
 )
 
 type LearnPlugin struct {
 }
+
 /*
 * botId 机器人Id
 * groupId 群Id
@@ -30,26 +31,28 @@ type LearnPlugin struct {
 * rs 成功防屏蔽码
 * rd 删除防屏蔽码
 * rf 失败防屏蔽码
-*/
-func (learnPlugin *LearnPlugin) Do(ctx *context.Context, botId, groupId, userId int64, messageId *onebot.MessageReceipt, rawMsg, card string, botRole, userRole, super bool, rs, rd, rf int) RetStuct {
+ */
+func (learnPlugin *LearnPlugin) Do(ctx *context.Context, botId, groupId, userId int64, groupName string, messageId int64, rawMsg, card string, botRole, userRole, super bool) utils.RetStuct {
 
 	s, b := Prefix(rawMsg, ".")
 	if !b {
-		return RetStuct{
-			RetVal: MESSAGE_IGNORE,
+		return utils.RetStuct{
+			RetVal: utils.MESSAGE_IGNORE,
 		}
 	}
+	gid := fmt.Sprintf("%v", groupId)
+	uid := fmt.Sprintf("%v", userId)
 	ggk, _ := GetJudgeKeys()
 	containsJudgeKeys := Judge(rawMsg, *ggk.JudgekeysSync)
 	if containsJudgeKeys != "" {
-		msg := strconv.Itoa(rf) + " （消息触发守卫，已被拦截）"
+		msg := "消息触发守卫，已被拦截"
 		log.Printf("[守卫] Bot(%v) Group(%v) -> %v", botId, groupId, msg)
-		return RetStuct{
-			RetVal: MESSAGE_BLOCK,
-			ReplyMsg: &Msg{
-					Text: msg,
-				},
-			ReqType: GroupMsg,
+		return utils.RetStuct{
+			RetVal: utils.MESSAGE_BLOCK,
+			ReplyMsg: &utils.Msg{
+				Text: msg,
+			},
+			ReqType: utils.GroupMsg,
 		}
 	}
 	reg1 := regexp.MustCompile("＃")
@@ -60,69 +63,69 @@ func (learnPlugin *LearnPlugin) Do(ctx *context.Context, botId, groupId, userId 
 		str3 := strings.Split(str2, "##")
 		if len(str3) != 2 {
 			if strings.TrimSpace(str3[0]) == "" {
-				replyText := strconv.Itoa(rf) + "（问指令不能为空）"
-				log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)			
-				return RetStuct{
-					RetVal: MESSAGE_BLOCK,
-					ReplyMsg: &Msg{
-					Text: replyText,
-				},
-					ReqType: GroupMsg,
-				}
-			}
-			err := LDBGAA(groupId, str3[0])
-			if err != nil {
-				replyText := strconv.Itoa(rf) + "（问答删除失败）"
+				replyText := "问指令不能为空"
 				log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
-				return RetStuct{
-					RetVal: MESSAGE_BLOCK,
-					ReplyMsg: &Msg{
-					Text: replyText,
-				},
-					ReqType: GroupMsg,
+				return utils.RetStuct{
+					RetVal: utils.MESSAGE_BLOCK,
+					ReplyMsg: &utils.Msg{
+						Text: replyText,
+					},
+					ReqType: utils.GroupMsg,
 				}
 			}
-			replyText := strconv.Itoa(rs) + "（问答删除成功）"
+			err := LDBGAA(gid, gid, str3[0])
+			if err != nil {
+				replyText := "问答删除失败"
+				log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
+				return utils.RetStuct{
+					RetVal: utils.MESSAGE_BLOCK,
+					ReplyMsg: &utils.Msg{
+						Text: replyText,
+					},
+					ReqType: utils.GroupMsg,
+				}
+			}
+			replyText := "问答删除成功"
 			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
-			return RetStuct{
-				RetVal: MESSAGE_BLOCK,
-				ReplyMsg: &Msg{
+			return utils.RetStuct{
+				RetVal: utils.MESSAGE_BLOCK,
+				ReplyMsg: &utils.Msg{
 					Text: replyText,
 				},
-				ReqType: GroupMsg,
+				ReqType: utils.GroupMsg,
 			}
 		}
 		if strings.TrimSpace(str3[0]) == "" {
-			replyText := strconv.Itoa(rf) + "（问指令不能为空）"
+			replyText := "问指令不能为空"
 			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
-			return RetStuct{
-				RetVal: MESSAGE_BLOCK,
-				ReplyMsg: &Msg{
+			return utils.RetStuct{
+				RetVal: utils.MESSAGE_BLOCK,
+				ReplyMsg: &utils.Msg{
 					Text: replyText,
 				},
-				ReqType: GroupMsg,
+				ReqType: utils.GroupMsg,
 			}
 		}
-		err := LearnSave(strings.TrimSpace(str3[0]), groupId, userId, null.NewString(str3[1], true), time.Now())
+		err := LearnSave(strings.TrimSpace(str3[0]), gid, gid, uid, null.NewString(str3[1], true), time.Now(), true)
 		if err != nil {
-			replyText := strconv.Itoa(rf) + "（添加失败）"
+			replyText := "添加失败"
 			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
-			return RetStuct{
-				RetVal: MESSAGE_BLOCK,
-				ReplyMsg: &Msg{
+			return utils.RetStuct{
+				RetVal: utils.MESSAGE_BLOCK,
+				ReplyMsg: &utils.Msg{
 					Text: replyText,
 				},
-				ReqType: GroupMsg,
+				ReqType: utils.GroupMsg,
 			}
 		}
-		replyText := strconv.Itoa(rs) + "（学习已完成，下次触发有效）"
+		replyText := "学习已完成，下次触发有效"
 		log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
-		return RetStuct{
-			RetVal: MESSAGE_BLOCK,
-			ReplyMsg: &Msg{
-					Text: replyText,
-				},
-			ReqType: GroupMsg,
+		return utils.RetStuct{
+			RetVal: utils.MESSAGE_BLOCK,
+			ReplyMsg: &utils.Msg{
+				Text: replyText,
+			},
+			ReqType: utils.GroupMsg,
 		}
 	}
 	if StartsWith(str1, "++") && super {
@@ -130,111 +133,111 @@ func (learnPlugin *LearnPlugin) Do(ctx *context.Context, botId, groupId, userId 
 		str3 := strings.Split(str2, "##")
 		if len(str3) != 2 {
 			if strings.TrimSpace(str3[0]) == "" {
-				replyText := strconv.Itoa(rf) + "（系统问指令不能为空）"
+				replyText := "系统问指令不能为空"
 				log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
-				return RetStuct{
-					RetVal: MESSAGE_BLOCK,
-					ReplyMsg: &Msg{
-					Text: replyText,
-				},
-					ReqType: GroupMsg,
+				return utils.RetStuct{
+					RetVal: utils.MESSAGE_BLOCK,
+					ReplyMsg: &utils.Msg{
+						Text: replyText,
+					},
+					ReqType: utils.GroupMsg,
 				}
 			}
-			err := LDBGAA(int64(9999999990), str3[0])
+			err := LDBGAA("9999999990", "9999999990", str3[0])
 			if err != nil {
-				replyText := strconv.Itoa(rf) + "（系统问答删除失败）"
+				replyText := "系统问答删除失败"
 				log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
-				return RetStuct{
-					RetVal: MESSAGE_BLOCK,
-					ReplyMsg: &Msg{
-					Text: replyText,
-				},
-					ReqType: GroupMsg,
+				return utils.RetStuct{
+					RetVal: utils.MESSAGE_BLOCK,
+					ReplyMsg: &utils.Msg{
+						Text: replyText,
+					},
+					ReqType: utils.GroupMsg,
 				}
 			}
-			replyText := strconv.Itoa(rs) + "（系统问答删除成功）"
+			replyText := "系统问答删除成功"
 			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
-			return RetStuct{
-				RetVal: MESSAGE_BLOCK,
-				ReplyMsg: &Msg{
+			return utils.RetStuct{
+				RetVal: utils.MESSAGE_BLOCK,
+				ReplyMsg: &utils.Msg{
 					Text: replyText,
 				},
-				ReqType: GroupMsg,
+				ReqType: utils.GroupMsg,
 			}
 		}
 		if strings.TrimSpace(str3[0]) == "" {
-			replyText := strconv.Itoa(rf) + "（系统问指令不能为空）"
+			replyText := "系统问指令不能为空"
 			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
-			return RetStuct{
-				RetVal: MESSAGE_BLOCK,
-				ReplyMsg: &Msg{
+			return utils.RetStuct{
+				RetVal: utils.MESSAGE_BLOCK,
+				ReplyMsg: &utils.Msg{
 					Text: replyText,
 				},
-				ReqType: GroupMsg,
+				ReqType: utils.GroupMsg,
 			}
 		}
-		err := LearnSave(strings.TrimSpace(str3[0]), int64(9999999990), userId, null.NewString(str3[1], true), time.Now())
+		err := LearnSave(strings.TrimSpace(str3[0]), "9999999990", "9999999990", uid, null.NewString(str3[1], true), time.Now(), true)
 		if err != nil {
-			replyText := strconv.Itoa(rf) + "（系统问答添加失败）"
+			replyText := "系统问答添加失败"
 			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
-			return RetStuct{
-				RetVal: MESSAGE_BLOCK,
-				ReplyMsg: &Msg{
+			return utils.RetStuct{
+				RetVal: utils.MESSAGE_BLOCK,
+				ReplyMsg: &utils.Msg{
 					Text: replyText,
 				},
-				ReqType: GroupMsg,
+				ReqType: utils.GroupMsg,
 			}
 		}
-		replyText := strconv.Itoa(rs) + "（系统问答学习已完成，下次触发有效）"
+		replyText := "系统问答学习已完成，下次触发有效"
 		log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
-		return RetStuct{
-			RetVal: MESSAGE_BLOCK,
-			ReplyMsg: &Msg{
-					Text: replyText,
-				},
-			ReqType: GroupMsg,
+		return utils.RetStuct{
+			RetVal: utils.MESSAGE_BLOCK,
+			ReplyMsg: &utils.Msg{
+				Text: replyText,
+			},
+			ReqType: utils.GroupMsg,
 		}
 	}
 	if strings.TrimSpace(rawMsg) == "" {
-		replyText := strconv.Itoa(rf) + "（指令不能为空）"
+		replyText := "指令不能为空"
 		log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
-		return RetStuct{
-			RetVal: MESSAGE_BLOCK,
-			ReplyMsg: &Msg{
-					Text: replyText,
-				},
-			ReqType: GroupMsg,
+		return utils.RetStuct{
+			RetVal: utils.MESSAGE_BLOCK,
+			ReplyMsg: &utils.Msg{
+				Text: replyText,
+			},
+			ReqType: utils.GroupMsg,
 		}
 	}
-	learn_get, err := LearnGet(groupId, strings.TrimSpace(s))
+	learn_get, err := LearnGet(gid, gid, strings.TrimSpace(s))
 	//log.Println(learn_get.LearnSync.Answer.String,"ceshil", err)
-	if err != nil || learn_get.LearnSync.Answer.String == "" {
-		sys_learn_get, _ := LearnGet(int64(9999999990), strings.TrimSpace(s))
-		if sys_learn_get.LearnSync.Answer.String != "" {
-			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, sys_learn_get.LearnSync.Answer.String)
-			return RetStuct{
-				RetVal: MESSAGE_BLOCK,
-				ReplyMsg: &Msg{
-					Text: sys_learn_get.LearnSync.Answer.String,
+	if err != nil || learn_get.Answer.String == "" {
+		sys_learn_get, _ := LearnGet("9999999990", "9999999990", strings.TrimSpace(s))
+		if sys_learn_get.Answer.String != "" {
+			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, sys_learn_get.Answer.String)
+			return utils.RetStuct{
+				RetVal: utils.MESSAGE_BLOCK,
+				ReplyMsg: &utils.Msg{
+					Text: sys_learn_get.Answer.String,
 				},
-				ReqType: GroupMsg,
+				ReqType: utils.GroupMsg,
 			}
 		}
 	}
-	if learn_get.LearnSync.Answer.String != "" {
-		log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, learn_get.LearnSync.Answer.String)
-		return RetStuct{
-			RetVal: MESSAGE_BLOCK,
-			ReplyMsg: &Msg{
-					Text: learn_get.LearnSync.Answer.String,
-				},
-			ReqType: GroupMsg,
+	if learn_get.Answer.String != "" {
+		log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, learn_get.Answer.String)
+		return utils.RetStuct{
+			RetVal: utils.MESSAGE_BLOCK,
+			ReplyMsg: &utils.Msg{
+				Text: learn_get.Answer.String,
+			},
+			ReqType: utils.GroupMsg,
 		}
 	}
-	return RetStuct{
-		RetVal: MESSAGE_IGNORE,
+	return utils.RetStuct{
+		RetVal: utils.MESSAGE_IGNORE,
 	}
 }
 func init() {
-	Register("学习", &LearnPlugin{})
+	utils.Register("学习", &LearnPlugin{})
 }

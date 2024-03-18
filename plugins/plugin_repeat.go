@@ -5,9 +5,9 @@ import (
 	"log"
 	"math/rand"
 	"time"
-	"github.com/2mf8/GoPbBot/proto_gen/onebot"
+	
 	. "github.com/2mf8/GoTBot/public"
-	. "github.com/2mf8/GoTBot/utils"
+	 "github.com/2mf8/GoTBot/utils"
 	. "github.com/2mf8/GoTBot/data"
 )
 
@@ -28,7 +28,7 @@ type Repeat struct {
 * rd 删除防屏蔽码
 * rf 失败防屏蔽码
 */
-func (rep *Repeat) Do(ctx *context.Context, botId, groupId, userId int64, messageId *onebot.MessageReceipt, rawMsg, card string, botRole, userRole, super bool, rs, rd, rf int) RetStuct {
+func (rep *Repeat) Do(ctx *context.Context, botId, groupId, userId int64, groupName string, messageId int64, rawMsg, card string, botRole, userRole, super bool) utils.RetStuct {
 
 	rand.Seed(time.Now().UnixNano())
 	r := rand.Intn(101)
@@ -38,26 +38,26 @@ func (rep *Repeat) Do(ctx *context.Context, botId, groupId, userId int64, messag
 	if containsJudgeKeys != "" {
 		msg := "消息触发守卫，已被拦截"
 		log.Printf("[复读守卫] Bot(%v) Group(%v) -- %v", botId, groupId, msg)
-		return RetStuct{
-			RetVal: MESSAGE_BLOCK,
+		return utils.RetStuct{
+			RetVal: utils.MESSAGE_BLOCK,
 		}
 	}
 
 	if len(rawMsg) < 20 && r%70 == 0 && !(StartsWith(rawMsg, ".") || StartsWith(rawMsg, "%") || StartsWith(rawMsg, "％")) {
 		log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, rawMsg)
-		return RetStuct{
-			RetVal: MESSAGE_BLOCK,
-			ReplyMsg: &Msg{
+		return utils.RetStuct{
+			RetVal: utils.MESSAGE_BLOCK,
+			ReplyMsg: &utils.Msg{
 				Text: rawMsg,
 			},
-			ReqType: GroupMsg,
+			ReqType: utils.GroupMsg,
 		}
 	}
-	return RetStuct{
-		RetVal: MESSAGE_IGNORE,
+	return utils.RetStuct{
+		RetVal: utils.MESSAGE_IGNORE,
 	}
 }
 
 func init() {
-	Register("复读", &Repeat{})
+	utils.Register("复读", &Repeat{})
 }

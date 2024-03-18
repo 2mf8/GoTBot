@@ -2,18 +2,19 @@ package plugins
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/url"
 	"strings"
 
 	. "github.com/2mf8/GoTBot/data"
 	. "github.com/2mf8/GoTBot/public"
-	. "github.com/2mf8/GoTBot/utils"
-	"github.com/2mf8/GoPbBot/proto_gen/onebot"
+	"github.com/2mf8/GoTBot/utils"
 )
 
 type ScramblePlugin struct {
 }
+
 /*
 * botId 机器人Id
 * groupId 群Id
@@ -28,29 +29,29 @@ type ScramblePlugin struct {
 * rs 成功防屏蔽码
 * rd 删除防屏蔽码
 * rf 失败防屏蔽码
-*/
-func (scramble *ScramblePlugin) Do(ctx *context.Context, botId, groupId, userId int64, messageId *onebot.MessageReceipt, rawMsg, card string, botRole, userRole, super bool, rs, rd, rf int) RetStuct {
+ */
+func (scramble *ScramblePlugin) Do(ctx *context.Context, botId, groupId, userId int64, groupName string, messageId int64, rawMsg, card string, botRole, userRole, super bool) utils.RetStuct {
 
 	s, b := Prefix(rawMsg, ".")
 	if !b {
-		return RetStuct{
-			RetVal: MESSAGE_IGNORE,
+		return utils.RetStuct{
+			RetVal: utils.MESSAGE_IGNORE,
 		}
 	}
-
 	ins := Tnoodle(s).Instruction
 	shor := Tnoodle(s).ShortName
 	show := Tnoodle(s).ShowName
-	if ins == s && ins != "instruction" {
+	fmt.Println(ins, shor, show, s)
+	if ins != "instruction" {
 		gs := GetScramble(shor)
 		if StartsWith(gs, "net") || gs == "获取失败" {
 			log.Printf("[INFO] Bot(%v) Group(%v) -> 获取打乱失败", botId, groupId)
-			return RetStuct{
-				RetVal: MESSAGE_BLOCK,
-				ReplyMsg: &Msg{
+			return utils.RetStuct{
+				RetVal: utils.MESSAGE_BLOCK,
+				ReplyMsg: &utils.Msg{
 					Text: "获取打乱失败",
 				},
-				ReqType: GroupMsg,
+				ReqType: utils.GroupMsg,
 			}
 		}
 		if shor == "minx" {
@@ -58,23 +59,23 @@ func (scramble *ScramblePlugin) Do(ctx *context.Context, botId, groupId, userId 
 			gs = strings.Replace(gs, "U ", "U\n", -1)
 			gs = strings.Replace(gs, "#", "U'", -1)
 		}
-		imgUrl := "http://localhost:2014/view/" + shor + ".png?scramble=" + url.QueryEscape(strings.Replace(gs, "\n", " ", -1))
+		imgUrl := "http://2mf8.cn:2014/view/" + shor + ".png?scramble=" + url.QueryEscape(strings.Replace(gs, "\n", " ", -1))
 		sc := show + "\n" + gs
 		log.Printf("[INFO] Bot(%v) Group(%v) -> %v\n%v<image url=\"%v\"/>", botId, groupId, show, gs, imgUrl)
-		return RetStuct{
-			RetVal: MESSAGE_BLOCK,
-			ReplyMsg: &Msg{
-				Text: sc,
+		return utils.RetStuct{
+			RetVal: utils.MESSAGE_BLOCK,
+			ReplyMsg: &utils.Msg{
+				Text:  sc,
 				Image: imgUrl,
 			},
-			ReqType: GroupMsg,
+			ReqType: utils.GroupMsg,
 		}
 	}
-	return RetStuct{
-		RetVal: MESSAGE_IGNORE,
+	return utils.RetStuct{
+		RetVal: utils.MESSAGE_IGNORE,
 	}
 }
 
 func init() {
-	Register("打乱", &ScramblePlugin{})
+	utils.Register("打乱", &ScramblePlugin{})
 }
