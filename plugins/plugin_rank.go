@@ -53,7 +53,7 @@ func (rp *RankPlugin) Do(ctx *context.Context, botId *utils.BotIdType, groupId *
 						Text: s_r,
 					},
 					MsgId: messageId.Common,
-					OfficalMsgId: messageId.Offical,
+
 					ReqType: utils.GroupMsg,
 				}
 			} else if s.Data.TotalElements > 99 {
@@ -63,7 +63,7 @@ func (rp *RankPlugin) Do(ctx *context.Context, botId *utils.BotIdType, groupId *
 						Text: "搜索范围太大！",
 					},
 					MsgId: messageId.Common,
-					OfficalMsgId: messageId.Offical,
+
 					ReqType: utils.GroupMsg,
 				}
 			} else {
@@ -93,7 +93,7 @@ func (rp *RankPlugin) Do(ctx *context.Context, botId *utils.BotIdType, groupId *
 						Text: s_r,
 					},
 					MsgId: messageId.Common,
-					OfficalMsgId: messageId.Offical,
+
 					ReqType: utils.GroupMsg,
 				}
 			}
@@ -114,7 +114,6 @@ func (rp *RankPlugin) Do(ctx *context.Context, botId *utils.BotIdType, groupId *
 					Text: rs,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		}
 	}

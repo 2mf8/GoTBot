@@ -48,10 +48,8 @@ func (sub *Sub) Do(ctx *context.Context, botId *utils.BotIdType, groupId *utils.
 		return utils.RetStuct{
 			RetVal: utils.MESSAGE_BLOCK,
 			ReplyMsg: &utils.Msg{
-				Text: reply,
-			},
+				Text: reply},
 			ReqType: utils.GroupMsg,
-			OfficalMsgId: messageId.Offical,
 		}
 	}
 	if StartsWith(s, "取消订阅") && (userRole || super) {
@@ -61,10 +59,8 @@ func (sub *Sub) Do(ctx *context.Context, botId *utils.BotIdType, groupId *utils.
 		return utils.RetStuct{
 			RetVal: utils.MESSAGE_BLOCK,
 			ReplyMsg: &utils.Msg{
-				Text: reply,
-			},
+				Text: reply},
 			ReqType: utils.GroupMsg,
-			OfficalMsgId: messageId.Offical,
 		}
 	}
 	return utils.RetStuct{

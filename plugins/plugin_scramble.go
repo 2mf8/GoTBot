@@ -51,7 +51,6 @@ func (scramble *ScramblePlugin) Do(ctx *context.Context, botId *utils.BotIdType,
 					Text: "获取打乱失败",
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		}
 		if shor == "minx" {
@@ -69,7 +68,6 @@ func (scramble *ScramblePlugin) Do(ctx *context.Context, botId *utils.BotIdType,
 				Image: imgUrl,
 			},
 			ReqType: utils.GroupMsg,
-			OfficalMsgId: messageId.Offical,
 		}
 	}
 	return utils.RetStuct{

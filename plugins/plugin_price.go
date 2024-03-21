@@ -74,7 +74,6 @@ func (price *PricePlugin) Do(ctx *context.Context, botId *utils.BotIdType, group
 				Text: msg,
 			},
 			ReqType: utils.GroupMsg,
-			OfficalMsgId: messageId.Offical,
 		}
 	}
 
@@ -91,7 +90,6 @@ func (price *PricePlugin) Do(ctx *context.Context, botId *utils.BotIdType, group
 						Text: replyText,
 					},
 					ReqType: utils.GroupMsg,
-					OfficalMsgId: messageId.Offical,
 				}
 			}
 			if Contains(groupName, "黄小姐") {
@@ -105,7 +103,6 @@ func (price *PricePlugin) Do(ctx *context.Context, botId *utils.BotIdType, group
 							Text: replyText,
 						},
 						ReqType: utils.GroupMsg,
-						OfficalMsgId: messageId.Offical,
 					}
 				}
 				replyText := "删除成功"
@@ -116,7 +113,6 @@ func (price *PricePlugin) Do(ctx *context.Context, botId *utils.BotIdType, group
 						Text: replyText,
 					},
 					ReqType: utils.GroupMsg,
-					OfficalMsgId: messageId.Offical,
 				}
 			}
 			if Contains(groupName, "奇乐") {
@@ -130,7 +126,6 @@ func (price *PricePlugin) Do(ctx *context.Context, botId *utils.BotIdType, group
 							Text: replyText,
 						},
 						ReqType: utils.GroupMsg,
-						OfficalMsgId: messageId.Offical,
 					}
 				}
 				replyText := "删除成功"
@@ -141,7 +136,6 @@ func (price *PricePlugin) Do(ctx *context.Context, botId *utils.BotIdType, group
 						Text: replyText,
 					},
 					ReqType: utils.GroupMsg,
-					OfficalMsgId: messageId.Offical,
 				}
 			}
 			err := IDBGAN(gid, gid, str5[0])
@@ -154,7 +148,6 @@ func (price *PricePlugin) Do(ctx *context.Context, botId *utils.BotIdType, group
 						Text: replyText,
 					},
 					ReqType: utils.GroupMsg,
-					OfficalMsgId: messageId.Offical,
 				}
 			}
 			replyText := "删除成功"
@@ -165,7 +158,6 @@ func (price *PricePlugin) Do(ctx *context.Context, botId *utils.BotIdType, group
 					Text: replyText,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		}
 		if strings.TrimSpace(str5[0]) == "" {
@@ -177,7 +169,6 @@ func (price *PricePlugin) Do(ctx *context.Context, botId *utils.BotIdType, group
 					Text: replyText,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		}
 		str6 := strings.Split(str5[1], "#&")
@@ -194,7 +185,6 @@ func (price *PricePlugin) Do(ctx *context.Context, botId *utils.BotIdType, group
 							Text: replyText,
 						},
 						ReqType: utils.GroupMsg,
-						OfficalMsgId: messageId.Offical,
 					}
 				}
 				replyText := "添加成功"
@@ -206,7 +196,6 @@ func (price *PricePlugin) Do(ctx *context.Context, botId *utils.BotIdType, group
 						Text: replyText,
 					},
 					ReqType: utils.GroupMsg,
-					OfficalMsgId: messageId.Offical,
 				}
 			}
 			if Contains(groupName, "奇乐") {
@@ -221,7 +210,6 @@ func (price *PricePlugin) Do(ctx *context.Context, botId *utils.BotIdType, group
 							Text: replyText,
 						},
 						ReqType: utils.GroupMsg,
-						OfficalMsgId: messageId.Offical,
 					}
 				}
 				replyText := "添加成功"
@@ -232,7 +220,6 @@ func (price *PricePlugin) Do(ctx *context.Context, botId *utils.BotIdType, group
 						Text: replyText,
 					},
 					ReqType: utils.GroupMsg,
-					OfficalMsgId: messageId.Offical,
 				}
 			}
 			_, err := ItemSave(gid, gid, null.String{}, str5[0], null.NewString(str6[0], true), null.String{}, null.NewString(uid, true), time.Now().Unix(), isMagnetism, null.NewString("", true))
@@ -246,7 +233,6 @@ func (price *PricePlugin) Do(ctx *context.Context, botId *utils.BotIdType, group
 						Text: replyText,
 					},
 					ReqType: utils.GroupMsg,
-					OfficalMsgId: messageId.Offical,
 				}
 			}
 			replyText := "添加成功"
@@ -258,7 +244,6 @@ func (price *PricePlugin) Do(ctx *context.Context, botId *utils.BotIdType, group
 					Text: replyText,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		}
 		if Contains(groupName, "黄小姐") {
@@ -272,7 +257,6 @@ func (price *PricePlugin) Do(ctx *context.Context, botId *utils.BotIdType, group
 						Text: replyText,
 					},
 					ReqType: utils.GroupMsg,
-					OfficalMsgId: messageId.Offical,
 				}
 			}
 			replyText := "添加成功"
@@ -284,7 +268,6 @@ func (price *PricePlugin) Do(ctx *context.Context, botId *utils.BotIdType, group
 					Text: replyText,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		}
 		if Contains(groupName, "奇乐") {
@@ -299,7 +282,6 @@ func (price *PricePlugin) Do(ctx *context.Context, botId *utils.BotIdType, group
 						Text: replyText,
 					},
 					ReqType: utils.GroupMsg,
-					OfficalMsgId: messageId.Offical,
 				}
 			}
 			replyText := "添加成功"
@@ -310,7 +292,6 @@ func (price *PricePlugin) Do(ctx *context.Context, botId *utils.BotIdType, group
 					Text: replyText,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		}
 		_, err := ItemSave(gid, gid, null.String{}, str5[0], null.NewString(str6[0], true), null.NewString(str6[1], true), null.NewString(uid, true), time.Now().Unix(), isMagnetism, null.NewString("", true))
@@ -324,7 +305,6 @@ func (price *PricePlugin) Do(ctx *context.Context, botId *utils.BotIdType, group
 					Text: replyText,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		}
 		replyText := "添加成功"
@@ -332,10 +312,8 @@ func (price *PricePlugin) Do(ctx *context.Context, botId *utils.BotIdType, group
 		return utils.RetStuct{
 			RetVal: utils.MESSAGE_BLOCK,
 			ReplyMsg: &utils.Msg{
-				Text: replyText,
-			},
+				Text: replyText},
 			ReqType: utils.GroupMsg,
-			OfficalMsgId: messageId.Offical,
 		}
 	}
 	cps := []CuberPrice{}
@@ -370,7 +348,6 @@ func (price *PricePlugin) Do(ctx *context.Context, botId *utils.BotIdType, group
 					Text: replyText,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		} else {
 			psc = "共搜到" + strconv.Itoa(len(cps)) + "条记录" + "\n品名 | 价格 | 备注" + ps + "\n价格源自 " + from
@@ -381,7 +358,6 @@ func (price *PricePlugin) Do(ctx *context.Context, botId *utils.BotIdType, group
 					Text: psc,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		}
 	} else {
@@ -409,7 +385,6 @@ func (price *PricePlugin) Do(ctx *context.Context, botId *utils.BotIdType, group
 					Text: replyText,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		} else {
 			psc = "共搜到" + strconv.Itoa(len(cps)) + "条记录" + "\n品名 | 价格 | 备注" + ps + "\n价格源自 " + from
@@ -420,7 +395,6 @@ func (price *PricePlugin) Do(ctx *context.Context, botId *utils.BotIdType, group
 					Text: psc,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		}
 	}

@@ -33,7 +33,7 @@ import (
 func main() {
 	InitLog()
 	tomlData := `
-	Plugins = ["守卫","开关","复读","服务号","WCA","回复","频道管理","赛季","查价","打乱","学习"]   # 插件管理
+	Plugins = ["Log","守卫","开关","Bind","复读","WCA","回复","赛季","查价","打乱","学习","Rank"]   # 插件管理
 	AppId = 0 # 机器人AppId
 	AccessToken = "" # 机器人AccessToken
 	ClientSecret = "" # 机器人ClientSecret
@@ -72,18 +72,12 @@ func main() {
 	go StartOffical()
 
 	gonebot.HandleConnect = func(bot *gonebot.Bot) {
-		fmt.Printf("\n[连接] 新机器人已连接：%d\n", bot.BotId)
-		fmt.Println("[已连接] 所有机器人列表：")
+		log.Infof("\n[连接] 新机器人已连接：%d\n", bot.BotId)
+		log.Info("[已连接] 所有机器人列表：")
 		for botId, _ := range gonebot.Bots {
-			fmt.Println("[已连接]", botId)
+			log.Info("[已连接]", botId)
 		}
 	}
-	/*gonebot.HandleLifeTime = func(bot *gonebot.Bot, event *onebot.LifeTime) {
-		fmt.Println("生命周期", event.SelfId, event.PostType, event.Time, event.MetaEventType, event.SubType)
-	}
-	gonebot.HandleHeartBeat = func(bot *gonebot.Bot, event *onebot.BotHeartBeat) {
-		fmt.Println("心跳", event.SelfId, event.PostType, event.Time, event.MetaEventType, event.Status.Online, event.Status.AppEnabled, event.Status.AppGood, event.Status.AppInitialized, event.Status.Good)
-	}*/
 	gonebot.HandleGroupMessage = func(bot *gonebot.Bot, event *onebot.GroupMsgEvent) {
 		groupId := event.GroupId
 		rawMsg := event.RawMessage
@@ -96,13 +90,10 @@ func main() {
 		super := public.IsBotAdmin(uid, allconfig.Admins)
 		rand.New(rand.NewSource(time.Now().UnixNano()))
 		userRole := public.IsAdmin(event.Sender.Role)
-		fmt.Println(messageId, card, super, event.Sender.Nickname)
 		gi, _ := bot.GetGroupInfo(groupId, true)
 		gmi, _ := bot.GetGroupMemberInfo(groupId, bot.BotId, true)
 		botIsAdmin := public.IsAdmin(gmi.Data.Role)
-		log.Infof("[INFO] BotId(%v) GroupId(%v) UserId(%v) <- %s", botId, groupId, userId, rawMsg)
 
-		fmt.Println("权限测试", super, botIsAdmin, userRole, gi.Data.GroupName)
 		regStr := fmt.Sprintf(`\[CQ:at,qq=%v\]`, bot.BotId)
 		reg := regexp.MustCompile(regStr)
 		reg1 := regexp.MustCompile(`\[CQ:reply,id=[0-9]+\]`)
@@ -119,7 +110,6 @@ func main() {
 				ns = strings.ReplaceAll(strings.ReplaceAll(rawMsg, ss[0], "."), " ", "")
 			}
 		}
-		fmt.Println(ns)
 
 		if ns == "mk" && super {
 			kc := []*keyboard.Row{
@@ -264,10 +254,8 @@ func main() {
 				if err != nil {
 					fmt.Println(err)
 				}
-				fmt.Println(resp.Data, resp.Echo)
 				lm := gonebot.NewMsg().LongMsg(resp.Data)
-				rsp, err := bot.SendGroupMessage(groupId, lm, false)
-				fmt.Println(rsp.Echo, err)
+				bot.SendGroupMessage(groupId, lm, false)
 			}
 		}
 
@@ -308,14 +296,12 @@ func main() {
 			retStuct := utils.PluginSet[i].Do(&ctx, &botType, &groupIdType, &userIdType, gi.Data.GroupName, &msgIdType, ns, card, botIsAdmin, userRole, super)
 			if retStuct.RetVal == utils.MESSAGE_BLOCK {
 				if retStuct.ReqType == utils.GroupMsg {
-					log.Println(retStuct.ReplyMsg.Text)
 					if retStuct.ReplyMsg != nil {
 						newMsg := gonebot.NewMsg().Text(retStuct.ReplyMsg.Text)
 						if retStuct.ReplyMsg.Image != "" {
 							newMsg = newMsg.Image(retStuct.ReplyMsg.Image)
 						}
-						resp, err := bot.SendGroupMessage(groupId, newMsg, false)
-						fmt.Println(resp, resp.Data.MessageId, err)
+						bot.SendGroupMessage(groupId, newMsg, false)
 					}
 					break
 				}
@@ -379,7 +365,7 @@ func main() {
 	router := gin.New()
 	router.GET("/onebot/v11/ws", func(c *gin.Context) {
 		if err := gonebot.UpgradeWebsocket(c.Writer, c.Request); err != nil {
-			fmt.Println("[失败] 创建机器人失败")
+			log.Info("[失败] 创建机器人失败")
 		}
 	})
 
@@ -437,7 +423,6 @@ func StartOffical() {
 		log.Warn("登录失败，请检查 appid 和 AccessToken 是否正确。")
 		log.Info("该程序将于5秒后退出！")
 		time.Sleep(time.Second * 5)
-		log.Printf("%+v, err:%v", ws, err)
 	}
 	var groupMessage event.GroupAtMessageEventHandler = func(event *dto.WSPayload, data *dto.WSGroupATMessageData) error {
 		groupId := data.GroupId
@@ -448,7 +433,6 @@ func StartOffical() {
 		content = strings.TrimSpace(reg4.ReplaceAllString(content, ""))
 		super := public.IsBotAdmin(userId, database.AllConfig.Admins)
 		content = fmt.Sprintf(".%s", content)
-		log.Printf("[INFO] GroupId(%v) UserId(%v) -> %v", groupId, userId, content)
 		ctx := context.WithValue(context.Background(), "key", "value")
 		sg, _ := database.SGBGIACI(groupId, groupId)
 		botType := utils.BotIdType{
@@ -478,9 +462,7 @@ func StartOffical() {
 			retStuct := utils.PluginSet[i].Do(&ctx, &botType, &groupIdType, &userIdType, "", &msgIdType, content, "", true, false, super)
 			if retStuct.RetVal == utils.MESSAGE_BLOCK {
 				if retStuct.ReqType == utils.GroupMsg {
-					log.Println(retStuct.ReplyMsg.Text)
 					if retStuct.ReplyMsg != nil {
-						fmt.Println(retStuct.ReplyMsg.Text)
 						msg := fmt.Sprintf("\n%s", strings.TrimSpace(retStuct.ReplyMsg.Text))
 						if retStuct.ReplyMsg.Image != "" {
 							resp, _ := api.PostGroupRichMediaMessage(ctx, groupId, &dto.GroupRichMediaMessageToCreate{FileType: 1, Url: retStuct.ReplyMsg.Image, SrvSendMsg: false})

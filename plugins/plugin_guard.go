@@ -68,7 +68,6 @@ func (guard *Guard) Do(ctx *context.Context, botId *utils.BotIdType, groupId *ut
 				Text: msg,
 			},
 			ReqType: utils.GroupMsg,
-			OfficalMsgId: messageId.Offical,
 		}
 	}
 
@@ -84,7 +83,6 @@ func (guard *Guard) Do(ctx *context.Context, botId *utils.BotIdType, groupId *ut
 				Text: msg,
 			},
 			ReqType: utils.GroupMsg,
-			OfficalMsgId: messageId.Offical,
 		}
 	}
 
@@ -99,7 +97,6 @@ func (guard *Guard) Do(ctx *context.Context, botId *utils.BotIdType, groupId *ut
 					Text: msg,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		}
 		msg := "消息触发守卫，已撤回消息并禁言该用户两分钟, 请文明发言"
@@ -112,7 +109,6 @@ func (guard *Guard) Do(ctx *context.Context, botId *utils.BotIdType, groupId *ut
 			ReqType:  utils.DeleteMsg,
 			Duration: int64(120),
 			MsgId:    messageId.Common,
-			OfficalMsgId: messageId.Offical,
 		}
 	}
 	return utils.RetStuct{

@@ -71,7 +71,6 @@ func (botSwitch *BotSwitch) Do(ctx *context.Context, botId *utils.BotIdType, gro
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		}
 		err := SwitchSave(gid, gid, uid, int64(i), time.Now(), false)
@@ -85,7 +84,6 @@ func (botSwitch *BotSwitch) Do(ctx *context.Context, botId *utils.BotIdType, gro
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		} else {
 			reply := "开启成功"
@@ -97,7 +95,6 @@ func (botSwitch *BotSwitch) Do(ctx *context.Context, botId *utils.BotIdType, gro
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		}
 	}
@@ -121,7 +118,6 @@ func (botSwitch *BotSwitch) Do(ctx *context.Context, botId *utils.BotIdType, gro
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		}
 		err := SwitchSave(gid, gid, uid, int64(i), time.Now(), true)
@@ -135,7 +131,6 @@ func (botSwitch *BotSwitch) Do(ctx *context.Context, botId *utils.BotIdType, gro
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		} else {
 			reply := "关闭成功"
@@ -147,7 +142,6 @@ func (botSwitch *BotSwitch) Do(ctx *context.Context, botId *utils.BotIdType, gro
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		}
 

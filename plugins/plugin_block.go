@@ -45,7 +45,6 @@ func (block *Block) Do(ctx *context.Context, botId *utils.BotIdType, groupId *ut
 		uid = userId.Offical
 	}
 	ispblock, err := PBlockGet(gid, uid)
-	//fmt.Println(ispblock)
 	if err != nil {
 		fmt.Println("[INFO] ", err)
 	}
@@ -85,7 +84,6 @@ func (block *Block) Do(ctx *context.Context, botId *utils.BotIdType, groupId *ut
 					Text: replyMsg,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		}
 		pid := fmt.Sprintf("%v", pUserID)
@@ -99,7 +97,6 @@ func (block *Block) Do(ctx *context.Context, botId *utils.BotIdType, groupId *ut
 					Text: replyMsg,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		}
 		replyMsg := "屏蔽" + pUserID + "成功"
@@ -110,7 +107,6 @@ func (block *Block) Do(ctx *context.Context, botId *utils.BotIdType, groupId *ut
 				Text: replyMsg,
 			},
 			ReqType: utils.GroupMsg,
-			OfficalMsgId: messageId.Offical,
 		}
 	}
 	if StartsWith(s, "屏蔽-") && super {
@@ -124,7 +120,6 @@ func (block *Block) Do(ctx *context.Context, botId *utils.BotIdType, groupId *ut
 					Text: replyMsg,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		}
 		err = PBlockSave(gid, pUserID, uid, false, time.Now())
@@ -137,7 +132,6 @@ func (block *Block) Do(ctx *context.Context, botId *utils.BotIdType, groupId *ut
 					Text: replyMsg,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		}
 		replyMsg := "解除屏蔽" + pUserID + "成功"
@@ -148,7 +142,6 @@ func (block *Block) Do(ctx *context.Context, botId *utils.BotIdType, groupId *ut
 				Text: replyMsg,
 			},
 			ReqType: utils.GroupMsg,
-			OfficalMsgId: messageId.Offical,
 		}
 	}
 	return utils.RetStuct{

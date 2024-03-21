@@ -51,7 +51,6 @@ func (rep *Repeat) Do(ctx *context.Context, botId *utils.BotIdType, groupId *uti
 				Text: rawMsg,
 			},
 			ReqType: utils.GroupMsg,
-			OfficalMsgId: messageId.Offical,
 		}
 	}
 	return utils.RetStuct{

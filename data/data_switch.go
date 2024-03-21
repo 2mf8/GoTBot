@@ -29,20 +29,22 @@ type SwitchSync struct {
 type intent int
 
 const (
-	PluginGuard    intent = 1 << iota // 守卫
-	PluginBlock                       // 个人屏蔽
-	PluginSwitch                      // 开关
-	PluginRepeat                      // 复读
-	PluginWCA                         // WCA
-	PluginReply                       // 回复
-	PluginAdmin                       // 群管
-	PluginPrice                       // 查价
-	PluginScramble                    // 打乱
-	PluginRank                        // Rank
-	PluginLearn                       // 频道学习
+	PluginGuard intent = 1 << iota // 守卫
+	PluginLog
+	PluginBlock    // 个人屏蔽
+	PluginSwitch   // 开关
+	PluginRepeat   // 复读
+	PluginWCA      // WCA
+	PluginReply    // 回复
+	PluginAdmin    // 群管
+	PluginPrice    // 查价
+	PluginScramble // 打乱
+	PluginRank     // Rank
+	PluginLearn    // 频道学习
 )
 
 var IntentMap = map[intent]string{
+	PluginLog:      "Log",
 	PluginGuard:    "守卫",
 	PluginBlock:    "屏蔽",
 	PluginSwitch:   "开关",
@@ -57,6 +59,7 @@ var IntentMap = map[intent]string{
 }
 
 var SwitchMap = map[string]intent{
+	"Log":  PluginLog,
 	"守卫":   PluginGuard,
 	"屏蔽":   PluginBlock,
 	"开关":   PluginSwitch,

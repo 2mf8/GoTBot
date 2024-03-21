@@ -62,8 +62,7 @@ func (learnPlugin *LearnPlugin) Do(ctx *context.Context, botId *utils.BotIdType,
 			ReplyMsg: &utils.Msg{
 				Text: msg,
 			},
-			ReqType:      utils.GroupMsg,
-			OfficalMsgId: messageId.Offical,
+			ReqType: utils.GroupMsg,
 		}
 	}
 	reg1 := regexp.MustCompile("＃")
@@ -81,8 +80,7 @@ func (learnPlugin *LearnPlugin) Do(ctx *context.Context, botId *utils.BotIdType,
 					ReplyMsg: &utils.Msg{
 						Text: replyText,
 					},
-					ReqType:      utils.GroupMsg,
-					OfficalMsgId: messageId.Offical,
+					ReqType: utils.GroupMsg,
 				}
 			}
 			err := LDBGAA(gid, gid, str3[0])
@@ -94,8 +92,7 @@ func (learnPlugin *LearnPlugin) Do(ctx *context.Context, botId *utils.BotIdType,
 					ReplyMsg: &utils.Msg{
 						Text: replyText,
 					},
-					ReqType:      utils.GroupMsg,
-					OfficalMsgId: messageId.Offical,
+					ReqType: utils.GroupMsg,
 				}
 			}
 			replyText := "问答删除成功"
@@ -105,8 +102,7 @@ func (learnPlugin *LearnPlugin) Do(ctx *context.Context, botId *utils.BotIdType,
 				ReplyMsg: &utils.Msg{
 					Text: replyText,
 				},
-				ReqType:      utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
+				ReqType: utils.GroupMsg,
 			}
 		}
 		if strings.TrimSpace(str3[0]) == "" {
@@ -117,8 +113,7 @@ func (learnPlugin *LearnPlugin) Do(ctx *context.Context, botId *utils.BotIdType,
 				ReplyMsg: &utils.Msg{
 					Text: replyText,
 				},
-				ReqType:      utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
+				ReqType: utils.GroupMsg,
 			}
 		}
 		err := LearnSave(strings.TrimSpace(str3[0]), gid, gid, uid, null.NewString(str3[1], true), time.Now(), true)
@@ -130,8 +125,7 @@ func (learnPlugin *LearnPlugin) Do(ctx *context.Context, botId *utils.BotIdType,
 				ReplyMsg: &utils.Msg{
 					Text: replyText,
 				},
-				ReqType:      utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
+				ReqType: utils.GroupMsg,
 			}
 		}
 		replyText := "学习已完成，下次触发有效"
@@ -139,10 +133,8 @@ func (learnPlugin *LearnPlugin) Do(ctx *context.Context, botId *utils.BotIdType,
 		return utils.RetStuct{
 			RetVal: utils.MESSAGE_BLOCK,
 			ReplyMsg: &utils.Msg{
-				Text: replyText,
-			},
-			ReqType:      utils.GroupMsg,
-			OfficalMsgId: messageId.Offical,
+				Text: replyText},
+			ReqType: utils.GroupMsg,
 		}
 	}
 	if StartsWith(str1, "++") && super {
@@ -157,8 +149,7 @@ func (learnPlugin *LearnPlugin) Do(ctx *context.Context, botId *utils.BotIdType,
 					ReplyMsg: &utils.Msg{
 						Text: replyText,
 					},
-					ReqType:      utils.GroupMsg,
-					OfficalMsgId: messageId.Offical,
+					ReqType: utils.GroupMsg,
 				}
 			}
 			err := LDBGAA("9999999990", "9999999990", str3[0])
@@ -170,8 +161,7 @@ func (learnPlugin *LearnPlugin) Do(ctx *context.Context, botId *utils.BotIdType,
 					ReplyMsg: &utils.Msg{
 						Text: replyText,
 					},
-					ReqType:      utils.GroupMsg,
-					OfficalMsgId: messageId.Offical,
+					ReqType: utils.GroupMsg,
 				}
 			}
 			replyText := "系统问答删除成功"
@@ -181,8 +171,7 @@ func (learnPlugin *LearnPlugin) Do(ctx *context.Context, botId *utils.BotIdType,
 				ReplyMsg: &utils.Msg{
 					Text: replyText,
 				},
-				ReqType:      utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
+				ReqType: utils.GroupMsg,
 			}
 		}
 		if strings.TrimSpace(str3[0]) == "" {
@@ -193,8 +182,7 @@ func (learnPlugin *LearnPlugin) Do(ctx *context.Context, botId *utils.BotIdType,
 				ReplyMsg: &utils.Msg{
 					Text: replyText,
 				},
-				ReqType:      utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
+				ReqType: utils.GroupMsg,
 			}
 		}
 		err := LearnSave(strings.TrimSpace(str3[0]), "9999999990", "9999999990", uid, null.NewString(str3[1], true), time.Now(), true)
@@ -207,8 +195,7 @@ func (learnPlugin *LearnPlugin) Do(ctx *context.Context, botId *utils.BotIdType,
 				ReplyMsg: &utils.Msg{
 					Text: replyText,
 				},
-				ReqType:      utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
+				ReqType: utils.GroupMsg,
 			}
 		}
 		replyText := "系统问答学习已完成，下次触发有效"
@@ -216,10 +203,8 @@ func (learnPlugin *LearnPlugin) Do(ctx *context.Context, botId *utils.BotIdType,
 		return utils.RetStuct{
 			RetVal: utils.MESSAGE_BLOCK,
 			ReplyMsg: &utils.Msg{
-				Text: replyText,
-			},
-			ReqType:      utils.GroupMsg,
-			OfficalMsgId: messageId.Offical,
+				Text: replyText},
+			ReqType: utils.GroupMsg,
 		}
 	}
 	if strings.TrimSpace(rawMsg) == "" {
@@ -228,10 +213,8 @@ func (learnPlugin *LearnPlugin) Do(ctx *context.Context, botId *utils.BotIdType,
 		return utils.RetStuct{
 			RetVal: utils.MESSAGE_BLOCK,
 			ReplyMsg: &utils.Msg{
-				Text: replyText,
-			},
-			ReqType:      utils.GroupMsg,
-			OfficalMsgId: messageId.Offical,
+				Text: replyText},
+			ReqType: utils.GroupMsg,
 		}
 	}
 	learn_get, err := LearnGet(gid, gid, strings.TrimSpace(s))
@@ -245,8 +228,7 @@ func (learnPlugin *LearnPlugin) Do(ctx *context.Context, botId *utils.BotIdType,
 				ReplyMsg: &utils.Msg{
 					Text: sys_learn_get.Answer.String,
 				},
-				ReqType:      utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
+				ReqType: utils.GroupMsg,
 			}
 		}
 	}
@@ -257,8 +239,7 @@ func (learnPlugin *LearnPlugin) Do(ctx *context.Context, botId *utils.BotIdType,
 			ReplyMsg: &utils.Msg{
 				Text: learn_get.Answer.String,
 			},
-			ReqType:      utils.GroupMsg,
-			OfficalMsgId: messageId.Offical,
+			ReqType: utils.GroupMsg,
 		}
 	}
 	return utils.RetStuct{

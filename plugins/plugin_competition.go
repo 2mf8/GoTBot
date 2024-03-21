@@ -67,7 +67,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		}
 		si := strings.Split(strings.TrimSpace(sc), " ")
@@ -114,7 +113,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		}
 
@@ -128,7 +126,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		} else {
 			cr.Sessions += 1
@@ -144,7 +141,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		}
 		reply := "创建成功"
@@ -152,10 +148,8 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 		return utils.RetStuct{
 			RetVal: utils.MESSAGE_BLOCK,
 			ReplyMsg: &utils.Msg{
-				Text: reply,
-			},
+				Text: reply},
 			ReqType: utils.GroupMsg,
-			OfficalMsgId: messageId.Offical,
 		}
 	}
 	sczj, b := public.Prefix(s, "赛季追加")
@@ -169,7 +163,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		}
 		si := strings.Split(strings.TrimSpace(sc), " ")
@@ -210,7 +203,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		}
 
@@ -224,7 +216,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 					Text: tip,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		}
 		if err != nil {
@@ -236,7 +227,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		}
 		reply := "追加成功"
@@ -244,10 +234,8 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 		return utils.RetStuct{
 			RetVal: utils.MESSAGE_BLOCK,
 			ReplyMsg: &utils.Msg{
-				Text: reply,
-			},
+				Text: reply},
 			ReqType: utils.GroupMsg,
-			OfficalMsgId: messageId.Offical,
 		}
 	}
 
@@ -262,10 +250,8 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 		return utils.RetStuct{
 			RetVal: utils.MESSAGE_BLOCK,
 			ReplyMsg: &utils.Msg{
-				Text: reply,
-			},
+				Text: reply},
 			ReqType: utils.GroupMsg,
-			OfficalMsgId: messageId.Offical,
 		}
 	}
 
@@ -281,7 +267,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		}
 		gss, _ := data.CompetitionRead()
@@ -307,7 +292,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 							Text: reply,
 						},
 						ReqType: utils.GroupMsg,
-						OfficalMsgId: messageId.Offical,
 					}
 				}
 				if tgc == "333" && gss.CompContents.Three != "" {
@@ -321,7 +305,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 							Text: reply,
 						},
 						ReqType: utils.GroupMsg,
-						OfficalMsgId: messageId.Offical,
 					}
 				}
 				if tgc == "222" && gss.CompContents.Two != "" {
@@ -335,7 +318,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 							Text: reply,
 						},
 						ReqType: utils.GroupMsg,
-						OfficalMsgId: messageId.Offical,
 					}
 				}
 				if tgc == "skewb" && gss.CompContents.Skewb != "" {
@@ -349,7 +331,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 							Text: reply,
 						},
 						ReqType: utils.GroupMsg,
-						OfficalMsgId: messageId.Offical,
 					}
 				}
 				if tgc == "sq1" && gss.CompContents.Square != "" {
@@ -363,7 +344,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 							Text: reply,
 						},
 						ReqType: utils.GroupMsg,
-						OfficalMsgId: messageId.Offical,
 					}
 				}
 				if tgc == "pyram" && gss.CompContents.Pyraminx != "" {
@@ -377,7 +357,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 							Text: reply,
 						},
 						ReqType: utils.GroupMsg,
-						OfficalMsgId: messageId.Offical,
 					}
 				}
 				if tgc == "clock" && gss.CompContents.Clock != "" {
@@ -391,7 +370,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 							Text: reply,
 						},
 						ReqType: utils.GroupMsg,
-						OfficalMsgId: messageId.Offical,
 					}
 				}
 				reply := "项目不存在，请使用赛季追加功能追加"
@@ -402,7 +380,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 						Text: reply,
 					},
 					ReqType: utils.GroupMsg,
-					OfficalMsgId: messageId.Offical,
 				}
 			}
 			if tgc == "222" && gss.CompContents.Two != "" {
@@ -417,7 +394,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 						Image: imgUrl,
 					},
 					ReqType: utils.GroupMsg,
-					OfficalMsgId: messageId.Offical,
 				}
 			}
 			if tgc == "333" && gss.CompContents.Three != "" {
@@ -432,7 +408,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 						Image: imgUrl,
 					},
 					ReqType: utils.GroupMsg,
-					OfficalMsgId: messageId.Offical,
 				}
 			}
 			if tgc == "444" && gss.CompContents.Four != "" {
@@ -447,7 +422,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 						Image: imgUrl,
 					},
 					ReqType: utils.GroupMsg,
-					OfficalMsgId: messageId.Offical,
 				}
 			}
 			if tgc == "555" && gss.CompContents.Five != "" {
@@ -462,7 +436,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 						Image: imgUrl,
 					},
 					ReqType: utils.GroupMsg,
-					OfficalMsgId: messageId.Offical,
 				}
 			}
 			if tgc == "666" && gss.CompContents.Six != "" {
@@ -477,7 +450,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 						Image: imgUrl,
 					},
 					ReqType: utils.GroupMsg,
-					OfficalMsgId: messageId.Offical,
 				}
 			}
 			if tgc == "777" && gss.CompContents.Seven != "" {
@@ -492,7 +464,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 						Image: imgUrl,
 					},
 					ReqType: utils.GroupMsg,
-					OfficalMsgId: messageId.Offical,
 				}
 			}
 			if tgc == "skewb" && gss.CompContents.Skewb != "" {
@@ -507,7 +478,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 						Image: imgUrl,
 					},
 					ReqType: utils.GroupMsg,
-					OfficalMsgId: messageId.Offical,
 				}
 			}
 			if tgc == "pyram" && gss.CompContents.Pyraminx != "" {
@@ -522,7 +492,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 						Image: imgUrl,
 					},
 					ReqType: utils.GroupMsg,
-					OfficalMsgId: messageId.Offical,
 				}
 			}
 			if tgc == "sq1" && gss.CompContents.Square != "" {
@@ -537,7 +506,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 						Image: imgUrl,
 					},
 					ReqType: utils.GroupMsg,
-					OfficalMsgId: messageId.Offical,
 				}
 			}
 			if tgc == "clock" && gss.CompContents.Clock != "" {
@@ -552,7 +520,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 						Image: imgUrl,
 					},
 					ReqType: utils.GroupMsg,
-					OfficalMsgId: messageId.Offical,
 				}
 			}
 			if tgc == "minx" && gss.CompContents.Megaminx != "" {
@@ -570,7 +537,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 						Image: imgUrl,
 					},
 					ReqType: utils.GroupMsg,
-					OfficalMsgId: messageId.Offical,
 				}
 			}
 			reply := "项目不存在，请使用赛季追加功能追加"
@@ -581,7 +547,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		} else {
 			reply := "获取出错，格式不对"
@@ -592,7 +557,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		}
 	}
@@ -610,7 +574,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		}
 		session := v.Sessions
@@ -669,7 +632,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 			err := data.AchievementSave(uid, card, null.NewString("", true), tgc, best, average, session)
 			if err != nil {
 				reply := "成绩保存出错，请联系管理员或稍后重试"
-				fmt.Println(err)
 				log.Infof("GroupId(%v) UserId(%v) -> %s", gid, uid, reply)
 				return utils.RetStuct{
 					RetVal: utils.MESSAGE_BLOCK,
@@ -677,13 +639,11 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 						Text: reply,
 					},
 					ReqType: utils.GroupMsg,
-					OfficalMsgId: messageId.Offical,
 				}
 			}
 			bt, at := data.BestAndAverageTimeConvert(best, average)
 			pm := ""
 			bi, ai, err := data.AchievementGetCount(tgc, best, average, session)
-			fmt.Println(bi, ai)
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -704,7 +664,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		} else {
 			reply := "格式错误，缺少项目\n格式为\n赛季成绩 [项目] [成绩] [成绩] [成绩] ..."
@@ -715,7 +674,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		}
 	}
@@ -732,7 +690,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		}
 		session := v.Sessions
@@ -746,7 +703,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		}
 		if len(as) == 0 {
@@ -758,7 +714,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		}
 		it := fmt.Sprintf("%s(%v)在赛季%d中的成绩为\n项目 最好成绩 || 平均成绩", card, userId, session)
@@ -776,10 +731,8 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 		return utils.RetStuct{
 			RetVal: utils.MESSAGE_BLOCK,
 			ReplyMsg: &utils.Msg{
-				Text: it,
-			},
+				Text: it},
 			ReqType: utils.GroupMsg,
-			OfficalMsgId: messageId.Offical,
 		}
 	}
 
@@ -796,7 +749,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		}
 		session := v.Sessions
@@ -813,7 +765,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 						Text: reply,
 					},
 					ReqType: utils.GroupMsg,
-					OfficalMsgId: messageId.Offical,
 				}
 			}
 			reply := "删除成功"
@@ -824,7 +775,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		}
 		err = data.ADBUAIAS(uid, tgc, session)
@@ -838,7 +788,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		}
 		reply := "删除成功"
@@ -846,10 +795,8 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 		return utils.RetStuct{
 			RetVal: utils.MESSAGE_BLOCK,
 			ReplyMsg: &utils.Msg{
-				Text: reply,
-			},
+				Text: reply},
 			ReqType: utils.GroupMsg,
-			OfficalMsgId: messageId.Offical,
 		}
 	}
 
@@ -880,7 +827,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		}
 		v, err := data.CompetitionRead()
@@ -893,7 +839,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		}
 		session := v.Sessions
@@ -910,13 +855,11 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 						Text: reply,
 					},
 					ReqType: utils.GroupMsg,
-					OfficalMsgId: messageId.Offical,
 				}
 			}
 			reply := ""
 
 			err = data.PBlockSave(gid, ju, uid, true, time.Now())
-			fmt.Println("屏蔽出错", err)
 			if err != nil {
 				reply = "删除成功但屏蔽该用户失败，请联系机器人管理员"
 			} else {
@@ -929,7 +872,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		}
 		err = data.ADBUAIAS(ju, tgc, session)
@@ -943,7 +885,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		}
 		reply := ""
@@ -957,10 +898,8 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 		return utils.RetStuct{
 			RetVal: utils.MESSAGE_BLOCK,
 			ReplyMsg: &utils.Msg{
-				Text: reply,
-			},
+				Text: reply},
 			ReqType: utils.GroupMsg,
-			OfficalMsgId: messageId.Offical,
 		}
 	}
 
@@ -977,7 +916,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		}
 		session := v.Sessions
@@ -991,7 +929,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		}
 		num := strings.ReplaceAll(sjpm, tgc, "")
@@ -1011,7 +948,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		}
 
@@ -1025,7 +961,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		}
 
@@ -1064,10 +999,8 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 		return utils.RetStuct{
 			RetVal: utils.MESSAGE_BLOCK,
 			ReplyMsg: &utils.Msg{
-				Text: ct,
-			},
+				Text: ct},
 			ReqType: utils.GroupMsg,
-			OfficalMsgId: messageId.Offical,
 		}
 	}
 
@@ -1083,7 +1016,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		}
 		session := v.Sessions
@@ -1098,7 +1030,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		}
 		ats, err := data.AGBSOBIAAAA(session)
@@ -1112,7 +1043,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		}
 		if len(bts) == 0 {
@@ -1124,7 +1054,6 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
-				OfficalMsgId: messageId.Offical,
 			}
 		}
 
@@ -1160,10 +1089,8 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 		return utils.RetStuct{
 			RetVal: utils.MESSAGE_BLOCK,
 			ReplyMsg: &utils.Msg{
-				Text: ct,
-			},
+				Text: ct},
 			ReqType: utils.GroupMsg,
-			OfficalMsgId: messageId.Offical,
 		}
 	}
 
