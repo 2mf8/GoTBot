@@ -25,13 +25,12 @@ func (rp *RankPlugin) Do(ctx *context.Context, botId *utils.BotIdType, groupId *
 			RetVal: utils.MESSAGE_IGNORE,
 		}
 	}
+	fmt.Println("rank？")
 	if strings.HasPrefix(s, "rank") {
 		w_m := strings.TrimSpace(strings.TrimSpace(string([]byte(s)[len("rank"):])))
-		fmt.Println(w_m)
 		ss := strings.Split(w_m, "-")
 		if len(ss) > 0 {
 			url := "https://www.2mf8.cn:8300/wca/people/" + url.PathEscape(ss[0])
-			fmt.Println(url)
 			resp, _ := http.Get(url)
 			s := database.GetInfoResponse{}
 			body, _ := io.ReadAll(resp.Body)
@@ -55,6 +54,7 @@ func (rp *RankPlugin) Do(ctx *context.Context, botId *utils.BotIdType, groupId *
 					},
 					MsgId: messageId.Common,
 					OfficalMsgId: messageId.Offical,
+					ReqType: utils.GroupMsg,
 				}
 			} else if s.Data.TotalElements > 99 {
 				return utils.RetStuct{
@@ -64,6 +64,7 @@ func (rp *RankPlugin) Do(ctx *context.Context, botId *utils.BotIdType, groupId *
 					},
 					MsgId: messageId.Common,
 					OfficalMsgId: messageId.Offical,
+					ReqType: utils.GroupMsg,
 				}
 			} else {
 				rankList := ""
@@ -93,6 +94,7 @@ func (rp *RankPlugin) Do(ctx *context.Context, botId *utils.BotIdType, groupId *
 					},
 					MsgId: messageId.Common,
 					OfficalMsgId: messageId.Offical,
+					ReqType: utils.GroupMsg,
 				}
 			}
 		}

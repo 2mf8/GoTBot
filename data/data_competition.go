@@ -111,7 +111,7 @@ func GetScrambles(s []string, n int) (string, CompContent, error) {
 func (c *CompOptions) CompetitionCreate(day int, si []string) (err error) {
 	i := c.Sessions
 	_, compContents, _ := GetScrambles(si, 5)
-	filepath := "private/competition/"
+	filepath := "competition/"
 	filename := fmt.Sprintf("%scompetition%d.json", filepath, i)
 	co := CompOptions{
 		Sessions:     i,
@@ -137,7 +137,7 @@ func (c *CompOptions) CompetitionCreate(day int, si []string) (err error) {
 		fmt.Println("Error writing JSON to file", err)
 		return
 	}
-	err = os.WriteFile("private/competition/latest.json", output, 0644)
+	err = os.WriteFile("competition/latest.json", output, 0644)
 	if err != nil {
 		fmt.Println("Error writing JSON to file", err)
 		return
@@ -149,7 +149,7 @@ func (c *CompOptions) CompetitionUpdate(sa []string) (tip string, err error) {
 	if time.Now().Unix() > c.EndTime || time.Now().Unix() < c.StartTime {
 		return "赛季项目更新错误，赛季不存在或已过期", nil
 	}
-	filename := fmt.Sprintf("private/competition/competition%d.json", c.Sessions)
+	filename := fmt.Sprintf("competition/competition%d.json", c.Sessions)
 	var itemTemp []string
 	for _, v := range sa {
 		fmt.Println(v)
@@ -201,7 +201,7 @@ func (c *CompOptions) CompetitionUpdate(sa []string) (tip string, err error) {
 		fmt.Println("Error writing JSON to file", err)
 		return
 	}
-	err = os.WriteFile("private/competition/latest.json", output, 0644)
+	err = os.WriteFile("competition/latest.json", output, 0644)
 	if err != nil {
 		fmt.Println("Error writing JSON to file", err)
 		return
@@ -210,7 +210,7 @@ func (c *CompOptions) CompetitionUpdate(sa []string) (tip string, err error) {
 }
 
 func CompetitionRead() (c CompOptions, err error) {
-	jsonFile, err := os.Open("private/competition/latest.json")
+	jsonFile, err := os.Open("competition/latest.json")
 	if err != nil {
 		fmt.Println("Error reading JSON File:", err)
 		return

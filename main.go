@@ -447,6 +447,7 @@ func StartOffical() {
 		reg4 := regexp.MustCompile("/")
 		content = strings.TrimSpace(reg4.ReplaceAllString(content, ""))
 		super := public.IsBotAdmin(userId, database.AllConfig.Admins)
+		content = fmt.Sprintf(".%s", content)
 		log.Printf("[INFO] GroupId(%v) UserId(%v) -> %v", groupId, userId, content)
 		ctx := context.WithValue(context.Background(), "key", "value")
 		sg, _ := database.SGBGIACI(groupId, groupId)
@@ -466,8 +467,7 @@ func StartOffical() {
 			Common:  0,
 			Offical: msgId,
 		}
-		for v, i := range database.AllConfig.Plugins {
-			fmt.Println(v,i)
+		for _, i := range database.AllConfig.Plugins {
 			intent := sg.PluginSwitch.IsCloseOrGuard & int64(database.PluginNameToIntent(i))
 			if intent == int64(database.PluginReply) {
 				break
@@ -481,11 +481,12 @@ func StartOffical() {
 					log.Println(retStuct.ReplyMsg.Text)
 					if retStuct.ReplyMsg != nil {
 						fmt.Println(retStuct.ReplyMsg.Text)
+						msg := fmt.Sprintf("\n%s", strings.TrimSpace(retStuct.ReplyMsg.Text))
 						if retStuct.ReplyMsg.Image != "" {
 							resp, _ := api.PostGroupRichMediaMessage(ctx, groupId, &dto.GroupRichMediaMessageToCreate{FileType: 1, Url: retStuct.ReplyMsg.Image, SrvSendMsg: false})
 							if resp != nil {
 								newMsg := &dto.GroupMessageToCreate{
-									Content: retStuct.ReplyMsg.Text, //+ "\n[🔗奇乐最新价格]\n(https://2mf8.cn/webview/#/pages/index/webview?url=https%3A%2F%2Fqilecube.gitee.io%2F)",
+									Content: msg, //+ "\n[🔗奇乐最新价格]\n(https://2mf8.cn/webview/#/pages/index/webview?url=https%3A%2F%2Fqilecube.gitee.io%2F)",
 									Media: &dto.FileInfo{
 										FileInfo: resp.FileInfo,
 									},
@@ -497,7 +498,7 @@ func StartOffical() {
 							}
 						} else {
 							newMsg := &dto.GroupMessageToCreate{
-								Content: "\n" + retStuct.ReplyMsg.Text, //+ "\n[🔗奇乐最新价格]\n(https://2mf8.cn/webview/#/pages/index/webview?url=https%3A%2F%2Fqilecube.gitee.io%2F)",
+								Content: msg, //+ "\n[🔗奇乐最新价格]\n(https://2mf8.cn/webview/#/pages/index/webview?url=https%3A%2F%2Fqilecube.gitee.io%2F)",
 								MsgID:   data.MsgId,
 								MsgType: 0,
 							}
@@ -507,7 +508,7 @@ func StartOffical() {
 							resp, _ := api.PostGroupRichMediaMessage(ctx, groupId, &dto.GroupRichMediaMessageToCreate{FileType: 1, Url: retStuct.ReplyMsg.Images[1], SrvSendMsg: false})
 							if resp != nil {
 								newMsg := &dto.GroupMessageToCreate{
-									Content: retStuct.ReplyMsg.Text, //+ "\n[🔗奇乐最新价格]\n(https://2mf8.cn/webview/#/pages/index/webview?url=https%3A%2F%2Fqilecube.gitee.io%2F)",
+									Content: msg, //+ "\n[🔗奇乐最新价格]\n(https://2mf8.cn/webview/#/pages/index/webview?url=https%3A%2F%2Fqilecube.gitee.io%2F)",
 									Media: &dto.FileInfo{
 										FileInfo: resp.FileInfo,
 									},
@@ -522,7 +523,7 @@ func StartOffical() {
 							resp, _ := api.PostGroupRichMediaMessage(ctx, groupId, &dto.GroupRichMediaMessageToCreate{FileType: 1, Url: retStuct.ReplyMsg.Images[1], SrvSendMsg: false})
 							if resp != nil {
 								newMsg := &dto.GroupMessageToCreate{
-									Content: retStuct.ReplyMsg.Text, //+ "\n[🔗奇乐最新价格]\n(https://2mf8.cn/webview/#/pages/index/webview?url=https%3A%2F%2Fqilecube.gitee.io%2F)",
+									Content: msg, //+ "\n[🔗奇乐最新价格]\n(https://2mf8.cn/webview/#/pages/index/webview?url=https%3A%2F%2Fqilecube.gitee.io%2F)",
 									Media: &dto.FileInfo{
 										FileInfo: resp.FileInfo,
 									},
@@ -535,7 +536,7 @@ func StartOffical() {
 							resp1, _ := api.PostGroupRichMediaMessage(ctx, groupId, &dto.GroupRichMediaMessageToCreate{FileType: 1, Url: retStuct.ReplyMsg.Images[2], SrvSendMsg: false})
 							if resp1 != nil {
 								newMsg := &dto.GroupMessageToCreate{
-									Content: retStuct.ReplyMsg.Text, //+ "\n[🔗奇乐最新价格]\n(https://2mf8.cn/webview/#/pages/index/webview?url=https%3A%2F%2Fqilecube.gitee.io%2F)",
+									Content: msg, //+ "\n[🔗奇乐最新价格]\n(https://2mf8.cn/webview/#/pages/index/webview?url=https%3A%2F%2Fqilecube.gitee.io%2F)",
 									Media: &dto.FileInfo{
 										FileInfo: resp1.FileInfo,
 									},

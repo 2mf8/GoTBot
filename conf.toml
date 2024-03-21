@@ -1,5 +1,5 @@
 
-	Plugins = ["守卫","开关","Bind","复读","WCA","回复","赛季","查价","打乱","学习"]   # 插件管理
+	Plugins = ["守卫","开关","Bind","复读","WCA","回复","赛季","查价","打乱","学习","Rank"]   # 插件管理
 	AppId = 101986244 # 机器人AppId
 	AccessToken = "1sou4Anz0TyJ7kGLa1k2fKAl57B3tBxH" # 机器人AccessToken
 	ClientSecret = "" # 机器人ClientSecret
@@ -7,13 +7,13 @@
 	DatabaseUser = "sa"   # MSSQL数据库用户名
 	DatabasePassword = "wr@#2mf8"   # MSSQL数据库密码
 	DatabasePort = 1433   # MSSQL数据库服务端口
-	DatabaseServer = "116.62.13.42"   # MSSQL数据库服务网址
+	DatabaseServer = "127.0.0.1"   # MSSQL数据库服务网址
 	DatabaseName = "kequ5060"
 	ServerPort = 8081   # 服务端口
 	ScrambleServer = "http://localhost:2014"   # 打乱服务地址
 	RedisServer = "127.0.0.1" # Redis服务网址
 	RedisPort = 6379 # Redis端口
-	RedisPassword = "" # Redis密码
+	RedisPassword = "@#*5896Djkd_Sn." # Redis密码
 	RedisTable = 0 # Redis数据表
 	RedisPoolSize = 1000 # Redis连接池数量
 	JwtKey = "%^#$8784hjd.p"
