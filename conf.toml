@@ -1,19 +1,19 @@
 
-	Plugins = ["守卫","开关","复读","WCA","回复","群管","赛季","查价","打乱","Rank","学习"]   # 插件管理
-	AppId = 102070767 # 机器人AppId
-	AccessToken = "sIA7q1O8C9SFtrZjgk2FVUjzJYXXnQed" # 机器人AccessToken
-	ClientSecret = "EH5f06ycbMs9ByWp" # 机器人ClientSecret
-	Admins = ["2693678434"]   # 机器人管理员管理
+	Plugins = ["守卫","开关","Bind","复读","WCA","回复","赛季","查价","打乱","学习"]   # 插件管理
+	AppId = 101986244 # 机器人AppId
+	AccessToken = "1sou4Anz0TyJ7kGLa1k2fKAl57B3tBxH" # 机器人AccessToken
+	ClientSecret = "" # 机器人ClientSecret
+	Admins = ["16531809630840244788", "1876631039A150D78CA0BCBC9ECD19A0"]   # 机器人管理员管理
 	DatabaseUser = "sa"   # MSSQL数据库用户名
 	DatabasePassword = "wr@#2mf8"   # MSSQL数据库密码
 	DatabasePort = 1433   # MSSQL数据库服务端口
 	DatabaseServer = "116.62.13.42"   # MSSQL数据库服务网址
 	DatabaseName = "kequ5060"
 	ServerPort = 8081   # 服务端口
-	ScrambleServer = "http://2mf8.cn:2014"   # 打乱服务地址
+	ScrambleServer = "http://localhost:2014"   # 打乱服务地址
 	RedisServer = "127.0.0.1" # Redis服务网址
 	RedisPort = 6379 # Redis端口
-	RedisPassword = "@#*5896Djkd_Sn." # Redis密码
+	RedisPassword = "" # Redis密码
 	RedisTable = 0 # Redis数据表
 	RedisPoolSize = 1000 # Redis连接池数量
 	JwtKey = "%^#$8784hjd.p"

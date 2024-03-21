@@ -3,6 +3,7 @@ package plugins
 import (
 	"context"
 
+	"github.com/2mf8/GoTBot/utils"
 	. "github.com/2mf8/GoTBot/utils"
 )
 
@@ -24,7 +25,7 @@ type Reply struct {
 * rd 删除防屏蔽码
 * rf 失败防屏蔽码
  */
-func (rep *Reply) Do(ctx *context.Context, botId, groupId, userId int64, groupName string, messageId int64, rawMsg, card string, botRole, userRole, super bool) RetStuct {
+func (rep *Reply) Do(ctx *context.Context, botId *utils.BotIdType, groupId *utils.GroupIdType, userId *utils.UserIdType, groupName string, messageId *utils.MsgIdType, rawMsg, card string, botRole, userRole, super bool) (retStuct utils.RetStuct) {
 	return RetStuct{
 		RetVal: MESSAGE_IGNORE,
 	}

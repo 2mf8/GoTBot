@@ -31,15 +31,25 @@ type Block struct{}
 * rd 删除防屏蔽码
 * rf 失败防屏蔽码
  */
-func (block *Block) Do(ctx *context.Context, botId, groupId, userId int64, groupName string, messageId int64, rawMsg, card string, botRole, userRole, super bool) utils.RetStuct {
-	gid := fmt.Sprintf("%v", groupId)
-	uid := fmt.Sprintf("%v", userId)
+func (block *Block) Do(ctx *context.Context, botId *utils.BotIdType, groupId *utils.GroupIdType, userId *utils.UserIdType, groupName string, messageId *utils.MsgIdType, rawMsg, card string, botRole, userRole, super bool) (retStuct utils.RetStuct) {
+	gid := ""
+	uid := ""
+	if groupId.Common > 0 {
+		gid = strconv.Itoa(int(groupId.Common))
+	} else {
+		gid = groupId.Offical
+	}
+	if userId.Common > 0 {
+		uid = strconv.Itoa(int(userId.Common))
+	} else {
+		uid = userId.Offical
+	}
 	ispblock, err := PBlockGet(gid, uid)
 	//fmt.Println(ispblock)
 	if err != nil {
 		fmt.Println("[INFO] ", err)
 	}
-	if ispblock.UserId == strconv.Itoa(int(userId)) && ispblock.IsPBlock {
+	if (ispblock.UserId == strconv.Itoa(int(userId.Common)) || ispblock.UserId == userId.Offical) && ispblock.IsPBlock {
 		if !super {
 			return utils.RetStuct{
 				RetVal: utils.MESSAGE_BLOCK,
@@ -75,6 +85,7 @@ func (block *Block) Do(ctx *context.Context, botId, groupId, userId int64, group
 					Text: replyMsg,
 				},
 				ReqType: utils.GroupMsg,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
 		pid := fmt.Sprintf("%v", pUserID)
@@ -88,6 +99,7 @@ func (block *Block) Do(ctx *context.Context, botId, groupId, userId int64, group
 					Text: replyMsg,
 				},
 				ReqType: utils.GroupMsg,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
 		replyMsg := "屏蔽" + pUserID + "成功"
@@ -98,6 +110,7 @@ func (block *Block) Do(ctx *context.Context, botId, groupId, userId int64, group
 				Text: replyMsg,
 			},
 			ReqType: utils.GroupMsg,
+			OfficalMsgId: messageId.Offical,
 		}
 	}
 	if StartsWith(s, "屏蔽-") && super {
@@ -111,6 +124,7 @@ func (block *Block) Do(ctx *context.Context, botId, groupId, userId int64, group
 					Text: replyMsg,
 				},
 				ReqType: utils.GroupMsg,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
 		err = PBlockSave(gid, pUserID, uid, false, time.Now())
@@ -123,6 +137,7 @@ func (block *Block) Do(ctx *context.Context, botId, groupId, userId int64, group
 					Text: replyMsg,
 				},
 				ReqType: utils.GroupMsg,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
 		replyMsg := "解除屏蔽" + pUserID + "成功"
@@ -133,6 +148,7 @@ func (block *Block) Do(ctx *context.Context, botId, groupId, userId int64, group
 				Text: replyMsg,
 			},
 			ReqType: utils.GroupMsg,
+			OfficalMsgId: messageId.Offical,
 		}
 	}
 	return utils.RetStuct{

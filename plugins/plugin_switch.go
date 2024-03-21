@@ -2,8 +2,8 @@ package plugins
 
 import (
 	"context"
-	"fmt"
 	"log"
+	"strconv"
 	"strings"
 	"time"
 
@@ -30,7 +30,7 @@ type BotSwitch struct {
 * rd 删除防屏蔽码
 * rf 失败防屏蔽码
  */
-func (botSwitch *BotSwitch) Do(ctx *context.Context, botId, groupId, userId int64, groupName string, messageId int64, rawMsg, card string, botRole, userRole, super bool) utils.RetStuct {
+func (botSwitch *BotSwitch) Do(ctx *context.Context, botId *utils.BotIdType, groupId *utils.GroupIdType, userId *utils.UserIdType, groupName string, messageId *utils.MsgIdType, rawMsg, card string, botRole, userRole, super bool) (retStuct utils.RetStuct) {
 	s, b := Prefix(rawMsg, ".")
 	if !b {
 		return utils.RetStuct{
@@ -38,8 +38,18 @@ func (botSwitch *BotSwitch) Do(ctx *context.Context, botId, groupId, userId int6
 		}
 	}
 
-	gid := fmt.Sprintf("%v", groupId)
-	uid := fmt.Sprintf("%v", userId)
+	gid := ""
+	uid := ""
+	if groupId.Common > 0 {
+		gid = strconv.Itoa(int(groupId.Common))
+	} else {
+		gid = groupId.Offical
+	}
+	if userId.Common > 0 {
+		uid = strconv.Itoa(int(userId.Common))
+	} else {
+		uid = userId.Offical
+	}
 
 	if StartsWith(s, "开启") && (userRole || super) {
 		s = strings.TrimSpace(strings.TrimPrefix(s, "开启"))
@@ -61,6 +71,7 @@ func (botSwitch *BotSwitch) Do(ctx *context.Context, botId, groupId, userId int6
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
 		err := SwitchSave(gid, gid, uid, int64(i), time.Now(), false)
@@ -74,6 +85,7 @@ func (botSwitch *BotSwitch) Do(ctx *context.Context, botId, groupId, userId int6
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
+				OfficalMsgId: messageId.Offical,
 			}
 		} else {
 			reply := "开启成功"
@@ -85,6 +97,7 @@ func (botSwitch *BotSwitch) Do(ctx *context.Context, botId, groupId, userId int6
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
 	}
@@ -108,6 +121,7 @@ func (botSwitch *BotSwitch) Do(ctx *context.Context, botId, groupId, userId int6
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
 		err := SwitchSave(gid, gid, uid, int64(i), time.Now(), true)
@@ -121,6 +135,7 @@ func (botSwitch *BotSwitch) Do(ctx *context.Context, botId, groupId, userId int6
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
+				OfficalMsgId: messageId.Offical,
 			}
 		} else {
 			reply := "关闭成功"
@@ -132,6 +147,7 @@ func (botSwitch *BotSwitch) Do(ctx *context.Context, botId, groupId, userId int6
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
 

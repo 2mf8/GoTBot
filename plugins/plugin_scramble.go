@@ -30,7 +30,7 @@ type ScramblePlugin struct {
 * rd 删除防屏蔽码
 * rf 失败防屏蔽码
  */
-func (scramble *ScramblePlugin) Do(ctx *context.Context, botId, groupId, userId int64, groupName string, messageId int64, rawMsg, card string, botRole, userRole, super bool) utils.RetStuct {
+func (scramble *ScramblePlugin) Do(ctx *context.Context, botId *utils.BotIdType, groupId *utils.GroupIdType, userId *utils.UserIdType, groupName string, messageId *utils.MsgIdType, rawMsg, card string, botRole, userRole, super bool) (retStuct utils.RetStuct) {
 	s, b := Prefix(rawMsg, ".")
 	if !b {
 		return utils.RetStuct{
@@ -51,6 +51,7 @@ func (scramble *ScramblePlugin) Do(ctx *context.Context, botId, groupId, userId 
 					Text: "获取打乱失败",
 				},
 				ReqType: utils.GroupMsg,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
 		if shor == "minx" {
@@ -68,6 +69,7 @@ func (scramble *ScramblePlugin) Do(ctx *context.Context, botId, groupId, userId 
 				Image: imgUrl,
 			},
 			ReqType: utils.GroupMsg,
+			OfficalMsgId: messageId.Offical,
 		}
 	}
 	return utils.RetStuct{

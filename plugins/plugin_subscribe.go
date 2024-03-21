@@ -31,7 +31,7 @@ type Sub struct {
 * rd 删除防屏蔽码
 * rf 失败防屏蔽码
  */
-func (sub *Sub) Do(ctx *context.Context, botId, groupId, userId int64, groupName string, messageId int64, rawMsg, card string, botRole, userRole, super bool) utils.RetStuct {
+func (sub *Sub) Do(ctx *context.Context, botId *utils.BotIdType, groupId *utils.GroupIdType, userId *utils.UserIdType, groupName string, messageId *utils.MsgIdType, rawMsg, card string, botRole, userRole, super bool) (retStuct utils.RetStuct) {
 	s, b := Prefix(rawMsg, ".")
 	if !b {
 		return utils.RetStuct{
@@ -42,7 +42,7 @@ func (sub *Sub) Do(ctx *context.Context, botId, groupId, userId int64, groupName
 	if StartsWith(s, "订阅") && (userRole || super) {
 		s = strings.TrimSpace(strings.TrimPrefix(s, "订阅"))
 		r_groupId, _ := strconv.Atoi(s)
-		_ = SubSave(groupId, int64(r_groupId), userId)
+		_ = SubSave(groupId.Common, int64(r_groupId), userId.Common)
 		reply := " 订阅成功"
 		log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, reply)
 		return utils.RetStuct{
@@ -51,10 +51,11 @@ func (sub *Sub) Do(ctx *context.Context, botId, groupId, userId int64, groupName
 				Text: reply,
 			},
 			ReqType: utils.GroupMsg,
+			OfficalMsgId: messageId.Offical,
 		}
 	}
 	if StartsWith(s, "取消订阅") && (userRole || super) {
-		_ = SubDeleteByGroupId(groupId)
+		_ = SubDeleteByGroupId(groupId.Common)
 		reply := "取消订阅成功"
 		log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, reply)
 		return utils.RetStuct{
@@ -63,6 +64,7 @@ func (sub *Sub) Do(ctx *context.Context, botId, groupId, userId int64, groupName
 				Text: reply,
 			},
 			ReqType: utils.GroupMsg,
+			OfficalMsgId: messageId.Offical,
 		}
 	}
 	return utils.RetStuct{

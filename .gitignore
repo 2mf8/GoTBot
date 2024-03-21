@@ -47,4 +47,3 @@ cuberbot
 tmp
 dist/
 /goreleaser
-*.toml

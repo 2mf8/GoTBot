@@ -2,8 +2,8 @@ package plugins
 
 import (
 	"context"
-	"fmt"
 	"log"
+	"strconv"
 	"strings"
 
 	. "github.com/2mf8/GoTBot/data"
@@ -29,13 +29,18 @@ type Guard struct {
 * rd 删除防屏蔽码
 * rf 失败防屏蔽码
  */
-func (guard *Guard) Do(ctx *context.Context, botId, groupId, userId int64, groupName string, messageId int64, rawMsg, card string, botRole, userRole, super bool) utils.RetStuct {
+func (guard *Guard) Do(ctx *context.Context, botId *utils.BotIdType, groupId *utils.GroupIdType, userId *utils.UserIdType, groupName string, messageId *utils.MsgIdType, rawMsg, card string, botRole, userRole, super bool) (retStuct utils.RetStuct) {
 	if !botRole {
 		return utils.RetStuct{
 			RetVal: utils.MESSAGE_IGNORE,
 		}
 	}
-	gid := fmt.Sprintf("%v", groupId)
+	gid := ""
+	if groupId.Common > 0 {
+		gid = strconv.Itoa(int(groupId.Common))
+	} else {
+		gid = groupId.Offical
+	}
 	guardIntent := int64(PluginGuard)
 	sg, _ := SGBGIACI(gid, gid)
 	isGuard := sg.PluginSwitch.IsCloseOrGuard & guardIntent
@@ -63,6 +68,7 @@ func (guard *Guard) Do(ctx *context.Context, botId, groupId, userId int64, group
 				Text: msg,
 			},
 			ReqType: utils.GroupMsg,
+			OfficalMsgId: messageId.Offical,
 		}
 	}
 
@@ -78,6 +84,7 @@ func (guard *Guard) Do(ctx *context.Context, botId, groupId, userId int64, group
 				Text: msg,
 			},
 			ReqType: utils.GroupMsg,
+			OfficalMsgId: messageId.Offical,
 		}
 	}
 
@@ -92,6 +99,7 @@ func (guard *Guard) Do(ctx *context.Context, botId, groupId, userId int64, group
 					Text: msg,
 				},
 				ReqType: utils.GroupMsg,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
 		msg := "消息触发守卫，已撤回消息并禁言该用户两分钟, 请文明发言"
@@ -103,7 +111,8 @@ func (guard *Guard) Do(ctx *context.Context, botId, groupId, userId int64, group
 			},
 			ReqType:  utils.DeleteMsg,
 			Duration: int64(120),
-			MsgId:    messageId,
+			MsgId:    messageId.Common,
+			OfficalMsgId: messageId.Offical,
 		}
 	}
 	return utils.RetStuct{

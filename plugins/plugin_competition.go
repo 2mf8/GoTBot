@@ -27,7 +27,7 @@ type ItmeAndBestAndAverage struct {
 	AverageUserName string
 }
 
-func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, groupName string, messageId int64, rawMsg, card string, botRole, userRole, super bool) utils.RetStuct {
+func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId *utils.GroupIdType, userId *utils.UserIdType, groupName string, messageId *utils.MsgIdType, rawMsg, card string, botRole, userRole, super bool) (retStuct utils.RetStuct) {
 	var sic []string
 	s, b := public.Prefix(rawMsg, ".")
 	if !b {
@@ -35,9 +35,18 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 			RetVal: utils.MESSAGE_IGNORE,
 		}
 	}
-
-	gid := fmt.Sprintf("%v", groupId)
-	uid := fmt.Sprintf("%v", userId)
+	gid := ""
+	uid := ""
+	if groupId.Common > 0 {
+		gid = strconv.Itoa(int(groupId.Common))
+	} else {
+		gid = groupId.Offical
+	}
+	if userId.Common > 0 {
+		uid = strconv.Itoa(int(userId.Common))
+	} else {
+		uid = userId.Offical
+	}
 
 	reg1 := regexp.MustCompile("@!")
 	reg2 := regexp.MustCompile("@")
@@ -58,6 +67,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
 		si := strings.Split(strings.TrimSpace(sc), " ")
@@ -104,6 +114,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
 
@@ -117,6 +128,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
+				OfficalMsgId: messageId.Offical,
 			}
 		} else {
 			cr.Sessions += 1
@@ -132,6 +144,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
 		reply := "创建成功"
@@ -142,6 +155,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 				Text: reply,
 			},
 			ReqType: utils.GroupMsg,
+			OfficalMsgId: messageId.Offical,
 		}
 	}
 	sczj, b := public.Prefix(s, "赛季追加")
@@ -155,6 +169,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
 		si := strings.Split(strings.TrimSpace(sc), " ")
@@ -195,6 +210,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
 
@@ -208,6 +224,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 					Text: tip,
 				},
 				ReqType: utils.GroupMsg,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
 		if err != nil {
@@ -219,6 +236,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
 		reply := "追加成功"
@@ -229,6 +247,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 				Text: reply,
 			},
 			ReqType: utils.GroupMsg,
+			OfficalMsgId: messageId.Offical,
 		}
 	}
 
@@ -246,6 +265,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 				Text: reply,
 			},
 			ReqType: utils.GroupMsg,
+			OfficalMsgId: messageId.Offical,
 		}
 	}
 
@@ -261,6 +281,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
 		gss, _ := data.CompetitionRead()
@@ -286,6 +307,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 							Text: reply,
 						},
 						ReqType: utils.GroupMsg,
+						OfficalMsgId: messageId.Offical,
 					}
 				}
 				if tgc == "333" && gss.CompContents.Three != "" {
@@ -299,6 +321,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 							Text: reply,
 						},
 						ReqType: utils.GroupMsg,
+						OfficalMsgId: messageId.Offical,
 					}
 				}
 				if tgc == "222" && gss.CompContents.Two != "" {
@@ -312,6 +335,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 							Text: reply,
 						},
 						ReqType: utils.GroupMsg,
+						OfficalMsgId: messageId.Offical,
 					}
 				}
 				if tgc == "skewb" && gss.CompContents.Skewb != "" {
@@ -325,6 +349,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 							Text: reply,
 						},
 						ReqType: utils.GroupMsg,
+						OfficalMsgId: messageId.Offical,
 					}
 				}
 				if tgc == "sq1" && gss.CompContents.Square != "" {
@@ -338,6 +363,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 							Text: reply,
 						},
 						ReqType: utils.GroupMsg,
+						OfficalMsgId: messageId.Offical,
 					}
 				}
 				if tgc == "pyram" && gss.CompContents.Pyraminx != "" {
@@ -351,6 +377,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 							Text: reply,
 						},
 						ReqType: utils.GroupMsg,
+						OfficalMsgId: messageId.Offical,
 					}
 				}
 				if tgc == "clock" && gss.CompContents.Clock != "" {
@@ -364,6 +391,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 							Text: reply,
 						},
 						ReqType: utils.GroupMsg,
+						OfficalMsgId: messageId.Offical,
 					}
 				}
 				reply := "项目不存在，请使用赛季追加功能追加"
@@ -374,6 +402,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 						Text: reply,
 					},
 					ReqType: utils.GroupMsg,
+					OfficalMsgId: messageId.Offical,
 				}
 			}
 			if tgc == "222" && gss.CompContents.Two != "" {
@@ -388,6 +417,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 						Image: imgUrl,
 					},
 					ReqType: utils.GroupMsg,
+					OfficalMsgId: messageId.Offical,
 				}
 			}
 			if tgc == "333" && gss.CompContents.Three != "" {
@@ -402,6 +432,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 						Image: imgUrl,
 					},
 					ReqType: utils.GroupMsg,
+					OfficalMsgId: messageId.Offical,
 				}
 			}
 			if tgc == "444" && gss.CompContents.Four != "" {
@@ -416,6 +447,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 						Image: imgUrl,
 					},
 					ReqType: utils.GroupMsg,
+					OfficalMsgId: messageId.Offical,
 				}
 			}
 			if tgc == "555" && gss.CompContents.Five != "" {
@@ -430,6 +462,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 						Image: imgUrl,
 					},
 					ReqType: utils.GroupMsg,
+					OfficalMsgId: messageId.Offical,
 				}
 			}
 			if tgc == "666" && gss.CompContents.Six != "" {
@@ -444,6 +477,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 						Image: imgUrl,
 					},
 					ReqType: utils.GroupMsg,
+					OfficalMsgId: messageId.Offical,
 				}
 			}
 			if tgc == "777" && gss.CompContents.Seven != "" {
@@ -458,6 +492,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 						Image: imgUrl,
 					},
 					ReqType: utils.GroupMsg,
+					OfficalMsgId: messageId.Offical,
 				}
 			}
 			if tgc == "skewb" && gss.CompContents.Skewb != "" {
@@ -472,6 +507,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 						Image: imgUrl,
 					},
 					ReqType: utils.GroupMsg,
+					OfficalMsgId: messageId.Offical,
 				}
 			}
 			if tgc == "pyram" && gss.CompContents.Pyraminx != "" {
@@ -486,6 +522,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 						Image: imgUrl,
 					},
 					ReqType: utils.GroupMsg,
+					OfficalMsgId: messageId.Offical,
 				}
 			}
 			if tgc == "sq1" && gss.CompContents.Square != "" {
@@ -500,6 +537,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 						Image: imgUrl,
 					},
 					ReqType: utils.GroupMsg,
+					OfficalMsgId: messageId.Offical,
 				}
 			}
 			if tgc == "clock" && gss.CompContents.Clock != "" {
@@ -514,6 +552,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 						Image: imgUrl,
 					},
 					ReqType: utils.GroupMsg,
+					OfficalMsgId: messageId.Offical,
 				}
 			}
 			if tgc == "minx" && gss.CompContents.Megaminx != "" {
@@ -531,6 +570,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 						Image: imgUrl,
 					},
 					ReqType: utils.GroupMsg,
+					OfficalMsgId: messageId.Offical,
 				}
 			}
 			reply := "项目不存在，请使用赛季追加功能追加"
@@ -541,6 +581,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
+				OfficalMsgId: messageId.Offical,
 			}
 		} else {
 			reply := "获取出错，格式不对"
@@ -551,6 +592,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
 	}
@@ -568,6 +610,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
 		session := v.Sessions
@@ -623,7 +666,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 				best = minNum
 				average = (sum - best - maxNum) / 3
 			}
-			err := data.AchievementSave(strconv.Itoa(int(userId)), card, null.NewString("", true), tgc, best, average, session)
+			err := data.AchievementSave(uid, card, null.NewString("", true), tgc, best, average, session)
 			if err != nil {
 				reply := "成绩保存出错，请联系管理员或稍后重试"
 				fmt.Println(err)
@@ -634,6 +677,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 						Text: reply,
 					},
 					ReqType: utils.GroupMsg,
+					OfficalMsgId: messageId.Offical,
 				}
 			}
 			bt, at := data.BestAndAverageTimeConvert(best, average)
@@ -649,7 +693,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 			if ai >= 0 && at != "DNF" {
 				pm += fmt.Sprintf("平均 %d (%s)。", ai+1, at)
 			}
-			reply := "成绩上传成功。\n" + card + " (" + strconv.Itoa(int(userId)) + ") 在赛季 " + strconv.Itoa(session) + "的项目 " + tgc + " 中获得排名：" + pm + "\n" + "详情(项目+成绩)：\n" + sjcj
+			reply := "成绩上传成功。\n" + card + " (" + uid + ") 在赛季 " + strconv.Itoa(session) + "的项目 " + tgc + " 中获得排名：" + pm + "\n" + "详情(项目+成绩)：\n" + sjcj
 			if len(gs) == 0 || len(gs) > 5 {
 				reply = "成绩上传错误，请上传1-5个成绩\n格式为\n赛季成绩 [项目] [成绩] [成绩] [成绩] ..."
 			}
@@ -660,6 +704,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
+				OfficalMsgId: messageId.Offical,
 			}
 		} else {
 			reply := "格式错误，缺少项目\n格式为\n赛季成绩 [项目] [成绩] [成绩] [成绩] ..."
@@ -670,6 +715,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
 	}
@@ -686,10 +732,11 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
 		session := v.Sessions
-		as, err := data.AGBUAS(strconv.Itoa(int(userId)), session)
+		as, err := data.AGBUAS(uid, session)
 		if err != nil {
 			reply := "成绩获取出错，请稍后重试"
 			log.Infof("GroupId(%v) UserId(%v) -> %s", groupId, userId, reply)
@@ -699,6 +746,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
 		if len(as) == 0 {
@@ -710,6 +758,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
 		it := fmt.Sprintf("%s(%v)在赛季%d中的成绩为\n项目 最好成绩 || 平均成绩", card, userId, session)
@@ -730,6 +779,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 				Text: it,
 			},
 			ReqType: utils.GroupMsg,
+			OfficalMsgId: messageId.Offical,
 		}
 	}
 
@@ -746,12 +796,13 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
 		session := v.Sessions
 		tgc := data.ToGetScramble(cji[0])
 		if tgc == "" {
-			err := data.ADBUAS(strconv.Itoa(int(userId)), session)
+			err := data.ADBUAS(uid, session)
 			if err != nil {
 				fmt.Println(err)
 				reply := "删除出错，请稍后重试或联系管理员"
@@ -762,6 +813,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 						Text: reply,
 					},
 					ReqType: utils.GroupMsg,
+					OfficalMsgId: messageId.Offical,
 				}
 			}
 			reply := "删除成功"
@@ -772,9 +824,10 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
-		err = data.ADBUAIAS(strconv.Itoa(int(userId)), tgc, session)
+		err = data.ADBUAIAS(uid, tgc, session)
 		if err != nil {
 			fmt.Println(err)
 			reply := "删除出错，请稍后重试或联系管理员"
@@ -785,6 +838,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
 		reply := "删除成功"
@@ -795,6 +849,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 				Text: reply,
 			},
 			ReqType: utils.GroupMsg,
+			OfficalMsgId: messageId.Offical,
 		}
 	}
 
@@ -825,6 +880,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
 		v, err := data.CompetitionRead()
@@ -837,6 +893,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
 		session := v.Sessions
@@ -853,6 +910,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 						Text: reply,
 					},
 					ReqType: utils.GroupMsg,
+					OfficalMsgId: messageId.Offical,
 				}
 			}
 			reply := ""
@@ -871,6 +929,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
 		err = data.ADBUAIAS(ju, tgc, session)
@@ -884,6 +943,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
 		reply := ""
@@ -900,6 +960,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 				Text: reply,
 			},
 			ReqType: utils.GroupMsg,
+			OfficalMsgId: messageId.Offical,
 		}
 	}
 
@@ -916,6 +977,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
 		session := v.Sessions
@@ -929,6 +991,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
 		num := strings.ReplaceAll(sjpm, tgc, "")
@@ -948,6 +1011,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
 
@@ -961,6 +1025,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
 
@@ -1002,6 +1067,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 				Text: ct,
 			},
 			ReqType: utils.GroupMsg,
+			OfficalMsgId: messageId.Offical,
 		}
 	}
 
@@ -1017,6 +1083,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
 		session := v.Sessions
@@ -1031,6 +1098,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
 		ats, err := data.AGBSOBIAAAA(session)
@@ -1044,6 +1112,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
 		if len(bts) == 0 {
@@ -1055,6 +1124,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 					Text: reply,
 				},
 				ReqType: utils.GroupMsg,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
 
@@ -1093,6 +1163,7 @@ func (rep *Competition) Do(ctx *context.Context, botId, groupId, userId int64, g
 				Text: ct,
 			},
 			ReqType: utils.GroupMsg,
+			OfficalMsgId: messageId.Offical,
 		}
 	}
 

@@ -18,7 +18,7 @@ import (
 type WCA struct {
 }
 
-func (wca *WCA) Do(ctx *context.Context, botId, groupId, userId int64, groupName string, messageId int64, rawMsg, card string, botRole, userRole, super bool) utils.RetStuct {
+func (wca *WCA) Do(ctx *context.Context, botId *utils.BotIdType, groupId *utils.GroupIdType, userId *utils.UserIdType, groupName string, messageId *utils.MsgIdType, rawMsg, card string, botRole, userRole, super bool) (retStuct utils.RetStuct) {
 	fmt.Println("rank插件测试，wca")
 	s, b := public.Prefix(rawMsg, ".")
 	if !b {
@@ -47,7 +47,8 @@ func (wca *WCA) Do(ctx *context.Context, botId, groupId, userId int64, groupName
 				ReplyMsg: &utils.Msg{
 					Text: s_r,
 				},
-				MsgId: messageId,
+				MsgId:        messageId.Common,
+				OfficalMsgId: messageId.Offical,
 			}
 		} else if s.Data.TotalElements > 99 {
 			return utils.RetStuct{
@@ -55,7 +56,8 @@ func (wca *WCA) Do(ctx *context.Context, botId, groupId, userId int64, groupName
 				ReplyMsg: &utils.Msg{
 					Text: "搜索范围太大！",
 				},
-				MsgId: messageId,
+				MsgId:        messageId.Common,
+				OfficalMsgId: messageId.Offical,
 			}
 		} else {
 			rankList := ""
@@ -83,7 +85,8 @@ func (wca *WCA) Do(ctx *context.Context, botId, groupId, userId int64, groupName
 				ReplyMsg: &utils.Msg{
 					Text: s_r,
 				},
-				MsgId: messageId,
+				MsgId:        messageId.Common,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
 	}

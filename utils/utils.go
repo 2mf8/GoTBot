@@ -29,6 +29,7 @@ type RetStuct struct {
 	RejectAddAgain bool
 	Retract        int
 	MsgId          int64
+	OfficalMsgId   string
 }
 
 type Msg struct {
@@ -38,8 +39,28 @@ type Msg struct {
 	Images []string
 }
 
+type GroupIdType struct {
+	Common  int64
+	Offical string
+}
+
+type UserIdType struct {
+	Common  int64
+	Offical string
+}
+
+type MsgIdType struct {
+	Common  int64
+	Offical string
+}
+
+type BotIdType struct {
+	Common  int64
+	Offical string
+}
+
 type Plugin interface {
-	Do(ctx *context.Context, botId, groupId, userId int64, groupName string, messageId int64, rawMsg, card string, botRole, userRole, super bool) (retStuct RetStuct)
+	Do(ctx *context.Context, botId *BotIdType, groupId *GroupIdType, userId *UserIdType, groupName string, messageId *MsgIdType, rawMsg, card string, botRole, userRole, super bool) (retStuct RetStuct)
 }
 
 var PluginSet map[string]Plugin

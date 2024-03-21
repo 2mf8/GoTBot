@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -32,15 +33,25 @@ type LearnPlugin struct {
 * rd 删除防屏蔽码
 * rf 失败防屏蔽码
  */
-func (learnPlugin *LearnPlugin) Do(ctx *context.Context, botId, groupId, userId int64, groupName string, messageId int64, rawMsg, card string, botRole, userRole, super bool) utils.RetStuct {
+func (learnPlugin *LearnPlugin) Do(ctx *context.Context, botId *utils.BotIdType, groupId *utils.GroupIdType, userId *utils.UserIdType, groupName string, messageId *utils.MsgIdType, rawMsg, card string, botRole, userRole, super bool) (retStuct utils.RetStuct) {
 	s, b := Prefix(rawMsg, ".")
 	if !b {
 		return utils.RetStuct{
 			RetVal: utils.MESSAGE_IGNORE,
 		}
 	}
-	gid := fmt.Sprintf("%v", groupId)
-	uid := fmt.Sprintf("%v", userId)
+	gid := ""
+	uid := ""
+	if groupId.Common > 0 {
+		gid = strconv.Itoa(int(groupId.Common))
+	} else {
+		gid = groupId.Offical
+	}
+	if userId.Common > 0 {
+		uid = strconv.Itoa(int(userId.Common))
+	} else {
+		uid = userId.Offical
+	}
 	ggk, _ := GetJudgeKeys()
 	containsJudgeKeys := Judge(rawMsg, *ggk.JudgekeysSync)
 	if containsJudgeKeys != "" {
@@ -51,7 +62,8 @@ func (learnPlugin *LearnPlugin) Do(ctx *context.Context, botId, groupId, userId 
 			ReplyMsg: &utils.Msg{
 				Text: msg,
 			},
-			ReqType: utils.GroupMsg,
+			ReqType:      utils.GroupMsg,
+			OfficalMsgId: messageId.Offical,
 		}
 	}
 	reg1 := regexp.MustCompile("＃")
@@ -69,7 +81,8 @@ func (learnPlugin *LearnPlugin) Do(ctx *context.Context, botId, groupId, userId 
 					ReplyMsg: &utils.Msg{
 						Text: replyText,
 					},
-					ReqType: utils.GroupMsg,
+					ReqType:      utils.GroupMsg,
+					OfficalMsgId: messageId.Offical,
 				}
 			}
 			err := LDBGAA(gid, gid, str3[0])
@@ -81,7 +94,8 @@ func (learnPlugin *LearnPlugin) Do(ctx *context.Context, botId, groupId, userId 
 					ReplyMsg: &utils.Msg{
 						Text: replyText,
 					},
-					ReqType: utils.GroupMsg,
+					ReqType:      utils.GroupMsg,
+					OfficalMsgId: messageId.Offical,
 				}
 			}
 			replyText := "问答删除成功"
@@ -91,7 +105,8 @@ func (learnPlugin *LearnPlugin) Do(ctx *context.Context, botId, groupId, userId 
 				ReplyMsg: &utils.Msg{
 					Text: replyText,
 				},
-				ReqType: utils.GroupMsg,
+				ReqType:      utils.GroupMsg,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
 		if strings.TrimSpace(str3[0]) == "" {
@@ -102,7 +117,8 @@ func (learnPlugin *LearnPlugin) Do(ctx *context.Context, botId, groupId, userId 
 				ReplyMsg: &utils.Msg{
 					Text: replyText,
 				},
-				ReqType: utils.GroupMsg,
+				ReqType:      utils.GroupMsg,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
 		err := LearnSave(strings.TrimSpace(str3[0]), gid, gid, uid, null.NewString(str3[1], true), time.Now(), true)
@@ -114,7 +130,8 @@ func (learnPlugin *LearnPlugin) Do(ctx *context.Context, botId, groupId, userId 
 				ReplyMsg: &utils.Msg{
 					Text: replyText,
 				},
-				ReqType: utils.GroupMsg,
+				ReqType:      utils.GroupMsg,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
 		replyText := "学习已完成，下次触发有效"
@@ -124,7 +141,8 @@ func (learnPlugin *LearnPlugin) Do(ctx *context.Context, botId, groupId, userId 
 			ReplyMsg: &utils.Msg{
 				Text: replyText,
 			},
-			ReqType: utils.GroupMsg,
+			ReqType:      utils.GroupMsg,
+			OfficalMsgId: messageId.Offical,
 		}
 	}
 	if StartsWith(str1, "++") && super {
@@ -139,7 +157,8 @@ func (learnPlugin *LearnPlugin) Do(ctx *context.Context, botId, groupId, userId 
 					ReplyMsg: &utils.Msg{
 						Text: replyText,
 					},
-					ReqType: utils.GroupMsg,
+					ReqType:      utils.GroupMsg,
+					OfficalMsgId: messageId.Offical,
 				}
 			}
 			err := LDBGAA("9999999990", "9999999990", str3[0])
@@ -151,7 +170,8 @@ func (learnPlugin *LearnPlugin) Do(ctx *context.Context, botId, groupId, userId 
 					ReplyMsg: &utils.Msg{
 						Text: replyText,
 					},
-					ReqType: utils.GroupMsg,
+					ReqType:      utils.GroupMsg,
+					OfficalMsgId: messageId.Offical,
 				}
 			}
 			replyText := "系统问答删除成功"
@@ -161,7 +181,8 @@ func (learnPlugin *LearnPlugin) Do(ctx *context.Context, botId, groupId, userId 
 				ReplyMsg: &utils.Msg{
 					Text: replyText,
 				},
-				ReqType: utils.GroupMsg,
+				ReqType:      utils.GroupMsg,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
 		if strings.TrimSpace(str3[0]) == "" {
@@ -172,10 +193,12 @@ func (learnPlugin *LearnPlugin) Do(ctx *context.Context, botId, groupId, userId 
 				ReplyMsg: &utils.Msg{
 					Text: replyText,
 				},
-				ReqType: utils.GroupMsg,
+				ReqType:      utils.GroupMsg,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
 		err := LearnSave(strings.TrimSpace(str3[0]), "9999999990", "9999999990", uid, null.NewString(str3[1], true), time.Now(), true)
+		fmt.Println(err)
 		if err != nil {
 			replyText := "系统问答添加失败"
 			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
@@ -184,7 +207,8 @@ func (learnPlugin *LearnPlugin) Do(ctx *context.Context, botId, groupId, userId 
 				ReplyMsg: &utils.Msg{
 					Text: replyText,
 				},
-				ReqType: utils.GroupMsg,
+				ReqType:      utils.GroupMsg,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
 		replyText := "系统问答学习已完成，下次触发有效"
@@ -194,7 +218,8 @@ func (learnPlugin *LearnPlugin) Do(ctx *context.Context, botId, groupId, userId 
 			ReplyMsg: &utils.Msg{
 				Text: replyText,
 			},
-			ReqType: utils.GroupMsg,
+			ReqType:      utils.GroupMsg,
+			OfficalMsgId: messageId.Offical,
 		}
 	}
 	if strings.TrimSpace(rawMsg) == "" {
@@ -205,7 +230,8 @@ func (learnPlugin *LearnPlugin) Do(ctx *context.Context, botId, groupId, userId 
 			ReplyMsg: &utils.Msg{
 				Text: replyText,
 			},
-			ReqType: utils.GroupMsg,
+			ReqType:      utils.GroupMsg,
+			OfficalMsgId: messageId.Offical,
 		}
 	}
 	learn_get, err := LearnGet(gid, gid, strings.TrimSpace(s))
@@ -219,7 +245,8 @@ func (learnPlugin *LearnPlugin) Do(ctx *context.Context, botId, groupId, userId 
 				ReplyMsg: &utils.Msg{
 					Text: sys_learn_get.Answer.String,
 				},
-				ReqType: utils.GroupMsg,
+				ReqType:      utils.GroupMsg,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
 	}
@@ -230,7 +257,8 @@ func (learnPlugin *LearnPlugin) Do(ctx *context.Context, botId, groupId, userId 
 			ReplyMsg: &utils.Msg{
 				Text: learn_get.Answer.String,
 			},
-			ReqType: utils.GroupMsg,
+			ReqType:      utils.GroupMsg,
+			OfficalMsgId: messageId.Offical,
 		}
 	}
 	return utils.RetStuct{

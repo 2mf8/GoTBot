@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"math/rand"
+	"net/url"
 	"os"
 	"path"
 	"regexp"
@@ -22,21 +23,15 @@ import (
 	"github.com/rifflock/lfshook"
 	log "github.com/sirupsen/logrus"
 	easy "github.com/t-tomalak/logrus-easy-formatter"
+	"github.com/tencent-connect/botgo"
+	"github.com/tencent-connect/botgo/dto"
+	"github.com/tencent-connect/botgo/event"
+	"github.com/tencent-connect/botgo/token"
+	"github.com/tencent-connect/botgo/websocket"
 )
 
-type Push struct {
-	Bot     *gonebot.Bot
-	GroupId int64
-}
-
-var push = Push{}
-
-var pushes = make(map[int64]*Push)
-
 func main() {
-
 	InitLog()
-
 	tomlData := `
 	Plugins = ["守卫","开关","复读","服务号","WCA","回复","频道管理","赛季","查价","打乱","学习"]   # 插件管理
 	AppId = 0 # 机器人AppId
@@ -74,6 +69,8 @@ func main() {
 
 	log.Infof("已加载插件 %s", pluginString)
 
+	go StartOffical()
+
 	gonebot.HandleConnect = func(bot *gonebot.Bot) {
 		fmt.Printf("\n[连接] 新机器人已连接：%d\n", bot.BotId)
 		fmt.Println("[已连接] 所有机器人列表：")
@@ -97,7 +94,7 @@ func main() {
 		gid := fmt.Sprintf("%v", groupId)
 		uid := fmt.Sprintf("%v", userId)
 		super := public.IsBotAdmin(uid, allconfig.Admins)
-		rand.Seed(time.Now().UnixNano())
+		rand.New(rand.NewSource(time.Now().UnixNano()))
 		userRole := public.IsAdmin(event.Sender.Role)
 		fmt.Println(messageId, card, super, event.Sender.Nickname)
 		gi, _ := bot.GetGroupInfo(groupId, true)
@@ -106,18 +103,19 @@ func main() {
 		log.Infof("[INFO] BotId(%v) GroupId(%v) UserId(%v) <- %s", botId, groupId, userId, rawMsg)
 
 		fmt.Println("权限测试", super, botIsAdmin, userRole, gi.Data.GroupName)
-		reg := regexp.MustCompile(`\[CQ:at,qq=[0-9]+\]`)
+		regStr := fmt.Sprintf(`\[CQ:at,qq=%v\]`, bot.BotId)
+		reg := regexp.MustCompile(regStr)
 		reg1 := regexp.MustCompile(`\[CQ:reply,id=[0-9]+\]`)
-		
+
 		ss := reg.FindAllString(rawMsg, -1)
 		s1 := reg1.FindAllString(rawMsg, -1)
 		ns := ""
 		if len(ss) == 0 {
 			ns = rawMsg
 		} else {
-			if len(s1) > 0{
+			if len(s1) > 0 {
 				ns = strings.ReplaceAll(strings.ReplaceAll(strings.ReplaceAll(strings.ReplaceAll(rawMsg, ss[0], "."), " ", ""), s1[0], ""), "..", ".")
-			}else{
+			} else {
 				ns = strings.ReplaceAll(strings.ReplaceAll(rawMsg, ss[0], "."), " ", "")
 			}
 		}
@@ -251,7 +249,7 @@ func main() {
 								Permission: &keyboard.Permission{
 									Type: keyboard.PermissionTypAll,
 								},
-								Data:                 "http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=5vLUePWP-bVT3zyjLCier6K7aH8-de1J&authKey=uE97P94%2FMqRn%2FUYVM0IGF2UbkgpEP7NiJIHRUt79Y3QgGQfwsZUxZdT3AMf49901&noverify=0&group_code=758958532",
+								Data:                 "https://2mf8.cn/",
 								Reply:                true,
 								Enter:                true,
 								AtBotShowChannelList: true,
@@ -261,7 +259,7 @@ func main() {
 				},
 			}
 			if err == nil {
-				md := "# 标题 \\n## 二级标题"
+				md := fmt.Sprintf("# 标题 \\n## 二级标题\\n[直发指令](mqqapi://aio/inlinecmd?command=%s&reply=false&enter=true)\\n[手动指令](mqqapi://aio/inlinecmd?command=%s&reply=false&enter=false)\\n[🔗爱魔方吧](https://2mf8.cn/)", url.PathEscape("直发指令"), url.PathEscape("手动指令"))
 				resp, err := bot.SendForwardMsg(gmi.Data.Nickname, md, kc)
 				if err != nil {
 					fmt.Println(err)
@@ -291,7 +289,23 @@ func main() {
 			if intent > 0 {
 				continue
 			}
-			retStuct := utils.PluginSet[i].Do(&ctx, botId, groupId, userId, gi.Data.GroupName, messageId, ns, card, botIsAdmin, userRole, super)
+			botType := utils.BotIdType{
+				Common:  botId,
+				Offical: "",
+			}
+			groupIdType := utils.GroupIdType{
+				Common:  groupId,
+				Offical: "",
+			}
+			userIdType := utils.UserIdType{
+				Common:  userId,
+				Offical: "",
+			}
+			msgIdType := utils.MsgIdType{
+				Common:  messageId,
+				Offical: "",
+			}
+			retStuct := utils.PluginSet[i].Do(&ctx, &botType, &groupIdType, &userIdType, gi.Data.GroupName, &msgIdType, ns, card, botIsAdmin, userRole, super)
 			if retStuct.RetVal == utils.MESSAGE_BLOCK {
 				if retStuct.ReqType == utils.GroupMsg {
 					log.Println(retStuct.ReplyMsg.Text)
@@ -361,7 +375,6 @@ func main() {
 			}
 		}
 	}
-
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.New()
 	router.GET("/onebot/v11/ws", func(c *gin.Context) {
@@ -409,4 +422,137 @@ func InitLog() {
 			LogFormat:       "[%time%] [%lvl%]: %msg% \r\n",
 		},
 	))
+}
+
+func StartOffical() {
+	botLoginInfo := &public.BotLogin{
+		AppId:       database.AllConfig.AppId,
+		AccessToken: database.AllConfig.AccessToken,
+	}
+	token := token.BotToken(botLoginInfo.AppId, botLoginInfo.AccessToken, string(token.TypeBot))
+	api := botgo.NewOpenAPI(token).WithTimeout(3 * time.Second)
+	ctx := context.Background()
+	ws, err := api.WS(ctx, nil, "")
+	if err != nil {
+		log.Warn("登录失败，请检查 appid 和 AccessToken 是否正确。")
+		log.Info("该程序将于5秒后退出！")
+		time.Sleep(time.Second * 5)
+		log.Printf("%+v, err:%v", ws, err)
+	}
+	var groupMessage event.GroupAtMessageEventHandler = func(event *dto.WSPayload, data *dto.WSGroupATMessageData) error {
+		groupId := data.GroupId
+		userId := data.Author.UserId
+		content := strings.TrimSpace(data.Content)
+		msgId := data.MsgId
+		reg4 := regexp.MustCompile("/")
+		content = strings.TrimSpace(reg4.ReplaceAllString(content, ""))
+		super := public.IsBotAdmin(userId, database.AllConfig.Admins)
+		log.Printf("[INFO] GroupId(%v) UserId(%v) -> %v", groupId, userId, content)
+		ctx := context.WithValue(context.Background(), "key", "value")
+		sg, _ := database.SGBGIACI(groupId, groupId)
+		botType := utils.BotIdType{
+			Common:  0,
+			Offical: "",
+		}
+		groupIdType := utils.GroupIdType{
+			Common:  0,
+			Offical: groupId,
+		}
+		userIdType := utils.UserIdType{
+			Common:  0,
+			Offical: userId,
+		}
+		msgIdType := utils.MsgIdType{
+			Common:  0,
+			Offical: msgId,
+		}
+		for v, i := range database.AllConfig.Plugins {
+			fmt.Println(v,i)
+			intent := sg.PluginSwitch.IsCloseOrGuard & int64(database.PluginNameToIntent(i))
+			if intent == int64(database.PluginReply) {
+				break
+			}
+			if intent > 0 {
+				continue
+			}
+			retStuct := utils.PluginSet[i].Do(&ctx, &botType, &groupIdType, &userIdType, "", &msgIdType, content, "", true, false, super)
+			if retStuct.RetVal == utils.MESSAGE_BLOCK {
+				if retStuct.ReqType == utils.GroupMsg {
+					log.Println(retStuct.ReplyMsg.Text)
+					if retStuct.ReplyMsg != nil {
+						fmt.Println(retStuct.ReplyMsg.Text)
+						if retStuct.ReplyMsg.Image != "" {
+							resp, _ := api.PostGroupRichMediaMessage(ctx, groupId, &dto.GroupRichMediaMessageToCreate{FileType: 1, Url: retStuct.ReplyMsg.Image, SrvSendMsg: false})
+							if resp != nil {
+								newMsg := &dto.GroupMessageToCreate{
+									Content: retStuct.ReplyMsg.Text, //+ "\n[🔗奇乐最新价格]\n(https://2mf8.cn/webview/#/pages/index/webview?url=https%3A%2F%2Fqilecube.gitee.io%2F)",
+									Media: &dto.FileInfo{
+										FileInfo: resp.FileInfo,
+									},
+									MsgID:   data.MsgId,
+									MsgType: 7,
+									MsgReq:  1,
+								}
+								api.PostGroupMessage(ctx, groupId, newMsg)
+							}
+						} else {
+							newMsg := &dto.GroupMessageToCreate{
+								Content: "\n" + retStuct.ReplyMsg.Text, //+ "\n[🔗奇乐最新价格]\n(https://2mf8.cn/webview/#/pages/index/webview?url=https%3A%2F%2Fqilecube.gitee.io%2F)",
+								MsgID:   data.MsgId,
+								MsgType: 0,
+							}
+							api.PostGroupMessage(ctx, groupId, newMsg)
+						}
+						if len(retStuct.ReplyMsg.Images) == 2 {
+							resp, _ := api.PostGroupRichMediaMessage(ctx, groupId, &dto.GroupRichMediaMessageToCreate{FileType: 1, Url: retStuct.ReplyMsg.Images[1], SrvSendMsg: false})
+							if resp != nil {
+								newMsg := &dto.GroupMessageToCreate{
+									Content: retStuct.ReplyMsg.Text, //+ "\n[🔗奇乐最新价格]\n(https://2mf8.cn/webview/#/pages/index/webview?url=https%3A%2F%2Fqilecube.gitee.io%2F)",
+									Media: &dto.FileInfo{
+										FileInfo: resp.FileInfo,
+									},
+									MsgID:   data.MsgId,
+									MsgType: 7,
+									MsgReq:  2,
+								}
+								api.PostGroupMessage(ctx, groupId, newMsg)
+							}
+						}
+						if len(retStuct.ReplyMsg.Images) >= 3 {
+							resp, _ := api.PostGroupRichMediaMessage(ctx, groupId, &dto.GroupRichMediaMessageToCreate{FileType: 1, Url: retStuct.ReplyMsg.Images[1], SrvSendMsg: false})
+							if resp != nil {
+								newMsg := &dto.GroupMessageToCreate{
+									Content: retStuct.ReplyMsg.Text, //+ "\n[🔗奇乐最新价格]\n(https://2mf8.cn/webview/#/pages/index/webview?url=https%3A%2F%2Fqilecube.gitee.io%2F)",
+									Media: &dto.FileInfo{
+										FileInfo: resp.FileInfo,
+									},
+									MsgID:   data.MsgId,
+									MsgType: 7,
+									MsgReq:  2,
+								}
+								api.PostGroupMessage(ctx, groupId, newMsg)
+							}
+							resp1, _ := api.PostGroupRichMediaMessage(ctx, groupId, &dto.GroupRichMediaMessageToCreate{FileType: 1, Url: retStuct.ReplyMsg.Images[2], SrvSendMsg: false})
+							if resp1 != nil {
+								newMsg := &dto.GroupMessageToCreate{
+									Content: retStuct.ReplyMsg.Text, //+ "\n[🔗奇乐最新价格]\n(https://2mf8.cn/webview/#/pages/index/webview?url=https%3A%2F%2Fqilecube.gitee.io%2F)",
+									Media: &dto.FileInfo{
+										FileInfo: resp1.FileInfo,
+									},
+									MsgID:   data.MsgId,
+									MsgType: 7,
+									MsgReq:  3,
+								}
+								api.PostGroupMessage(ctx, groupId, newMsg)
+							}
+						}
+					}
+					break
+				}
+			}
+		}
+		return nil
+	}
+	intent := websocket.RegisterHandlers(groupMessage)
+	botgo.NewSessionManager().Start(ws, token, &intent)
 }

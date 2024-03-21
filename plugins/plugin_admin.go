@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
 	. "github.com/2mf8/GoTBot/public"
 	"github.com/2mf8/GoTBot/utils"
 )
@@ -30,9 +31,14 @@ type Admin struct {
 * rs 成功防屏蔽码
 * rd 删除防屏蔽码
 * rf 失败防屏蔽码
-*/
-func (admin *Admin) Do(ctx *context.Context, botId, groupId, userId int64, groupName string, messageId int64, rawMsg, card string, botRole, userRole, super bool) utils.RetStuct {
-	if groupId == 560820998 || groupId == 189420325 || groupId == 348591755 || groupId == 481097523 || groupId == 176211061 || groupId == 138080634 { 
+ */
+func (admin *Admin) Do(ctx *context.Context, botId *utils.BotIdType, groupId *utils.GroupIdType, userId *utils.UserIdType, groupName string, messageId *utils.MsgIdType, rawMsg, card string, botRole, userRole, super bool) (retStuct utils.RetStuct) {
+	if botId.Common < 1 {
+		return utils.RetStuct{
+			RetVal: utils.MESSAGE_IGNORE,
+		}
+	}
+	if groupId.Common == 560820998 || groupId.Common == 189420325 || groupId.Common == 348591755 || groupId.Common == 481097523 || groupId.Common == 176211061 || groupId.Common == 138080634 {
 		return utils.RetStuct{
 			RetVal: utils.MESSAGE_IGNORE,
 		}
@@ -64,6 +70,7 @@ func (admin *Admin) Do(ctx *context.Context, botId, groupId, userId int64, group
 					Text: msg,
 				},
 				ReqType: utils.GroupBan,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
 		msg := " 恭喜你抽中" + convertJinTime(jin_duration) + "禁言套餐，已发放"
@@ -73,14 +80,15 @@ func (admin *Admin) Do(ctx *context.Context, botId, groupId, userId int64, group
 			ReplyMsg: &utils.Msg{
 				Text: msg,
 			},
-			ReqType: utils.GroupBan,
+			ReqType:  utils.GroupBan,
 			Duration: int64(jin_duration),
-			BanId: userId,
+			BanId:    userId.Common,
+			OfficalMsgId: messageId.Offical,
 		}
 	}
-	if s == "退群" && super{
+	if s == "退群" && super {
 		return utils.RetStuct{
-			RetVal: utils.MESSAGE_BLOCK,
+			RetVal:  utils.MESSAGE_BLOCK,
 			ReqType: utils.GroupLeave,
 		}
 	}
@@ -97,6 +105,7 @@ func (admin *Admin) Do(ctx *context.Context, botId, groupId, userId int64, group
 					Text: replyText,
 				},
 				ReqType: utils.GroupBan,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
 		jinId, err := strconv.ParseInt(str3[0], 10, 64)
@@ -109,6 +118,7 @@ func (admin *Admin) Do(ctx *context.Context, botId, groupId, userId int64, group
 					Text: replyText,
 				},
 				ReqType: utils.GroupBan,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
 
@@ -118,20 +128,20 @@ func (admin *Admin) Do(ctx *context.Context, botId, groupId, userId int64, group
 			replyText := "解除 " + strconv.Itoa(int(jinId)) + " 的禁言"
 			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
 			return utils.RetStuct{
-				RetVal: utils.MESSAGE_BLOCK,
-				ReqType: utils.RelieveBan,
+				RetVal:   utils.MESSAGE_BLOCK,
+				ReqType:  utils.RelieveBan,
 				Duration: int64(duration),
-				BanId: jinId,
+				BanId:    jinId,
 			}
 		}
 		if duration < 30*60*60*24 {
 			replyText := "禁言 " + strconv.Itoa(int(jinId)) + " " + strconv.Itoa(int(duration)) + "秒"
 			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
 			return utils.RetStuct{
-				RetVal: utils.MESSAGE_BLOCK,
-				ReqType: utils.GroupBan,
+				RetVal:   utils.MESSAGE_BLOCK,
+				ReqType:  utils.GroupBan,
 				Duration: int64(duration),
-				BanId: jinId,
+				BanId:    jinId,
 			}
 		} else {
 			replyText := "禁言时间超过最大允许范围"
@@ -142,6 +152,7 @@ func (admin *Admin) Do(ctx *context.Context, botId, groupId, userId int64, group
 					Text: replyText,
 				},
 				ReqType: utils.GroupBan,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
 	}
@@ -150,7 +161,7 @@ func (admin *Admin) Do(ctx *context.Context, botId, groupId, userId int64, group
 		str2 = strings.TrimSpace(string([]byte(strings.ToLower(str2))[len("t"):]))
 		tId, err := strconv.ParseInt(str2, 10, 64)
 		if err != nil {
-			replyText :=  "踢出对象错误"
+			replyText := "踢出对象错误"
 			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
 			return utils.RetStuct{
 				RetVal: utils.MESSAGE_BLOCK,
@@ -158,14 +169,15 @@ func (admin *Admin) Do(ctx *context.Context, botId, groupId, userId int64, group
 					Text: replyText,
 				},
 				ReqType: utils.GroupKick,
+				OfficalMsgId: messageId.Offical,
 			}
 		}
 		replyText := "踢出 " + strconv.Itoa(int(tId)) + " 成功"
 		log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
 		return utils.RetStuct{
-			RetVal: utils.MESSAGE_BLOCK,
-			ReqType: utils.GroupKick,
-			BanId: tId,
+			RetVal:         utils.MESSAGE_BLOCK,
+			ReqType:        utils.GroupKick,
+			BanId:          tId,
 			RejectAddAgain: rejectAddAgain,
 		}
 	}
