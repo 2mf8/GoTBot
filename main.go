@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"math/rand"
-	"net/url"
 	"os"
 	"path"
 	"regexp"
@@ -12,11 +11,12 @@ import (
 	"time"
 
 	database "github.com/2mf8/GoTBot/data"
+	"github.com/2mf8/GoneBot/keyboard"
 	_ "github.com/2mf8/GoTBot/plugins"
 	"github.com/2mf8/GoTBot/public"
 	"github.com/2mf8/GoTBot/utils"
 	gonebot "github.com/2mf8/GoneBot"
-	"github.com/2mf8/GoneBot/keyboard"
+	"github.com/2mf8/GoneBot/markdown"
 	"github.com/2mf8/GoneBot/onebot"
 	"github.com/gin-gonic/gin"
 	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
@@ -91,7 +91,8 @@ func main() {
 		rand.New(rand.NewSource(time.Now().UnixNano()))
 		userRole := public.IsAdmin(event.Sender.Role)
 		gi, _ := bot.GetGroupInfo(groupId, true)
-		gmi, _ := bot.GetGroupMemberInfo(groupId, bot.BotId, true)
+		gmi, err := bot.GetGroupMemberInfo(groupId, bot.BotId, true)
+		fmt.Println(gmi.Data.Role, err)
 		botIsAdmin := public.IsAdmin(gmi.Data.Role)
 
 		regStr := fmt.Sprintf(`\[CQ:at,qq=%v\]`, bot.BotId)
@@ -112,151 +113,11 @@ func main() {
 		}
 
 		if ns == "mk" && super {
-			kc := []*keyboard.Row{
-				{
-					Buttons: []*keyboard.Button{
-						{
-							ID: "1",
-							RenderData: &keyboard.RenderData{
-								Label:        "3",
-								VisitedLabel: "3",
-								Style:        0,
-							},
-							Action: &keyboard.Action{
-								Type: 2,
-								Permission: &keyboard.Permission{
-									Type: keyboard.PermissionTypAll,
-								},
-								Data:                 "3",
-								Reply:                true,
-								Enter:                true,
-								AtBotShowChannelList: true,
-							},
-						},
-						{
-							ID: "2",
-							RenderData: &keyboard.RenderData{
-								Label:        "4",
-								VisitedLabel: "4",
-								Style:        0,
-							},
-							Action: &keyboard.Action{
-								Type: 2,
-								Permission: &keyboard.Permission{
-									Type: keyboard.PermissionTypAll,
-								},
-								Data:                 "4",
-								Reply:                true,
-								Enter:                true,
-								AtBotShowChannelList: true,
-							},
-						},
-						{
-							ID: "5",
-							RenderData: &keyboard.RenderData{
-								Label:        "5",
-								VisitedLabel: "5",
-								Style:        0,
-							},
-							Action: &keyboard.Action{
-								Type: 2,
-								Permission: &keyboard.Permission{
-									Type: keyboard.PermissionTypAll,
-								},
-								Data:                 "5",
-								Reply:                true,
-								Enter:                true,
-								AtBotShowChannelList: true,
-							},
-						},
-						{
-							ID: "6",
-							RenderData: &keyboard.RenderData{
-								Label:        "6",
-								VisitedLabel: "6",
-								Style:        0,
-							},
-							Action: &keyboard.Action{
-								Type: 2,
-								Permission: &keyboard.Permission{
-									Type: keyboard.PermissionTypAll,
-								},
-								Data:                 "6",
-								Reply:                true,
-								Enter:                true,
-								AtBotShowChannelList: true,
-							},
-						},
-						{
-							ID: "7",
-							RenderData: &keyboard.RenderData{
-								Label:        "7",
-								VisitedLabel: "7",
-								Style:        0,
-							},
-							Action: &keyboard.Action{
-								Type: 2,
-								Permission: &keyboard.Permission{
-									Type: keyboard.PermissionTypAll,
-								},
-								Data:                 "7",
-								Reply:                true,
-								Enter:                true,
-								AtBotShowChannelList: true,
-							},
-						},
-					},
-				},
-				{
-					Buttons: []*keyboard.Button{
-						{
-							ID: "3",
-							RenderData: &keyboard.RenderData{
-								Label:        "赛季信息",
-								VisitedLabel: "赛季信息",
-								Style:        0,
-							},
-							Action: &keyboard.Action{
-								Type: 2,
-								Permission: &keyboard.Permission{
-									Type: keyboard.PermissionTypAll,
-								},
-								Data:                 "赛季信息",
-								Reply:                true,
-								Enter:                true,
-								AtBotShowChannelList: true,
-							},
-						},
-						{
-							ID: "4",
-							RenderData: &keyboard.RenderData{
-								Label:        "爱魔方吧",
-								VisitedLabel: "孙一仝",
-								Style:        1,
-							},
-							Action: &keyboard.Action{
-								Type: 0,
-								Permission: &keyboard.Permission{
-									Type: keyboard.PermissionTypAll,
-								},
-								Data:                 "https://2mf8.cn/",
-								Reply:                true,
-								Enter:                true,
-								AtBotShowChannelList: true,
-							},
-						},
-					},
-				},
-			}
-			if err == nil {
-				md := fmt.Sprintf("# 标题 \\n## 二级标题\\n[直发指令](mqqapi://aio/inlinecmd?command=%s&reply=false&enter=true)\\n[手动指令](mqqapi://aio/inlinecmd?command=%s&reply=false&enter=false)\\n[🔗爱魔方吧](https://2mf8.cn/)", url.PathEscape("直发指令"), url.PathEscape("手动指令"))
-				resp, err := bot.SendForwardMsg(gmi.Data.Nickname, md, kc)
-				if err != nil {
-					fmt.Println(err)
-				}
-				lm := gonebot.NewMsg().LongMsg(resp.Data)
-				bot.SendGroupMessage(groupId, lm, false)
-			}
+			md := markdown.NewMarkDown().H1("标题").MqqApi("手动").MqqApiAuto("自动").Url("爱魔方吧", "https://2mf8.cn").BlockReference("块引用").Italic("斜体").Bold("加粗").ItalicBold("块引用").DeleteLine("删除线").Image("图片", "https://2mf8.cn/logo.png", 500, 500)
+			bt1 := keyboard.NewRow().TextButton("测试", "成功", "测试", false, true).TextButtonAdmin("管理", "成功", "测试", false, true).UrlButton("爱魔方吧", "url", "https://2mf8.cn", false, true)
+			bt2 := keyboard.NewRow().TextButton("测试", "成功", "测试", false, true).TextButtonAdmin("管理", "成功", "测试", false, true).UrlButton("爱魔方吧", "url", "https://2mf8.cn", false, true)
+			kb := keyboard.NewKeyBoard().Row(bt1).Row(bt2)
+			bot.SendMarkdownAndKeyboardMsg(groupId, gmi.Data.Card, md, kb)
 		}
 
 		if ns == "禁言" && botIsAdmin && (super || userRole) {
