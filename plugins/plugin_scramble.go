@@ -58,7 +58,7 @@ func (scramble *ScramblePlugin) Do(ctx *context.Context, botId *utils.BotIdType,
 			gs = strings.Replace(gs, "U ", "U\n", -1)
 			gs = strings.Replace(gs, "#", "U'", -1)
 		}
-		imgUrl := "http://2mf8.cn:2014/view/" + shor + ".png?scramble=" + url.QueryEscape(strings.Replace(gs, "\n", " ", -1))
+		imgUrl := fmt.Sprintf("%s/view/", AllConfig.ScrambleServer) + shor + ".png?scramble=" + url.QueryEscape(strings.Replace(gs, "\n", " ", -1))
 		sc := show + "\n" + gs
 		log.Printf("[INFO] Bot(%v) Group(%v) -> %v\n%v<image url=\"%v\"/>", botId, groupId, show, gs, imgUrl)
 		return utils.RetStuct{

@@ -385,7 +385,7 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 			if tgc == "222" && gss.CompContents.Two != "" {
 				tsc := strings.Split(gss.CompContents.Two, "\n")
 				reply := "2阶\n" + strconv.Itoa(t) + "、" + tsc[t-1]
-				imgUrl := "http://2mf8.cn:2014/view/" + tgc + ".png?scramble=" + url.QueryEscape(strings.Replace(tsc[t-1], "\n", " ", -1))
+				imgUrl := fmt.Sprintf("%s/view/", data.AllConfig.ScrambleServer) + tgc + ".png?scramble=" + url.QueryEscape(strings.Replace(tsc[t-1], "\n", " ", -1))
 				log.Infof("GroupId(%v) UserId(%v) -> %s", gid, uid, reply)
 				return utils.RetStuct{
 					RetVal: utils.MESSAGE_BLOCK,
@@ -399,7 +399,7 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 			if tgc == "333" && gss.CompContents.Three != "" {
 				tsc := strings.Split(gss.CompContents.Three, "\n")
 				reply := "3阶\n" + strconv.Itoa(t) + "、" + tsc[t-1]
-				imgUrl := "http://2mf8.cn:2014/view/" + tgc + ".png?scramble=" + url.QueryEscape(strings.Replace(tsc[t-1], "\n", " ", -1))
+				imgUrl := fmt.Sprintf("%s/view/", data.AllConfig.ScrambleServer) + tgc + ".png?scramble=" + url.QueryEscape(strings.Replace(tsc[t-1], "\n", " ", -1))
 				log.Infof("GroupId(%v) UserId(%v) -> %s", gid, uid, reply)
 				return utils.RetStuct{
 					RetVal: utils.MESSAGE_BLOCK,
@@ -413,7 +413,7 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 			if tgc == "444" && gss.CompContents.Four != "" {
 				tsc := strings.Split(gss.CompContents.Four, "\n")
 				reply := "4阶\n" + strconv.Itoa(t) + "、" + tsc[t-1]
-				imgUrl := "http://2mf8.cn:2014/view/" + tgc + ".png?scramble=" + url.QueryEscape(strings.Replace(tsc[t-1], "\n", " ", -1))
+				imgUrl := fmt.Sprintf("%s/view/", data.AllConfig.ScrambleServer) + tgc + ".png?scramble=" + url.QueryEscape(strings.Replace(tsc[t-1], "\n", " ", -1))
 				log.Infof("GroupId(%v) UserId(%v) -> %s", gid, uid, reply)
 				return utils.RetStuct{
 					RetVal: utils.MESSAGE_BLOCK,
@@ -427,7 +427,7 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 			if tgc == "555" && gss.CompContents.Five != "" {
 				tsc := strings.Split(gss.CompContents.Five, "\n")
 				reply := "5阶\n" + strconv.Itoa(t) + "、" + tsc[t-1]
-				imgUrl := "http://2mf8.cn:2014/view/" + tgc + ".png?scramble=" + url.QueryEscape(strings.Replace(tsc[t-1], "\n", " ", -1))
+				imgUrl := fmt.Sprintf("%s/view/", data.AllConfig.ScrambleServer) + tgc + ".png?scramble=" + url.QueryEscape(strings.Replace(tsc[t-1], "\n", " ", -1))
 				log.Infof("GroupId(%v) UserId(%v) -> %s", gid, uid, reply)
 				return utils.RetStuct{
 					RetVal: utils.MESSAGE_BLOCK,
@@ -441,7 +441,7 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 			if tgc == "666" && gss.CompContents.Six != "" {
 				tsc := strings.Split(gss.CompContents.Six, "\n")
 				reply := "6阶\n" + strconv.Itoa(t) + "、" + tsc[t-1]
-				imgUrl := "http://2mf8.cn:2014/view/" + tgc + ".png?scramble=" + url.QueryEscape(strings.Replace(tsc[t-1], "\n", " ", -1))
+				imgUrl := fmt.Sprintf("%s/view/", data.AllConfig.ScrambleServer) + tgc + ".png?scramble=" + url.QueryEscape(strings.Replace(tsc[t-1], "\n", " ", -1))
 				log.Infof("GroupId(%v) UserId(%v) -> %s", gid, uid, reply)
 				return utils.RetStuct{
 					RetVal: utils.MESSAGE_BLOCK,
@@ -455,7 +455,7 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 			if tgc == "777" && gss.CompContents.Seven != "" {
 				tsc := strings.Split(gss.CompContents.Seven, "\n")
 				reply := "7阶\n" + strconv.Itoa(t) + "、" + tsc[t-1]
-				imgUrl := "http://2mf8.cn:2014/view/" + tgc + ".png?scramble=" + url.QueryEscape(strings.Replace(tsc[t-1], "\n", " ", -1))
+				imgUrl := fmt.Sprintf("%s/view/", data.AllConfig.ScrambleServer) + tgc + ".png?scramble=" + url.QueryEscape(strings.Replace(tsc[t-1], "\n", " ", -1))
 				log.Infof("GroupId(%v) UserId(%v) -> %s", gid, uid, reply)
 				return utils.RetStuct{
 					RetVal: utils.MESSAGE_BLOCK,
@@ -469,7 +469,7 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 			if tgc == "skewb" && gss.CompContents.Skewb != "" {
 				tsc := strings.Split(gss.CompContents.Skewb, "\n")
 				reply := "Skewb\n" + strconv.Itoa(t) + "、" + tsc[t-1]
-				imgUrl := "http://2mf8.cn:2014/view/" + tgc + ".png?scramble=" + url.QueryEscape(strings.Replace(tsc[t-1], "\n", " ", -1))
+				imgUrl := fmt.Sprintf("%s/view/", data.AllConfig.ScrambleServer) + tgc + ".png?scramble=" + url.QueryEscape(strings.Replace(tsc[t-1], "\n", " ", -1))
 				log.Infof("GroupId(%v) UserId(%v) -> %s", gid, uid, reply)
 				return utils.RetStuct{
 					RetVal: utils.MESSAGE_BLOCK,
@@ -483,7 +483,7 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 			if tgc == "pyram" && gss.CompContents.Pyraminx != "" {
 				tsc := strings.Split(gss.CompContents.Pyraminx, "\n")
 				reply := "Pyraminx\n" + strconv.Itoa(t) + "、" + tsc[t-1]
-				imgUrl := "http://2mf8.cn:2014/view/" + tgc + ".png?scramble=" + url.QueryEscape(strings.Replace(tsc[t-1], "\n", " ", -1))
+				imgUrl := fmt.Sprintf("%s/view/", data.AllConfig.ScrambleServer) + tgc + ".png?scramble=" + url.QueryEscape(strings.Replace(tsc[t-1], "\n", " ", -1))
 				log.Infof("GroupId(%v) UserId(%v) -> %s", gid, uid, reply)
 				return utils.RetStuct{
 					RetVal: utils.MESSAGE_BLOCK,
@@ -497,7 +497,7 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 			if tgc == "sq1" && gss.CompContents.Square != "" {
 				tsc := strings.Split(gss.CompContents.Square, "\n")
 				reply := "Square One\n" + strconv.Itoa(t) + "、" + tsc[t-1]
-				imgUrl := "http://2mf8.cn:2014/view/" + tgc + ".png?scramble=" + url.QueryEscape(strings.Replace(tsc[t-1], "\n", " ", -1))
+				imgUrl := fmt.Sprintf("%s/view/", data.AllConfig.ScrambleServer) + tgc + ".png?scramble=" + url.QueryEscape(strings.Replace(tsc[t-1], "\n", " ", -1))
 				log.Infof("GroupId(%v) UserId(%v) -> %s", gid, uid, reply)
 				return utils.RetStuct{
 					RetVal: utils.MESSAGE_BLOCK,
@@ -511,7 +511,7 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 			if tgc == "clock" && gss.CompContents.Clock != "" {
 				tsc := strings.Split(gss.CompContents.Clock, "\n")
 				reply := "Clock\n" + strconv.Itoa(t) + "、" + tsc[t-1]
-				imgUrl := "http://2mf8.cn:2014/view/" + tgc + ".png?scramble=" + url.QueryEscape(strings.Replace(tsc[t-1], "\n", " ", -1))
+				imgUrl := fmt.Sprintf("%s/view/", data.AllConfig.ScrambleServer) + tgc + ".png?scramble=" + url.QueryEscape(strings.Replace(tsc[t-1], "\n", " ", -1))
 				log.Infof("GroupId(%v) UserId(%v) -> %s", gid, uid, reply)
 				return utils.RetStuct{
 					RetVal: utils.MESSAGE_BLOCK,
@@ -528,7 +528,7 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 				tsc[t-1] = strings.Replace(tsc[t-1], "U ", "U\n", -1)
 				tsc[t-1] = strings.Replace(tsc[t-1], "#", "U'", -1)
 				reply := "Megaminx\n" + strconv.Itoa(t) + "、" + tsc[t-1]
-				imgUrl := "http://2mf8.cn:2014/view/" + tgc + ".png?scramble=" + url.QueryEscape(strings.Replace(tsc[t-1], "\n", " ", -1))
+				imgUrl := fmt.Sprintf("%s/view/", data.AllConfig.ScrambleServer) + tgc + ".png?scramble=" + url.QueryEscape(strings.Replace(tsc[t-1], "\n", " ", -1))
 				log.Infof("GroupId(%v) UserId(%v) -> %s", gid, uid, reply)
 				return utils.RetStuct{
 					RetVal: utils.MESSAGE_BLOCK,

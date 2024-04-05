@@ -6,7 +6,6 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -75,7 +74,8 @@ var ScrambleIndexMap = map[string]int{
 func GetScrambles(s []string, n int) (string, CompContent, error) {
 	var c CompContent
 	for _, v := range s {
-		resp, err := http.Get("http://2mf8.cn:2014/scramble/.txt?=" + v + "*" + strconv.Itoa(n))
+		url := fmt.Sprintf("%s/scramble/.txt?=%s*%v", AllConfig.ScrambleServer, v, n)
+		resp, err := http.Get(url)
 		if err != nil {
 			return "获取失败", CompContent{}, err
 		}

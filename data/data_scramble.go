@@ -1,6 +1,7 @@
 package database
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 )
@@ -44,7 +45,8 @@ func Tnoodle(scramble string) (s Scramble) {
 }
 
 func GetScramble(s string) string {
-	resp, err := http.Get("http://2mf8.cn:2014/scramble/.txt?=" + s)
+	url := fmt.Sprintf("%s/scramble/.txt?=%s", AllConfig.ScrambleServer, s)
+	resp, err := http.Get(url)
 	if err != nil {
 		return "获取失败"
 	}

@@ -11,11 +11,11 @@ import (
 	"time"
 
 	database "github.com/2mf8/GoTBot/data"
-	"github.com/2mf8/GoneBot/keyboard"
 	_ "github.com/2mf8/GoTBot/plugins"
 	"github.com/2mf8/GoTBot/public"
 	"github.com/2mf8/GoTBot/utils"
 	gonebot "github.com/2mf8/GoneBot"
+	"github.com/2mf8/GoneBot/keyboard"
 	"github.com/2mf8/GoneBot/markdown"
 	"github.com/2mf8/GoneBot/onebot"
 	"github.com/gin-gonic/gin"
@@ -78,6 +78,65 @@ func main() {
 			log.Info("[已连接]", botId)
 		}
 	}
+
+	gonebot.HandlePrivateMessage = func(bot *gonebot.Bot, event *onebot.PrivateMsgEvent) {
+		userId := event.Sender.UserId
+		rawMsg := event.RawMessage
+		uid := fmt.Sprintf("%v", userId)
+		super := public.IsBotAdmin(uid, allconfig.Admins)
+		if rawMsg == "hello" {
+			msg := gonebot.NewMsg().Text("world")
+			bot.SendPrivateMsg(userId, msg, false)
+		}
+		if rawMsg == "md" && super {
+			json := `{
+				\"message_type\": \"group\",
+				\"sub_type\": \"normal\",
+				\"message_id\": 553617467,
+				\"group_id\": 489777313,
+				\"user_id\": 2693678434,
+				\"anonymous\": null,
+				\"message\": [{
+					\"type\": \"at\",
+					\"data\": {
+						\"qq\": \"3473196298\"
+					}
+				}, {
+					\"type\": \"text\",
+					\"data\": {
+						\"text\": \" \\u6D4B\\u8BD5\"
+					}
+				}],
+				\"raw_message\": \"[CQ:at,qq=3473196298] \\u6D4B\\u8BD5\",
+				\"font\": 0,
+				\"sender\": {
+					\"user_id\": 2693678434,
+					\"nickname\": \"\\u5B59\\u4E00\\u4EDD\",
+					\"card\": \"\",
+					\"sex\": \"unknown\",
+					\"age\": 0,
+					\"area\": \"\",
+					\"level\": \"10\",
+					\"role\": \"owner\",
+					\"title\": \"\"
+				},
+				\"time\": 1711870612,
+				\"self_id\": 3473196298,
+				\"post_type\": \"message\"
+			}`
+			md := markdown.NewMarkDown().H1("闹新春").Json(json).Italic("斜体").NewLine().BlockReference("二月春天来，").BlockReference("燕子闹新春，").BlockReference("剪出新花样，").BlockReference("遍地生绿根。").DividerLine().Text("上面是分隔线")
+			bot.SendMarkdownMsg(0,userId, "[]", md)
+		}
+
+		if rawMsg == "mk" && super {
+			md := markdown.NewMarkDown().H1("标题").MqqApi("手动").MqqApiAuto("自动").Url("爱魔方吧", "https://2mf8.cn").Italic("斜体").NewLine().BlockReference("块引用").NewLine().Italic("斜体").Bold("加粗").ItalicBold("块引用").DeleteLine("删除线").Image("图片", "https://2mf8.cn/logo.png", 500, 500)
+			bt1 := keyboard.NewRow().TextButton("测试", "成功", "测试", false, true).TextButtonAdmin("管理", "成功", "测试", false, true).UrlButton("爱魔方吧", "url", "https://2mf8.cn", false, true)
+			bt2 := keyboard.NewRow().TextButton("测试", "成功", "测试", false, true).TextButtonAdmin("管理", "成功", "测试", false, true).UrlButton("爱魔方吧", "url", "https://2mf8.cn", false, true)
+			kb := keyboard.NewKeyBoard().Row(bt1).Row(bt2)
+			bot.SendMarkdownAndKeyboardMsg(0,userId, "[]", md, kb)
+		}
+
+	}
 	gonebot.HandleGroupMessage = func(bot *gonebot.Bot, event *onebot.GroupMsgEvent) {
 		groupId := event.GroupId
 		rawMsg := event.RawMessage
@@ -112,12 +171,52 @@ func main() {
 			}
 		}
 
+		if ns == "md" && super {
+			json := `{
+				\"message_type\": \"group\",
+				\"sub_type\": \"normal\",
+				\"message_id\": 553617467,
+				\"group_id\": 489777313,
+				\"user_id\": 2693678434,
+				\"anonymous\": null,
+				\"message\": [{
+					\"type\": \"at\",
+					\"data\": {
+						\"qq\": \"3473196298\"
+					}
+				}, {
+					\"type\": \"text\",
+					\"data\": {
+						\"text\": \" \\u6D4B\\u8BD5\"
+					}
+				}],
+				\"raw_message\": \"[CQ:at,qq=3473196298] \\u6D4B\\u8BD5\",
+				\"font\": 0,
+				\"sender\": {
+					\"user_id\": 2693678434,
+					\"nickname\": \"\\u5B59\\u4E00\\u4EDD\",
+					\"card\": \"\",
+					\"sex\": \"unknown\",
+					\"age\": 0,
+					\"area\": \"\",
+					\"level\": \"10\",
+					\"role\": \"owner\",
+					\"title\": \"\"
+				},
+				\"time\": 1711870612,
+				\"self_id\": 3473196298,
+				\"post_type\": \"message\"
+			}`
+			md := markdown.NewMarkDown().H1("闹新春").Json(json).Italic("斜体").NewLine().BlockReference("二月春天来，").BlockReference("燕子闹新春，").BlockReference("剪出新花样，").BlockReference("遍地生绿根。").DividerLine().Text("上面是分隔线")
+			bot.SendMarkdownMsg(groupId, 0, gmi.Data.Nickname, md)
+		}
+
 		if ns == "mk" && super {
-			md := markdown.NewMarkDown().H1("标题").MqqApi("手动").MqqApiAuto("自动").Url("爱魔方吧", "https://2mf8.cn").BlockReference("块引用").Italic("斜体").Bold("加粗").ItalicBold("块引用").DeleteLine("删除线").Image("图片", "https://2mf8.cn/logo.png", 500, 500)
+			md := markdown.NewMarkDown().H1("标题").MqqApi("手动").MqqApiAuto("自动").Url("爱魔方吧", "https://2mf8.cn").Italic("斜体").NewLine().BlockReference("块引用").NewLine().Italic("斜体").Bold("加粗").ItalicBold("块引用").DeleteLine("删除线").Image("图片", "https://2mf8.cn/logo.png", 500, 500)
 			bt1 := keyboard.NewRow().TextButton("测试", "成功", "测试", false, true).TextButtonAdmin("管理", "成功", "测试", false, true).UrlButton("爱魔方吧", "url", "https://2mf8.cn", false, true)
 			bt2 := keyboard.NewRow().TextButton("测试", "成功", "测试", false, true).TextButtonAdmin("管理", "成功", "测试", false, true).UrlButton("爱魔方吧", "url", "https://2mf8.cn", false, true)
 			kb := keyboard.NewKeyBoard().Row(bt1).Row(bt2)
-			bot.SendMarkdownAndKeyboardMsg(groupId, gmi.Data.Card, md, kb)
+			bot.SendMarkdownAndKeyboardMsg(groupId, 0, gmi.Data.Card, md, kb)
 		}
 
 		if ns == "禁言" && botIsAdmin && (super || userRole) {

@@ -28,3 +28,6 @@
 
 
 
+```json
+{"op":0,"s":1,"t":"READY","d":{"version":1,"session_id":"1b503ddc-5a97-4500-8fdd-308a6ce99f29","user":{"id":"5700624312231158393","username":"魔方","bot":true,"status":1},"shard":[0,1]}}
+```
