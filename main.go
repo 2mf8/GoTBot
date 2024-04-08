@@ -124,8 +124,8 @@ func main() {
 				\"self_id\": 3473196298,
 				\"post_type\": \"message\"
 			}`
-			md := markdown.NewMarkDown().H1("闹新春").Json(json).Italic("斜体").NewLine().BlockReference("二月春天来，").BlockReference("燕子闹新春，").BlockReference("剪出新花样，").BlockReference("遍地生绿根。").DividerLine().Text("上面是分隔线")
-			bot.SendMarkdownMsg(0,userId, "[]", md)
+			md := markdown.NewMarkDown().H1("闹新春").Code(json).Italic("斜体").NewLine().BlockReference("二月春天来，").BlockReference("燕子闹新春，").BlockReference("剪出新花样，").BlockReference("遍地生绿根。").DividerLine().Text("上面是分隔线")
+			bot.SendMarkdownMsg(0, userId, md)
 		}
 
 		if rawMsg == "mk" && super {
@@ -133,7 +133,7 @@ func main() {
 			bt1 := keyboard.NewRow().TextButton("测试", "成功", "测试", false, true).TextButtonAdmin("管理", "成功", "测试", false, true).UrlButton("爱魔方吧", "url", "https://2mf8.cn", false, true)
 			bt2 := keyboard.NewRow().TextButton("测试", "成功", "测试", false, true).TextButtonAdmin("管理", "成功", "测试", false, true).UrlButton("爱魔方吧", "url", "https://2mf8.cn", false, true)
 			kb := keyboard.NewKeyBoard().Row(bt1).Row(bt2)
-			bot.SendMarkdownAndKeyboardMsg(0,userId, "[]", md, kb)
+			bot.SendMarkdownAndKeyboardMsg(0, userId, md, kb)
 		}
 
 	}
@@ -170,45 +170,16 @@ func main() {
 				ns = strings.ReplaceAll(strings.ReplaceAll(rawMsg, ss[0], "."), " ", "")
 			}
 		}
-
 		if ns == "md" && super {
 			json := `{
 				\"message_type\": \"group\",
 				\"sub_type\": \"normal\",
 				\"message_id\": 553617467,
 				\"group_id\": 489777313,
-				\"user_id\": 2693678434,
-				\"anonymous\": null,
-				\"message\": [{
-					\"type\": \"at\",
-					\"data\": {
-						\"qq\": \"3473196298\"
-					}
-				}, {
-					\"type\": \"text\",
-					\"data\": {
-						\"text\": \" \\u6D4B\\u8BD5\"
-					}
-				}],
-				\"raw_message\": \"[CQ:at,qq=3473196298] \\u6D4B\\u8BD5\",
-				\"font\": 0,
-				\"sender\": {
-					\"user_id\": 2693678434,
-					\"nickname\": \"\\u5B59\\u4E00\\u4EDD\",
-					\"card\": \"\",
-					\"sex\": \"unknown\",
-					\"age\": 0,
-					\"area\": \"\",
-					\"level\": \"10\",
-					\"role\": \"owner\",
-					\"title\": \"\"
-				},
-				\"time\": 1711870612,
-				\"self_id\": 3473196298,
-				\"post_type\": \"message\"
+				\"user_id\": 2693678434
 			}`
-			md := markdown.NewMarkDown().H1("闹新春").Json(json).Italic("斜体").NewLine().BlockReference("二月春天来，").BlockReference("燕子闹新春，").BlockReference("剪出新花样，").BlockReference("遍地生绿根。").DividerLine().Text("上面是分隔线")
-			bot.SendMarkdownMsg(groupId, 0, gmi.Data.Nickname, md)
+			md := markdown.NewMarkDown().H1("闹新春").Code(json).Italic("斜体").NewLine().BlockReference("二月春天来，").BlockReference("燕子闹新春，").BlockReference("剪出新花样，").BlockReference("遍地生绿根。").DividerLine().Text("上面是分隔线")
+			bot.SendMarkdownMsg(901125207, 0, md)
 		}
 
 		if ns == "mk" && super {
@@ -216,7 +187,14 @@ func main() {
 			bt1 := keyboard.NewRow().TextButton("测试", "成功", "测试", false, true).TextButtonAdmin("管理", "成功", "测试", false, true).UrlButton("爱魔方吧", "url", "https://2mf8.cn", false, true)
 			bt2 := keyboard.NewRow().TextButton("测试", "成功", "测试", false, true).TextButtonAdmin("管理", "成功", "测试", false, true).UrlButton("爱魔方吧", "url", "https://2mf8.cn", false, true)
 			kb := keyboard.NewKeyBoard().Row(bt1).Row(bt2)
-			bot.SendMarkdownAndKeyboardMsg(groupId, 0, gmi.Data.Card, md, kb)
+			bot.SendMarkdownAndKeyboardMsg(901125207, userId, md, kb)
+		}
+
+		if rawMsg == "at"{
+			md := markdown.NewMarkDown().
+				MqqApiAtToUserInfo(card, uint64(userId)).
+				NewLine().BlockReference("这是引用")
+			bot.SendMarkdownAtMsg(groupId, userId, md)
 		}
 
 		if ns == "禁言" && botIsAdmin && (super || userRole) {

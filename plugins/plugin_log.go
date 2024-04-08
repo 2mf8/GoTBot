@@ -26,7 +26,7 @@ func (l *Log) Do(ctx *context.Context, botId *utils.BotIdType, groupId *utils.Gr
 		uid = userId.Offical
 	}
 	if botId.Common > 0 {
-		log.Infof("BotId(%v) GroupId(%s) UserId(%s) <- %s", botId, gid, uid, rawMsg)
+		log.Infof("BotId(%v) GroupId(%s) UserId(%s) <- %s", botId.Common, gid, uid, rawMsg)
 	} else {
 		log.Infof("GroupId(%s) UserId(%s) <- %s", gid, uid, rawMsg)
 	}
