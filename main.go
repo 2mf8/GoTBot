@@ -192,7 +192,7 @@ func main() {
 
 		if rawMsg == "at"{
 			md := markdown.NewMarkDown().
-				MqqApiAtToUserInfo(card, uint64(userId)).
+				MqqApiAtToProfile(card, uint64(userId)).
 				NewLine().BlockReference("这是引用")
 			bot.SendMarkdownAtMsg(groupId, userId, md)
 		}
