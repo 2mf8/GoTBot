@@ -124,15 +124,21 @@ func main() {
 				\"self_id\": 3473196298,
 				\"post_type\": \"message\"
 			}`
-			md := markdown.NewMarkDown().H1("闹新春").Code(json).Italic("斜体").NewLine().BlockReference("二月春天来，").BlockReference("燕子闹新春，").BlockReference("剪出新花样，").BlockReference("遍地生绿根。").DividerLine().Text("上面是分隔线")
+			md := markdown.Builder().H1("闹新春").Code(json).Italic("斜体").NewLine().BlockReference("二月春天来，").BlockReference("燕子闹新春，").BlockReference("剪出新花样，").BlockReference("遍地生绿根。").DividerLine().Text("上面是分隔线")
 			bot.SendMarkdownMsg(0, userId, md)
 		}
 
 		if rawMsg == "mk" && super {
-			md := markdown.NewMarkDown().H1("标题").MqqApi("手动").MqqApiAuto("自动").Url("爱魔方吧", "https://2mf8.cn").Italic("斜体").NewLine().BlockReference("块引用").NewLine().Italic("斜体").Bold("加粗").ItalicBold("块引用").DeleteLine("删除线").Image("图片", "https://2mf8.cn/logo.png", 500, 500)
-			bt1 := keyboard.NewRow().TextButton("测试", "成功", "测试", false, true).TextButtonAdmin("管理", "成功", "测试", false, true).UrlButton("爱魔方吧", "url", "https://2mf8.cn", false, true)
-			bt2 := keyboard.NewRow().TextButton("测试", "成功", "测试", false, true).TextButtonAdmin("管理", "成功", "测试", false, true).UrlButton("爱魔方吧", "url", "https://2mf8.cn", false, true)
-			kb := keyboard.NewKeyBoard().Row(bt1).Row(bt2)
+			md := markdown.Builder().H1("标题").MqqApi("手动").MqqApiAuto("自动").Url("爱魔方吧", "https://2mf8.cn").Italic("斜体").NewLine().BlockReference("块引用").NewLine().Italic("斜体").Bold("加粗").ItalicBold("块引用").DeleteLine("删除线").Image("图片", "https://2mf8.cn/logo.png", 500, 500)
+			kb := keyboard.Builder().
+					TextButton("测试", "成功", "测试", false, true).
+					TextButtonAdmin("管理", "成功", "测试", false, true).
+					UrlButton("爱魔方吧", "url", "https://2mf8.cn", false, true).
+					SetRow().
+					TextButton("测试", "成功", "测试", false, true).
+					TextButtonAdmin("管理", "成功", "测试", false, true).
+					UrlButton("爱魔方吧", "url", "https://2mf8.cn", false, true).
+					SetRow()
 			bot.SendMarkdownAndKeyboardMsg(0, userId, md, kb)
 		}
 
@@ -170,6 +176,7 @@ func main() {
 				ns = strings.ReplaceAll(strings.ReplaceAll(rawMsg, ss[0], "."), " ", "")
 			}
 		}
+
 		if ns == "md" && super {
 			json := `{
 				\"message_type\": \"group\",
@@ -178,20 +185,26 @@ func main() {
 				\"group_id\": 489777313,
 				\"user_id\": 2693678434
 			}`
-			md := markdown.NewMarkDown().H1("闹新春").Code(json).Italic("斜体").NewLine().BlockReference("二月春天来，").BlockReference("燕子闹新春，").BlockReference("剪出新花样，").BlockReference("遍地生绿根。").DividerLine().Text("上面是分隔线")
+			md := markdown.Builder().H1("闹新春").Code(json).Italic("斜体").NewLine().BlockReference("二月春天来，").BlockReference("燕子闹新春，").BlockReference("剪出新花样，").BlockReference("遍地生绿根。").DividerLine().Text("上面是分隔线")
 			bot.SendMarkdownMsg(901125207, 0, md)
 		}
 
 		if ns == "mk" && super {
-			md := markdown.NewMarkDown().H1("标题").MqqApi("手动").MqqApiAuto("自动").Url("爱魔方吧", "https://2mf8.cn").Italic("斜体").NewLine().BlockReference("块引用").NewLine().Italic("斜体").Bold("加粗").ItalicBold("块引用").DeleteLine("删除线").Image("图片", "https://2mf8.cn/logo.png", 500, 500)
-			bt1 := keyboard.NewRow().TextButton("测试", "成功", "测试", false, true).TextButtonAdmin("管理", "成功", "测试", false, true).UrlButton("爱魔方吧", "url", "https://2mf8.cn", false, true)
-			bt2 := keyboard.NewRow().TextButton("测试", "成功", "测试", false, true).TextButtonAdmin("管理", "成功", "测试", false, true).UrlButton("爱魔方吧", "url", "https://2mf8.cn", false, true)
-			kb := keyboard.NewKeyBoard().Row(bt1).Row(bt2)
+			md := markdown.Builder().H1("标题").MqqApi("手动").MqqApiAuto("自动").Url("爱魔方吧", "https://2mf8.cn").Italic("斜体").NewLine().BlockReference("块引用").NewLine().Italic("斜体").Bold("加粗").ItalicBold("块引用").DeleteLine("删除线").Image("图片", "https://2mf8.cn/logo.png", 500, 500)
+			kb := keyboard.Builder().
+					TextButton("测试", "成功", "测试", false, true).
+					TextButtonAdmin("管理", "成功", "测试", false, true).
+					UrlButton("爱魔方吧", "url", "https://2mf8.cn", false, true).
+					SetRow().
+					TextButton("测试2", "成功", "测试", false, true).
+					TextButtonAdmin("管理2", "成功", "测试", false, true).
+					UrlButton("爱魔方吧2", "url", "https://2mf8.cn", false, true).
+					SetRow()
 			bot.SendMarkdownAndKeyboardMsg(901125207, userId, md, kb)
 		}
 
-		if rawMsg == "at"{
-			md := markdown.NewMarkDown().
+		if rawMsg == "at" {
+			md := markdown.Builder().
 				MqqApiAtToProfile(card, uint64(userId)).
 				NewLine().BlockReference("这是引用")
 			bot.SendMarkdownAtMsg(groupId, userId, md)
@@ -307,7 +320,7 @@ func main() {
 		}
 	})
 
-	if err := router.Run(":8082"); err != nil {
+	if err := router.Run("127.0.0.1:8082"); err != nil {
 		panic(err)
 	}
 	select {}
