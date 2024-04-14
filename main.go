@@ -131,14 +131,14 @@ func main() {
 		if rawMsg == "mk" && super {
 			md := markdown.Builder().H1("标题").MqqApi("手动").MqqApiAuto("自动").Url("爱魔方吧", "https://2mf8.cn").Italic("斜体").NewLine().BlockReference("块引用").NewLine().Italic("斜体").Bold("加粗").ItalicBold("块引用").DeleteLine("删除线").Image("图片", "https://2mf8.cn/logo.png", 500, 500)
 			kb := keyboard.Builder().
-					TextButton("测试", "成功", "测试", false, true).
-					TextButtonAdmin("管理", "成功", "测试", false, true).
-					UrlButton("爱魔方吧", "url", "https://2mf8.cn", false, true).
-					SetRow().
-					TextButton("测试", "成功", "测试", false, true).
-					TextButtonAdmin("管理", "成功", "测试", false, true).
-					UrlButton("爱魔方吧", "url", "https://2mf8.cn", false, true).
-					SetRow()
+				TextButton("测试", "成功", "测试", false, true).
+				TextButtonAdmin("管理", "成功", "测试", false, true).
+				UrlButton("爱魔方吧", "url", "https://2mf8.cn", false, true).
+				SetRow().
+				TextButton("测试", "成功", "测试", false, true).
+				TextButtonAdmin("管理", "成功", "测试", false, true).
+				UrlButton("爱魔方吧", "url", "https://2mf8.cn", false, true).
+				SetRow()
 			bot.SendMarkdownAndKeyboardMsg(0, userId, md, kb)
 		}
 
@@ -190,16 +190,27 @@ func main() {
 		}
 
 		if ns == "mk" && super {
-			md := markdown.Builder().H1("标题").MqqApi("手动").MqqApiAuto("自动").Url("爱魔方吧", "https://2mf8.cn").Italic("斜体").NewLine().BlockReference("块引用").NewLine().Italic("斜体").Bold("加粗").ItalicBold("块引用").DeleteLine("删除线").Image("图片", "https://2mf8.cn/logo.png", 500, 500)
+			md := markdown.Builder().
+				H1("标题").
+				MqqApi("手动").
+				MqqApiAuto("自动").
+				Url("爱魔方吧", "https://2mf8.cn").
+				Italic("斜体").
+				NewLine().
+				BlockReference("块引用").
+				NewLine().Italic("斜体").
+				Bold("加粗").ItalicBold("块引用").
+				DeleteLine("删除线").
+				Image("图片", "https://2mf8.cn/logo.png", 500, 500)
 			kb := keyboard.Builder().
-					TextButton("测试", "成功", "测试", false, true).
-					TextButtonAdmin("管理", "成功", "测试", false, true).
-					UrlButton("爱魔方吧", "url", "https://2mf8.cn", false, true).
-					SetRow().
-					TextButton("测试2", "成功", "测试", false, true).
-					TextButtonAdmin("管理2", "成功", "测试", false, true).
-					UrlButton("爱魔方吧2", "url", "https://2mf8.cn", false, true).
-					SetRow()
+				TextButton("测试", "成功", "测试", false, true).
+				TextButtonAdmin("管理", "成功", "测试", false, true).
+				UrlButton("爱魔方吧", "url", "https://2mf8.cn", false, true).
+				SetRow().
+				TextButton("测试2", "成功", "测试", false, true).
+				TextButtonAdmin("管理2", "成功", "测试", false, true).
+				UrlButton("爱魔方吧2", "url", "https://2mf8.cn", false, true).
+				SetRow()
 			bot.SendMarkdownAndKeyboardMsg(901125207, userId, md, kb)
 		}
 
