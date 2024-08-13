@@ -3,7 +3,6 @@ package plugins
 import (
 	"context"
 	"log"
-	"strconv"
 	"strings"
 
 	//. "github.com/2mf8/GoTBot/config"
@@ -41,8 +40,7 @@ func (sub *Sub) Do(ctx *context.Context, botId *utils.BotIdType, groupId *utils.
 
 	if StartsWith(s, "订阅") && (userRole || super) {
 		s = strings.TrimSpace(strings.TrimPrefix(s, "订阅"))
-		r_groupId, _ := strconv.Atoi(s)
-		_ = SubSave(groupId.Common, int64(r_groupId), userId.Common)
+		SubscribeCreate(groupId.Offical, s)
 		reply := " 订阅成功"
 		log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, reply)
 		return utils.RetStuct{
@@ -53,7 +51,7 @@ func (sub *Sub) Do(ctx *context.Context, botId *utils.BotIdType, groupId *utils.
 		}
 	}
 	if StartsWith(s, "取消订阅") && (userRole || super) {
-		_ = SubDeleteByGroupId(groupId.Common)
+		SubscribeDelete(groupId.Offical)
 		reply := "取消订阅成功"
 		log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, reply)
 		return utils.RetStuct{

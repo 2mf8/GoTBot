@@ -122,6 +122,7 @@ func ItemSave(guildId, channelId string, brand null.String, item string, price n
 	cp_get, err := GetItem(guildId, channelId, item)
 	if err != nil {
 		id, err = cp.ItemCreate()
+		fmt.Println(id, err)
 		return
 	}
 	cp_get.Price = price
@@ -130,6 +131,7 @@ func ItemSave(guildId, channelId string, brand null.String, item string, price n
 	}
 	cp_get.IsMagnetism = is_magnetism
 	err = cp_get.ItemUpdate()
+	fmt.Println(err)
 	return cp_get.Id, err
 }
 

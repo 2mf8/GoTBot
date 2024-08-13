@@ -57,12 +57,20 @@ func (price *PricePlugin) Do(ctx *context.Context, botId *utils.BotIdType, group
 	isMagnetism := strings.Contains(rawMsg, "磁")
 
 	s, b := Prefix(str3, "%")
-	if !b {
+	is, p := Prefix(str3, ".%")
+	if !(b || p) {
 		return utils.RetStuct{
 			RetVal: utils.MESSAGE_IGNORE,
 		}
 	}
-
+	if p {
+		s = is
+	}
+	if gid == "c2c" && !super {
+		return utils.RetStuct{
+			RetVal: utils.MESSAGE_IGNORE,
+		}
+	}
 	ggk, _ := GetJudgeKeys()
 	containsJudgeKeys := Judge(rawMsg, *ggk.JudgekeysSync)
 	if containsJudgeKeys != "" {
@@ -78,69 +86,24 @@ func (price *PricePlugin) Do(ctx *context.Context, botId *utils.BotIdType, group
 	}
 
 	if StartsWith(s, "#+") && (userRole || super) {
+		sub, err := SubscribeRead()
 		str4 := strings.TrimSpace(string([]byte(s)[len("#+"):]))
 		str5 := strings.Split(str4, "##")
 		if len(str5) != 2 {
-			if strings.TrimSpace(str5[0]) == "" {
-				replyText := "商品名不能为空"
-				log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
-				return utils.RetStuct{
-					RetVal: utils.MESSAGE_BLOCK,
-					ReplyMsg: &utils.Msg{
-						Text: replyText,
-					},
-					ReqType: utils.GroupMsg,
-				}
-			}
-			if Contains(groupName, "黄小姐") {
-				err := IDBGAN("10001", "10001", str5[0])
-				if err != nil {
-					replyText := "删除失败"
-					log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
-					return utils.RetStuct{
-						RetVal: utils.MESSAGE_BLOCK,
-						ReplyMsg: &utils.Msg{
-							Text: replyText,
-						},
-						ReqType: utils.GroupMsg,
-					}
-				}
-				replyText := "删除成功"
-				log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
-				return utils.RetStuct{
-					RetVal: utils.MESSAGE_BLOCK,
-					ReplyMsg: &utils.Msg{
-						Text: replyText,
-					},
-					ReqType: utils.GroupMsg,
-				}
-			}
-			if Contains(groupName, "奇乐") {
-				err := IDBGAN("10002", "10002", str5[0])
-				if err != nil {
-					replyText := "删除失败"
-					log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
-					return utils.RetStuct{
-						RetVal: utils.MESSAGE_BLOCK,
-						ReplyMsg: &utils.Msg{
-							Text: replyText,
-						},
-						ReqType: utils.GroupMsg,
-					}
-				}
-				replyText := "删除成功"
-				log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
-				return utils.RetStuct{
-					RetVal: utils.MESSAGE_BLOCK,
-					ReplyMsg: &utils.Msg{
-						Text: replyText,
-					},
-					ReqType: utils.GroupMsg,
-				}
-			}
-			err := IDBGAN(gid, gid, str5[0])
 			if err != nil {
-				replyText := "删除失败"
+				err := IDBGAN(gid, gid, str5[0])
+				if err != nil {
+					replyText := "删除失败"
+					log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
+					return utils.RetStuct{
+						RetVal: utils.MESSAGE_BLOCK,
+						ReplyMsg: &utils.Msg{
+							Text: replyText,
+						},
+						ReqType: utils.GroupMsg,
+					}
+				}
+				replyText := "删除成功"
 				log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
 				return utils.RetStuct{
 					RetVal: utils.MESSAGE_BLOCK,
@@ -149,15 +112,28 @@ func (price *PricePlugin) Do(ctx *context.Context, botId *utils.BotIdType, group
 					},
 					ReqType: utils.GroupMsg,
 				}
-			}
-			replyText := "删除成功"
-			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
-			return utils.RetStuct{
-				RetVal: utils.MESSAGE_BLOCK,
-				ReplyMsg: &utils.Msg{
-					Text: replyText,
-				},
-				ReqType: utils.GroupMsg,
+			} else {
+				err := IDBGAN(sub[gid], sub[gid], str5[0])
+				if err != nil {
+					replyText := "删除失败"
+					log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
+					return utils.RetStuct{
+						RetVal: utils.MESSAGE_BLOCK,
+						ReplyMsg: &utils.Msg{
+							Text: replyText,
+						},
+						ReqType: utils.GroupMsg,
+					}
+				}
+				replyText := "删除成功"
+				log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
+				return utils.RetStuct{
+					RetVal: utils.MESSAGE_BLOCK,
+					ReplyMsg: &utils.Msg{
+						Text: replyText,
+					},
+					ReqType: utils.GroupMsg,
+				}
 			}
 		}
 		if strings.TrimSpace(str5[0]) == "" {
@@ -173,8 +149,8 @@ func (price *PricePlugin) Do(ctx *context.Context, botId *utils.BotIdType, group
 		}
 		str6 := strings.Split(str5[1], "#&")
 		if len(str6) != 2 {
-			if Contains(groupName, "黄小姐") {
-				_, err := ItemSave("10001", "10001", null.String{}, str5[0], null.NewString(str6[0], true), null.String{}, null.NewString(uid, true), time.Now().Unix(), isMagnetism, null.NewString("", true))
+			if err != nil {
+				_, err := ItemSave(gid, gid, null.String{}, str5[0], null.NewString(str6[0], true), null.String{}, null.NewString(uid, true), time.Now().Unix(), isMagnetism, null.NewString("", true))
 				if err != nil {
 					replyText := "添加失败"
 					log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
@@ -197,9 +173,8 @@ func (price *PricePlugin) Do(ctx *context.Context, botId *utils.BotIdType, group
 					},
 					ReqType: utils.GroupMsg,
 				}
-			}
-			if Contains(groupName, "奇乐") {
-				_, err := ItemSave("10002", "10002", null.String{}, str5[0], null.NewString(str6[0], true), null.String{}, null.NewString(uid, true), time.Now().Unix(), isMagnetism, null.NewString("", true))
+			} else {
+				_, err := ItemSave(sub[gid], sub[gid], null.String{}, str5[0], null.NewString(str6[0], true), null.String{}, null.NewString(uid, true), time.Now().Unix(), isMagnetism, null.NewString("", true))
 				if err != nil {
 					replyText := "添加失败"
 					log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
@@ -212,20 +187,9 @@ func (price *PricePlugin) Do(ctx *context.Context, botId *utils.BotIdType, group
 						ReqType: utils.GroupMsg,
 					}
 				}
+				fmt.Println(err)
 				replyText := "添加成功"
 				log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
-				return utils.RetStuct{
-					RetVal: utils.MESSAGE_BLOCK,
-					ReplyMsg: &utils.Msg{
-						Text: replyText,
-					},
-					ReqType: utils.GroupMsg,
-				}
-			}
-			_, err := ItemSave(gid, gid, null.String{}, str5[0], null.NewString(str6[0], true), null.String{}, null.NewString(uid, true), time.Now().Unix(), isMagnetism, null.NewString("", true))
-			if err != nil {
-				replyText := "添加失败"
-				log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
 
 				return utils.RetStuct{
 					RetVal: utils.MESSAGE_BLOCK,
@@ -234,69 +198,22 @@ func (price *PricePlugin) Do(ctx *context.Context, botId *utils.BotIdType, group
 					},
 					ReqType: utils.GroupMsg,
 				}
-			}
-			replyText := "添加成功"
-			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
-
-			return utils.RetStuct{
-				RetVal: utils.MESSAGE_BLOCK,
-				ReplyMsg: &utils.Msg{
-					Text: replyText,
-				},
-				ReqType: utils.GroupMsg,
 			}
 		}
-		if Contains(groupName, "黄小姐") {
-			_, err := ItemSave("10001", "10001", null.String{}, str5[0], null.NewString(str6[0], true), null.NewString(str6[1], true), null.NewString(uid, true), time.Now().Unix(), isMagnetism, null.NewString("", true))
-			if err != nil {
-				replyText := "添加失败"
-				log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
-				return utils.RetStuct{
-					RetVal: utils.MESSAGE_BLOCK,
-					ReplyMsg: &utils.Msg{
-						Text: replyText,
-					},
-					ReqType: utils.GroupMsg,
-				}
-			}
-			replyText := "添加成功"
-			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
-
-			return utils.RetStuct{
-				RetVal: utils.MESSAGE_BLOCK,
-				ReplyMsg: &utils.Msg{
-					Text: replyText,
-				},
-				ReqType: utils.GroupMsg,
-			}
-		}
-		if Contains(groupName, "奇乐") {
-			_, err := ItemSave("10002", "10002", null.String{}, str5[0], null.NewString(str6[0], true), null.NewString(str6[1], true), null.NewString(uid, true), time.Now().Unix(), isMagnetism, null.NewString("", true))
-			if err != nil {
-				replyText := "添加失败"
-				log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
-
-				return utils.RetStuct{
-					RetVal: utils.MESSAGE_BLOCK,
-					ReplyMsg: &utils.Msg{
-						Text: replyText,
-					},
-					ReqType: utils.GroupMsg,
-				}
-			}
-			replyText := "添加成功"
-			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
-			return utils.RetStuct{
-				RetVal: utils.MESSAGE_BLOCK,
-				ReplyMsg: &utils.Msg{
-					Text: replyText,
-				},
-				ReqType: utils.GroupMsg,
-			}
-		}
-		_, err := ItemSave(gid, gid, null.String{}, str5[0], null.NewString(str6[0], true), null.NewString(str6[1], true), null.NewString(uid, true), time.Now().Unix(), isMagnetism, null.NewString("", true))
 		if err != nil {
-			replyText := "添加失败"
+			_, err := ItemSave(gid, gid, null.String{}, str5[0], null.NewString(str6[0], true), null.NewString(str6[1], true), null.NewString(uid, true), time.Now().Unix(), isMagnetism, null.NewString("", true))
+			if err != nil {
+				replyText := "添加失败"
+				log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
+				return utils.RetStuct{
+					RetVal: utils.MESSAGE_BLOCK,
+					ReplyMsg: &utils.Msg{
+						Text: replyText,
+					},
+					ReqType: utils.GroupMsg,
+				}
+			}
+			replyText := "添加成功"
 			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
 
 			return utils.RetStuct{
@@ -306,14 +223,28 @@ func (price *PricePlugin) Do(ctx *context.Context, botId *utils.BotIdType, group
 				},
 				ReqType: utils.GroupMsg,
 			}
-		}
-		replyText := "添加成功"
-		log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
-		return utils.RetStuct{
-			RetVal: utils.MESSAGE_BLOCK,
-			ReplyMsg: &utils.Msg{
-				Text: replyText},
-			ReqType: utils.GroupMsg,
+		} else {
+			_, err := ItemSave(sub[gid], sub[gid], null.String{}, str5[0], null.NewString(str6[0], true), null.NewString(str6[1], true), null.NewString(uid, true), time.Now().Unix(), isMagnetism, null.NewString("", true))
+			if err != nil {
+				replyText := "添加失败"
+				log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
+
+				return utils.RetStuct{
+					RetVal: utils.MESSAGE_BLOCK,
+					ReplyMsg: &utils.Msg{
+						Text: replyText,
+					},
+					ReqType: utils.GroupMsg,
+				}
+			}
+			replyText := "添加成功"
+			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
+			return utils.RetStuct{
+				RetVal: utils.MESSAGE_BLOCK,
+				ReplyMsg: &utils.Msg{
+					Text: replyText},
+				ReqType: utils.GroupMsg,
+			}
 		}
 	}
 	cps := []CuberPrice{}
@@ -321,11 +252,10 @@ func (price *PricePlugin) Do(ctx *context.Context, botId *utils.BotIdType, group
 	psc := ""
 	ic := 0
 	from := ""
-	sub, err := GetSubscribe(groupId.Common)
+	sub, err := SubscribeRead()
 	if err != nil {
 		from = gid
-		cps, _ = GetItems(gid, gid, s)
-		fmt.Println(cps)
+		cps, _ = GetItems(groupId.Offical, groupId.Offical, s)
 		for _, i := range cps {
 			if i.Shipping.String == "" {
 				ps += "\n" + i.Item + " | " + i.Price.String
@@ -361,8 +291,11 @@ func (price *PricePlugin) Do(ctx *context.Context, botId *utils.BotIdType, group
 			}
 		}
 	} else {
-		from = strings.TrimSpace(reg5.ReplaceAllString(reg4.ReplaceAllString(strconv.Itoa(int(sub.SubSync.ReplaceGroupId)), "黄小姐的魔方店"), "奇乐魔方坊"))
-		cps, _ := GetItems(strconv.Itoa(int(sub.SubSync.ReplaceGroupId)), strconv.Itoa(int(sub.SubSync.ReplaceGroupId)), s)
+		from = strings.TrimSpace(reg5.ReplaceAllString(reg4.ReplaceAllString(sub[groupId.Offical], "黄小姐的魔方店"), "奇乐魔方坊"))
+		if from == "" {
+			from = gid
+		}
+		cps, _ := GetItems(sub[groupId.Offical], sub[groupId.Offical], s)
 		for _, i := range cps {
 			if i.Shipping.String == "" {
 				ps += "\n" + i.Item + " | " + i.Price.String

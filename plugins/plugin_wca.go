@@ -48,6 +48,7 @@ func (wca *WCA) Do(ctx *context.Context, botId *utils.BotIdType, groupId *utils.
 					Text: s_r,
 				},
 				MsgId: messageId.Common,
+				ReqType: utils.GroupMsg,
 			}
 		} else if s.Data.TotalElements > 99 {
 			return utils.RetStuct{
@@ -56,6 +57,7 @@ func (wca *WCA) Do(ctx *context.Context, botId *utils.BotIdType, groupId *utils.
 					Text: "搜索范围太大！",
 				},
 				MsgId: messageId.Common,
+				ReqType: utils.GroupMsg,
 			}
 		} else {
 			rankList := ""
@@ -84,6 +86,7 @@ func (wca *WCA) Do(ctx *context.Context, botId *utils.BotIdType, groupId *utils.
 					Text: s_r,
 				},
 				MsgId: messageId.Common,
+				ReqType: utils.GroupMsg,
 			}
 		}
 	}
