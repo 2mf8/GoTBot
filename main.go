@@ -6,16 +6,15 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
-	"path"
 	"regexp"
 	"strings"
 	"time"
 
-	bot "github.com/2mf8/Go-QQ-Client"
-	"github.com/2mf8/Go-QQ-Client/dto"
-	"github.com/2mf8/Go-QQ-Client/event"
-	"github.com/2mf8/Go-QQ-Client/token"
-	"github.com/2mf8/Go-QQ-Client/websocket"
+	bot "github.com/2mf8/Go-QQ-SDK"
+	"github.com/2mf8/Go-QQ-SDK/dto"
+	"github.com/2mf8/Go-QQ-SDK/openapi"
+	"github.com/2mf8/Go-QQ-SDK/token"
+	"github.com/2mf8/Go-QQ-SDK/webhook"
 	database "github.com/2mf8/GoTBot/data"
 	_ "github.com/2mf8/GoTBot/plugins"
 	"github.com/2mf8/GoTBot/public"
@@ -23,10 +22,7 @@ import (
 	gonebot "github.com/2mf8/GoneBot"
 	"github.com/2mf8/GoneBot/onebot"
 	"github.com/gin-gonic/gin"
-	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
-	"github.com/rifflock/lfshook"
 	log "github.com/sirupsen/logrus"
-	easy "github.com/t-tomalak/logrus-easy-formatter"
 )
 
 /* type SetBotCallBack struct {
@@ -36,7 +32,9 @@ import (
 	ButtonData string `json:"button_data,omitempty"` // button_data
 } */
 
-type Resolved struct{
+var Apis = make(map[string]openapi.OpenAPI, 0)
+
+type Resolved struct {
 	ButtonId   string `json:"button_id,omitempty"`   // button_id
 	ButtonData string `json:"button_data,omitempty"` // button_data
 }
@@ -50,7 +48,6 @@ type Resolved struct{
 	}
 */
 func main() {
-	InitLog()
 	tomlData := `
 	Plugins = ["Log","守卫","开关","Bind","复读","WCA","回复","赛季","查价","打乱","学习","Rank"]   # 插件管理
 	AppId = 0 # 机器人AppId
@@ -98,239 +95,17 @@ func main() {
 			log.Info("[已连接]", botId)
 		}
 	}
-
-	gonebot.HandlePrivateMessage = func(bot *gonebot.Bot, event *onebot.PrivateMsgEvent) {
-		userId := event.Sender.UserId
-		rawMsg := event.RawMessage
-		if rawMsg == "hello" {
-			msg := gonebot.NewMsg().Text("world")
-			bot.SendPrivateMsg(userId, msg, false)
-		}
-	}
 	gonebot.HandleGroupMessage = func(bot *gonebot.Bot, ievent *onebot.GroupMsgEvent) {
-		sub, _ := database.SubscribeRead()
 		groupId := ievent.GroupId
 		rawMsg := ievent.RawMessage
-		messageId := ievent.MessageId
-		botId := bot.BotId
-		userId := ievent.UserId
-		card := ievent.Sender.Nickname
-		gid := fmt.Sprintf("%v", groupId)
-		uid := fmt.Sprintf("%v", userId)
-		super := public.IsBotAdmin(uid, allconfig.Admins)
 		rand.New(rand.NewSource(time.Now().UnixNano()))
-		userRole := public.IsAdmin(ievent.Sender.Role)
-		gi, _ := bot.GetGroupInfo(groupId, true)
-		gmi, err := bot.GetGroupMemberInfo(groupId, bot.BotId, true)
-		fmt.Println(gmi.Data.Role, err)
-		botIsAdmin := public.IsAdmin(gmi.Data.Role)
 
-		regStr := fmt.Sprintf(`\[CQ:at,qq=%v\]`, bot.BotId)
-		reg := regexp.MustCompile(regStr)
-		reg1 := regexp.MustCompile(`\[CQ:reply,id=[0-9]+\]`)
-
-		ss := reg.FindAllString(rawMsg, -1)
-		s1 := reg1.FindAllString(rawMsg, -1)
-		ns := ""
-
-		if super && rawMsg == "订阅" {
-			database.SubscribeCreate(fmt.Sprintf("%v", groupId), "offical")
-		}
-		if super && rawMsg == "取消订阅" {
-			database.SubscribeDelete(fmt.Sprintf("%v", groupId))
-		}
-
-		l, b := public.Prefix(rawMsg, "++")
-		if b && super {
-			ctx := context.WithValue(context.Background(), "key", "value")
-			botType := utils.BotIdType{
-				Common:  botId,
-				Offical: "",
-			}
-			groupIdType := utils.GroupIdType{
-				Common:  groupId,
-				Offical: "",
-			}
-			userIdType := utils.UserIdType{
-				Common:  userId,
-				Offical: "",
-			}
-			msgIdType := utils.MsgIdType{
-				Common:  messageId,
-				Offical: "",
-			}
-			ns := fmt.Sprintf(".++%s", l)
-			retStuct := utils.PluginSet["学习"].Do(&ctx, &botType, &groupIdType, &userIdType, gi.Data.GroupName, &msgIdType, ns, card, botIsAdmin, userRole, super)
-			if retStuct.ReplyMsg != nil {
-				newMsg := gonebot.NewMsg().Text(retStuct.ReplyMsg.Text)
-				if retStuct.ReplyMsg.Image != "" {
-					newMsg = newMsg.Image(retStuct.ReplyMsg.Image)
-				}
-				bot.SendGroupMsg(groupId, newMsg, false)
-			}
-		}
-
-		if len(ss) == 0 {
-			ns = rawMsg
-		} else {
-			if len(s1) > 0 {
-				ns = strings.ReplaceAll(strings.ReplaceAll(strings.ReplaceAll(strings.ReplaceAll(rawMsg, ss[0], "."), " ", ""), s1[0], ""), "..", ".")
-			} else {
-				ns = strings.ReplaceAll(strings.ReplaceAll(rawMsg, ss[0], "."), " ", "")
-			}
-		}
-
-		if ns == "禁言" && botIsAdmin && (super || userRole) {
-			bot.SetGroupWholeBan(groupId, true)
-		}
-
-		if ns == "解除" && botIsAdmin && (super || userRole) {
-			bot.SetGroupWholeBan(groupId, false)
-		}
-
-		ctx := context.WithValue(context.Background(), "key", "value")
-		sg, _ := database.SGBGIACI(gid, gid)
-		for _, i := range allconfig.Plugins {
-			intent := sg.PluginSwitch.IsCloseOrGuard & int64(database.PluginNameToIntent(i))
-			if intent == int64(database.PluginReply) {
-				break
-			}
-			if intent > 0 {
-				continue
-			}
-			botType := utils.BotIdType{
-				Common:  botId,
-				Offical: "",
-			}
-			groupIdType := utils.GroupIdType{
-				Common:  groupId,
-				Offical: "",
-			}
-			userIdType := utils.UserIdType{
-				Common:  userId,
-				Offical: "",
-			}
-			msgIdType := utils.MsgIdType{
-				Common:  messageId,
-				Offical: "",
-			}
-			retStuct := utils.PluginSet[i].Do(&ctx, &botType, &groupIdType, &userIdType, gi.Data.GroupName, &msgIdType, ns, card, botIsAdmin, userRole, super)
-			if retStuct.RetVal == utils.MESSAGE_BLOCK {
-				if retStuct.ReqType == utils.GroupMsg {
-					if retStuct.ReplyMsg != nil {
-						fmt.Println(retStuct.ReplyMsg.Text)
-						if !strings.Contains(retStuct.ReplyMsg.Text, "http") && sub[fmt.Sprintf("%v", groupId)] == "offical" {
-							_, b := public.Prefix(ievent.RawMessage, ".")
-							if b {
-								bot.SendGroupBotCallback(102070767, ievent.GroupId, "id1", ievent.RawMessage)
-							}
-							_, p := public.Prefix(ievent.RawMessage, "%")
-							if p {
-								bot.SendGroupBotCallback(102070767, ievent.GroupId, "id2", ievent.RawMessage)
-							}
-							break
-						} else {
-							if sub[fmt.Sprintf("%v", groupId)] == "offical" {
-								newMsg := gonebot.NewMsg().Text(retStuct.ReplyMsg.Text)
-								if retStuct.ReplyMsg.Image != "" {
-									newMsg = newMsg.Image(retStuct.ReplyMsg.Image)
-								}
-								bot.SendGroupMsg(groupId, newMsg, false)
-							}
-						}
-					}
-					break
-				}
-				if retStuct.ReqType == utils.GroupBan {
-					if retStuct.BanId == 0 {
-						if retStuct.ReplyMsg != nil {
-							newMsg := gonebot.NewMsg().Text(retStuct.ReplyMsg.Text)
-							bot.SendGroupMsg(groupId, newMsg, false)
-							break
-						}
-						break
-					} else {
-						bot.SetGroupBan(groupId, retStuct.BanId, retStuct.Duration)
-						if retStuct.ReplyMsg != nil {
-							newMsg := gonebot.NewMsg().Text(retStuct.ReplyMsg.Text)
-							bot.SendGroupMsg(groupId, newMsg, false)
-							break
-						}
-						break
-					}
-				}
-				if retStuct.ReqType == utils.RelieveBan {
-					if retStuct.BanId == 0 {
-						break
-					} else {
-						bot.SetGroupBan(groupId, retStuct.BanId, retStuct.Duration)
-						break
-					}
-				}
-				if retStuct.ReqType == utils.GroupKick {
-					if retStuct.BanId == 0 {
-						break
-					}
-					bot.SetGroupKick(groupId, retStuct.BanId, retStuct.RejectAddAgain)
-					if retStuct.ReplyMsg != nil {
-						newMsg := gonebot.NewMsg().Text(retStuct.ReplyMsg.Text)
-						bot.SendGroupMsg(groupId, newMsg, false)
-					}
-					break
-				}
-				if retStuct.ReqType == utils.GroupLeave {
-					bot.SetGroupLeave(groupId, false)
-					if retStuct.ReplyMsg != nil {
-						newMsg := gonebot.NewMsg().Text(retStuct.ReplyMsg.Text)
-						bot.SendGroupMsg(groupId, newMsg, false)
-					}
-					break
-				}
-				if retStuct.ReqType == utils.DeleteMsg {
-					bot.DeleteMsg(retStuct.MsgId)
-					if retStuct.ReplyMsg != nil {
-						newMsg := gonebot.NewMsg().Text(retStuct.ReplyMsg.Text)
-						bot.SendGroupMsg(groupId, newMsg, false)
-					}
-					break
-				}
-			}
-		}
+		if strings.HasPrefix(rawMsg, ".") || strings.HasPrefix(rawMsg, "%") {
+			bot.SendGroupBotCallback(102070767, groupId, "1", rawMsg)
+		} 
 	}
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.New()
-	/* router.POST("/api/", func(ctx *gin.Context) {
-		sgbc := &SetBotCallBack{}
-		body := ctx.Request.Body
-		bw, err := io.ReadAll(body)
-		if err != nil {
-			ctx.JSON(200, gin.H{
-				"status": "请求失败",
-			})
-		}
-		err = json.Unmarshal(bw, sgbc)
-		if err != nil {
-			ctx.JSON(200, gin.H{
-				"status": "请求失败",
-			})
-		}
-		if sgbc != nil {
-			for _, bot := range gonebot.Bots {
-				r, err := bot.SendGroupBotCallback(int64(sgbc.BotId), sgbc.GroupId, sgbc.ButtonId, sgbc.ButtonData)
-				if err != nil {
-					ctx.JSON(200, gin.H{
-						"status": "请求失败",
-					})
-				} else {
-					ctx.JSON(200, gin.H{
-						"status":  r.Status,
-						"retcode": r.RetCode,
-					})
-				}
-				break
-			}
-		}
-	}) */
 	router.GET("/onebot/v11/ws", func(c *gin.Context) {
 		if err := gonebot.UpgradeWebsocket(c.Writer, c.Request); err != nil {
 			log.Info("[失败] 创建机器人失败")
@@ -343,271 +118,18 @@ func main() {
 	select {}
 }
 
-func InitLog() {
-	// 输出到命令行
-	customFormatter := &log.TextFormatter{
-		TimestampFormat: "2006-01-02 15:04:05",
-		FullTimestamp:   true,
-		ForceColors:     true,
-	}
-	log.SetFormatter(customFormatter)
-	log.SetOutput(os.Stdout)
-
-	// 输出到文件
-	rl, err := rotatelogs.New(path.Join("logs", "%Y-%m-%d.log"),
-		rotatelogs.WithLinkName(path.Join("logs", "latest.log")), // 最新日志软链接
-		rotatelogs.WithRotationTime(time.Hour*24),                // 每天一个新文件
-		rotatelogs.WithMaxAge(time.Hour*24*3),                    // 日志保留3天
-	)
-	if err != nil {
-		utils.FatalError(err)
-		return
-	}
-	log.AddHook(lfshook.NewHook(
-		lfshook.WriterMap{
-			log.InfoLevel:  rl,
-			log.WarnLevel:  rl,
-			log.ErrorLevel: rl,
-			log.FatalLevel: rl,
-			log.PanicLevel: rl,
-		},
-		&easy.Formatter{
-			TimestampFormat: "2006-01-02 15:04:05",
-			LogFormat:       "[%time%] [%lvl%]: %msg% \r\n",
-		},
-	))
-}
-
 func StartOffical() {
-	botLoginInfo := &public.BotLogin{
-		AppId:       database.AllConfig.AppId,
-		AccessToken: database.AllConfig.AccessToken,
+	webhook.InitLog()
+	as := webhook.ReadSetting()
+	var ctx context.Context
+	for i, v := range as.Apps {
+		token := token.BotToken(v.AppId, v.Token, string(token.TypeBot))
+		api := bot.NewOpenAPI(token).WithTimeout(3 * time.Second)
+		Apis[i] = api
 	}
-	token := token.BotToken(botLoginInfo.AppId, botLoginInfo.AccessToken, string(token.TypeBot))
-	api := bot.NewOpenAPI(token).WithTimeout(3 * time.Second)
-	ctx := context.Background()
-	ws, err := api.WS(ctx, nil, "")
-	if err != nil {
-		log.Warn("登录失败，请检查 appid 和 AccessToken 是否正确。")
-		log.Info("该程序将于5秒后退出！")
-		time.Sleep(time.Second * 5)
-	}
-	if err != nil {
-		log.Warn("登录失败，请检查 appid 和 AccessToken 是否正确。")
-		log.Info("该程序将于5秒后退出！")
-		time.Sleep(time.Second * 5)
-	}
-	var guildMsg event.MessageEventHandler = func(event *dto.WSPayload, data *dto.WSMessageData) error {
-		guildId := data.GuildID
-		channelId := data.ChannelID
-		userId := data.Author.ID
-		content := strings.TrimSpace(data.Content)
-		msgId := data.ID
-		reg4 := regexp.MustCompile("/")
-		content = strings.TrimSpace(reg4.ReplaceAllString(content, ""))
-		super := public.IsBotAdmin(userId, database.AllConfig.Admins)
-		ctx := context.WithValue(context.Background(), "key", "value")
-		me, _ := api.Me(ctx)
-		reg7 := regexp.MustCompile(fmt.Sprintf("<@!%s> ", me.ID))
-		content = reg7.ReplaceAllString(content, ".")
-		sg, _ := database.SGBGIACI(guildId, channelId)
-		botType := utils.BotIdType{
-			Common:  0,
-			Offical: "",
-		}
-		groupIdType := utils.GroupIdType{
-			Common:  0,
-			Offical: channelId,
-		}
-		userIdType := utils.UserIdType{
-			Common:  0,
-			Offical: userId,
-		}
-		msgIdType := utils.MsgIdType{
-			Common:  0,
-			Offical: msgId,
-		}
-		for _, i := range database.AllConfig.Plugins {
-			intent := sg.PluginSwitch.IsCloseOrGuard & int64(database.PluginNameToIntent(i))
-			if intent == int64(database.PluginReply) {
-				break
-			}
-			if intent > 0 {
-				continue
-			}
-			retStuct := utils.PluginSet[i].Do(&ctx, &botType, &groupIdType, &userIdType, "", &msgIdType, content, "", true, false, super)
-			if retStuct.RetVal == utils.MESSAGE_BLOCK {
-				if retStuct.ReqType == utils.GroupMsg {
-					if retStuct.ReplyMsg != nil {
-						msg := fmt.Sprintf("%s", strings.TrimSpace(retStuct.ReplyMsg.Text))
-						if retStuct.ReplyMsg.Image != "" {
-							api.PostMessage(ctx, channelId, &dto.MessageToCreate{
-								Content: msg,
-								Image:   retStuct.ReplyMsg.Image,
-								MsgID:   data.ID,
-							})
-						} else {
-							api.PostMessage(ctx, channelId, &dto.MessageToCreate{
-								Content: msg,
-								MsgID:   data.ID,
-							})
-						}
-						if len(retStuct.ReplyMsg.Images) == 2 {
-							api.PostMessage(ctx, channelId, &dto.MessageToCreate{
-								Content: msg,
-								Image:   retStuct.ReplyMsg.Images[1],
-								MsgID:   data.ID,
-							})
-						}
-						if len(retStuct.ReplyMsg.Images) >= 3 {
-							api.PostMessage(ctx, channelId, &dto.MessageToCreate{
-								Content: msg,
-								Image:   retStuct.ReplyMsg.Images[1],
-								MsgID:   data.ID,
-							})
-							api.PostMessage(ctx, channelId, &dto.MessageToCreate{
-								Content: msg,
-								Image:   retStuct.ReplyMsg.Images[2],
-								MsgID:   data.ID,
-							})
-						}
-					}
-					break
-				}
-			}
-		}
-		return nil
-	}
-
-	/* {
-		"bot_id": 101981675,
-		"group_id": 121196301,
-		"button_id": "id",
-		"button_data": "data"
-		} */
-
-	var recall event.InteractionEventHandler = func(event *dto.WSPayload, data *dto.WSInteractionData) error {
-		/* {
-		"id": "INTERACTION_CREATE:6c75dbe7-0793-4437-a7c8-6bb7cb792c7c",
-		"application_id": "101981675",
-		"type": 11,
-		-"data": {
-		"type": 11,
-		-"resolved": {
-		"button_data": "data",
-		"button_id": "id"
-		}
-		},
-		"group_openid": "FB8BAE6A0F7DAFD3E5A257D0E19BCCAE",
-		"group_member_openid": "B7E8437FADE3A0E26BB143F48282C83C",
-		"version": 1
-		}*/
-		dr := &Resolved{}
-		b, err := json.Marshal(data.Data.Resolved)
-		if err != nil {
-			return err
-		}
-		json.Unmarshal(b, dr)
-		fmt.Println("\n\n\n", string(b))
-		sg, _ := database.SGBGIACI(data.GroupOpenID, data.GroupOpenID)
-		botType := utils.BotIdType{
-			Common:  0,
-			Offical: "",
-		}
-		groupIdType := utils.GroupIdType{
-			Common:  0,
-			Offical: data.GroupOpenID,
-		}
-		userIdType := utils.UserIdType{
-			Common:  0,
-			Offical: data.GroupMemberOpenID,
-		}
-		for _, i := range database.AllConfig.Plugins {
-			intent := sg.PluginSwitch.IsCloseOrGuard & int64(database.PluginNameToIntent(i))
-			if intent == int64(database.PluginReply) {
-				break
-			}
-			if intent > 0 {
-				continue
-			}
-			retStuct := utils.PluginSet[i].Do(&ctx, &botType, &groupIdType, &userIdType, "", &utils.MsgIdType{}, dr.ButtonData, "", true, false, false)
-			if retStuct.RetVal == utils.MESSAGE_BLOCK {
-				if retStuct.ReqType == utils.GroupMsg {
-					if retStuct.ReplyMsg != nil {
-						msg := strings.TrimSpace(retStuct.ReplyMsg.Text)
-						if retStuct.ReplyMsg.Image != "" {
-							resp, _ := api.PostGroupRichMediaMessage(ctx, data.GroupOpenID, &dto.GroupRichMediaMessageToCreate{FileType: 1, Url: retStuct.ReplyMsg.Image, SrvSendMsg: false})
-							if resp != nil {
-								newMsg := &dto.GroupMessageToCreate{
-									Content: msg, //+ "\n[🔗奇乐最新价格]\n(https://2mf8.cn/webview/#/pages/index/webview?url=https%3A%2F%2Fqilecube.gitee.io%2F)",
-									Media: &dto.FileInfo{
-										FileInfo: resp.FileInfo,
-									},
-									EventID: data.ID,
-									MsgType: 7,
-									MsgReq:  1,
-								}
-								api.PostGroupMessage(ctx, data.GroupOpenID, newMsg)
-							}
-						} else {
-							newMsg := &dto.GroupMessageToCreate{
-								Content: msg, //+ "\n[🔗奇乐最新价格]\n(https://2mf8.cn/webview/#/pages/index/webview?url=https%3A%2F%2Fqilecube.gitee.io%2F)",
-								EventID: data.ID,
-								MsgType: 0,
-							}
-							api.PostGroupMessage(ctx, data.GroupOpenID, newMsg)
-						}
-						if len(retStuct.ReplyMsg.Images) == 2 {
-							resp, _ := api.PostGroupRichMediaMessage(ctx, data.GroupOpenID, &dto.GroupRichMediaMessageToCreate{FileType: 1, Url: retStuct.ReplyMsg.Images[1], SrvSendMsg: false})
-							if resp != nil {
-								newMsg := &dto.GroupMessageToCreate{
-									Content: msg, //+ "\n[🔗奇乐最新价格]\n(https://2mf8.cn/webview/#/pages/index/webview?url=https%3A%2F%2Fqilecube.gitee.io%2F)",
-									Media: &dto.FileInfo{
-										FileInfo: resp.FileInfo,
-									},
-									EventID: data.ID,
-									MsgType: 7,
-									MsgReq:  2,
-								}
-								api.PostGroupMessage(ctx, data.GroupOpenID, newMsg)
-							}
-						}
-						if len(retStuct.ReplyMsg.Images) >= 3 {
-							resp, _ := api.PostGroupRichMediaMessage(ctx, data.GroupOpenID, &dto.GroupRichMediaMessageToCreate{FileType: 1, Url: retStuct.ReplyMsg.Images[1], SrvSendMsg: false})
-							if resp != nil {
-								newMsg := &dto.GroupMessageToCreate{
-									Content: msg, //+ "\n[🔗奇乐最新价格]\n(https://2mf8.cn/webview/#/pages/index/webview?url=https%3A%2F%2Fqilecube.gitee.io%2F)",
-									Media: &dto.FileInfo{
-										FileInfo: resp.FileInfo,
-									},
-									EventID: data.ID,
-									MsgType: 7,
-									MsgReq:  2,
-								}
-								api.PostGroupMessage(ctx, data.GroupOpenID, newMsg)
-							}
-							resp1, _ := api.PostGroupRichMediaMessage(ctx, data.GroupOpenID, &dto.GroupRichMediaMessageToCreate{FileType: 1, Url: retStuct.ReplyMsg.Images[2], SrvSendMsg: false})
-							if resp1 != nil {
-								newMsg := &dto.GroupMessageToCreate{
-									Content: msg, //+ "\n[🔗奇乐最新价格]\n(https://2mf8.cn/webview/#/pages/index/webview?url=https%3A%2F%2Fqilecube.gitee.io%2F)",
-									Media: &dto.FileInfo{
-										FileInfo: resp1.FileInfo,
-									},
-									EventID: data.ID,
-									MsgType: 7,
-									MsgReq:  3,
-								}
-								api.PostGroupMessage(ctx, data.GroupOpenID, newMsg)
-							}
-						}
-					}
-					break
-				}
-			}
-		}
-		return nil
-	}
-	var groupMessage event.GroupAtMessageEventHandler = func(event *dto.WSPayload, data *dto.WSGroupATMessageData) error {
+	b, _ := json.Marshal(as)
+	fmt.Println("配置", string(b))
+	webhook.GroupAtMessageEventHandler = func(bot *webhook.BotHeaderInfo, event *dto.WSPayload, data *dto.WSGroupATMessageData) error {
 		groupId := data.GroupId
 		userId := data.Author.UserId
 		content := strings.TrimSpace(data.Content)
@@ -618,6 +140,14 @@ func StartOffical() {
 		content = fmt.Sprintf(".%s", content)
 		ctx := context.WithValue(context.Background(), "key", "value")
 		sg, _ := database.SGBGIACI(groupId, groupId)
+		if content == ".GetID" {
+			newMsg := &dto.GroupMessageToCreate{
+				Content: userId,
+				MsgID:   data.MsgId,
+				MsgType: 0,
+			}
+			Apis[bot.XBotAppid[0]].PostGroupMessage(ctx, groupId, newMsg)
+		}
 		botType := utils.BotIdType{
 			Common:  0,
 			Offical: "",
@@ -648,7 +178,7 @@ func StartOffical() {
 					if retStuct.ReplyMsg != nil {
 						msg := fmt.Sprintf("\n%s", strings.TrimSpace(retStuct.ReplyMsg.Text))
 						if retStuct.ReplyMsg.Image != "" {
-							resp, _ := api.PostGroupRichMediaMessage(ctx, groupId, &dto.GroupRichMediaMessageToCreate{FileType: 1, Url: retStuct.ReplyMsg.Image, SrvSendMsg: false})
+							resp, _ := Apis[bot.XBotAppid[0]].PostGroupRichMediaMessage(ctx, groupId, &dto.GroupRichMediaMessageToCreate{FileType: 1, Url: retStuct.ReplyMsg.Image, SrvSendMsg: false})
 							if resp != nil {
 								newMsg := &dto.GroupMessageToCreate{
 									Content: msg, //+ "\n[🔗奇乐最新价格]\n(https://2mf8.cn/webview/#/pages/index/webview?url=https%3A%2F%2Fqilecube.gitee.io%2F)",
@@ -659,7 +189,7 @@ func StartOffical() {
 									MsgType: 7,
 									MsgReq:  1,
 								}
-								api.PostGroupMessage(ctx, groupId, newMsg)
+								Apis[bot.XBotAppid[0]].PostGroupMessage(ctx, groupId, newMsg)
 							}
 						} else {
 							newMsg := &dto.GroupMessageToCreate{
@@ -667,10 +197,10 @@ func StartOffical() {
 								MsgID:   data.MsgId,
 								MsgType: 0,
 							}
-							api.PostGroupMessage(ctx, groupId, newMsg)
+							Apis[bot.XBotAppid[0]].PostGroupMessage(ctx, groupId, newMsg)
 						}
 						if len(retStuct.ReplyMsg.Images) == 2 {
-							resp, _ := api.PostGroupRichMediaMessage(ctx, groupId, &dto.GroupRichMediaMessageToCreate{FileType: 1, Url: retStuct.ReplyMsg.Images[1], SrvSendMsg: false})
+							resp, _ := Apis[bot.XBotAppid[0]].PostGroupRichMediaMessage(ctx, groupId, &dto.GroupRichMediaMessageToCreate{FileType: 1, Url: retStuct.ReplyMsg.Images[1], SrvSendMsg: false})
 							if resp != nil {
 								newMsg := &dto.GroupMessageToCreate{
 									Content: msg, //+ "\n[🔗奇乐最新价格]\n(https://2mf8.cn/webview/#/pages/index/webview?url=https%3A%2F%2Fqilecube.gitee.io%2F)",
@@ -681,11 +211,11 @@ func StartOffical() {
 									MsgType: 7,
 									MsgReq:  2,
 								}
-								api.PostGroupMessage(ctx, groupId, newMsg)
+								Apis[bot.XBotAppid[0]].PostGroupMessage(ctx, groupId, newMsg)
 							}
 						}
 						if len(retStuct.ReplyMsg.Images) >= 3 {
-							resp, _ := api.PostGroupRichMediaMessage(ctx, groupId, &dto.GroupRichMediaMessageToCreate{FileType: 1, Url: retStuct.ReplyMsg.Images[1], SrvSendMsg: false})
+							resp, _ := Apis[bot.XBotAppid[0]].PostGroupRichMediaMessage(ctx, groupId, &dto.GroupRichMediaMessageToCreate{FileType: 1, Url: retStuct.ReplyMsg.Images[1], SrvSendMsg: false})
 							if resp != nil {
 								newMsg := &dto.GroupMessageToCreate{
 									Content: msg, //+ "\n[🔗奇乐最新价格]\n(https://2mf8.cn/webview/#/pages/index/webview?url=https%3A%2F%2Fqilecube.gitee.io%2F)",
@@ -696,9 +226,9 @@ func StartOffical() {
 									MsgType: 7,
 									MsgReq:  2,
 								}
-								api.PostGroupMessage(ctx, groupId, newMsg)
+								Apis[bot.XBotAppid[0]].PostGroupMessage(ctx, groupId, newMsg)
 							}
-							resp1, _ := api.PostGroupRichMediaMessage(ctx, groupId, &dto.GroupRichMediaMessageToCreate{FileType: 1, Url: retStuct.ReplyMsg.Images[2], SrvSendMsg: false})
+							resp1, _ := Apis[bot.XBotAppid[0]].PostGroupRichMediaMessage(ctx, groupId, &dto.GroupRichMediaMessageToCreate{FileType: 1, Url: retStuct.ReplyMsg.Images[2], SrvSendMsg: false})
 							if resp1 != nil {
 								newMsg := &dto.GroupMessageToCreate{
 									Content: msg, //+ "\n[🔗奇乐最新价格]\n(https://2mf8.cn/webview/#/pages/index/webview?url=https%3A%2F%2Fqilecube.gitee.io%2F)",
@@ -709,7 +239,7 @@ func StartOffical() {
 									MsgType: 7,
 									MsgReq:  3,
 								}
-								api.PostGroupMessage(ctx, groupId, newMsg)
+								Apis[bot.XBotAppid[0]].PostGroupMessage(ctx, groupId, newMsg)
 							}
 						}
 					}
@@ -719,7 +249,7 @@ func StartOffical() {
 		}
 		return nil
 	}
-	var c2cMessage event.C2CMessageEventHandler = func(event *dto.WSPayload, data *dto.WSC2CMessageData) error {
+	webhook.C2CMessageEventHandler = func(bot *webhook.BotHeaderInfo, event *dto.WSPayload, data *dto.WSC2CMessageData) error {
 		userId := data.Author.UserOpenId
 		msgId := data.Id
 		content := data.Content
@@ -756,7 +286,7 @@ func StartOffical() {
 				if retStuct.ReqType == utils.GroupMsg {
 					if retStuct.ReplyMsg != nil {
 						if retStuct.ReplyMsg.Image != "" {
-							resp, err := api.PostC2CRichMediaMessage(ctx, data.Author.UserOpenId, &dto.C2CRichMediaMessageToCreate{FileType: 1, Url: retStuct.ReplyMsg.Image, SrvSendMsg: false})
+							resp, err := Apis[bot.XBotAppid[0]].PostC2CRichMediaMessage(ctx, data.Author.UserOpenId, &dto.C2CRichMediaMessageToCreate{FileType: 1, Url: retStuct.ReplyMsg.Image, SrvSendMsg: false})
 							log.Info(err)
 							if resp != nil {
 								newMsg := &dto.C2CMessageToCreate{
@@ -768,7 +298,7 @@ func StartOffical() {
 									MsgType: 7,
 									MsgReq:  1,
 								}
-								_, err := api.PostC2CMessage(ctx, data.Author.UserOpenId, newMsg)
+								_, err := Apis[bot.XBotAppid[0]].PostC2CMessage(ctx, data.Author.UserOpenId, newMsg)
 								log.Info(err)
 							}
 						} else {
@@ -778,11 +308,11 @@ func StartOffical() {
 								MsgType: 0,
 								MsgReq:  1,
 							}
-							_, err := api.PostC2CMessage(ctx, data.Author.UserOpenId, newMsg)
+							_, err := Apis[bot.XBotAppid[0]].PostC2CMessage(ctx, data.Author.UserOpenId, newMsg)
 							log.Info(err)
 						}
 						if len(retStuct.ReplyMsg.Images) == 2 {
-							resp, err := api.PostC2CRichMediaMessage(ctx, data.Author.UserOpenId, &dto.C2CRichMediaMessageToCreate{FileType: 1, Url: retStuct.ReplyMsg.Images[1], SrvSendMsg: false})
+							resp, err := Apis[bot.XBotAppid[0]].PostC2CRichMediaMessage(ctx, data.Author.UserOpenId, &dto.C2CRichMediaMessageToCreate{FileType: 1, Url: retStuct.ReplyMsg.Images[1], SrvSendMsg: false})
 							log.Info(err)
 							if resp != nil {
 								newMsg := &dto.C2CMessageToCreate{
@@ -793,12 +323,12 @@ func StartOffical() {
 									MsgType: 7,
 									MsgReq:  1,
 								}
-								_, err := api.PostC2CMessage(ctx, data.Author.UserOpenId, newMsg)
+								_, err := Apis[bot.XBotAppid[0]].PostC2CMessage(ctx, data.Author.UserOpenId, newMsg)
 								log.Info(err)
 							}
 						}
 						if len(retStuct.ReplyMsg.Images) >= 3 {
-							resp, err := api.PostC2CRichMediaMessage(ctx, data.Author.UserOpenId, &dto.C2CRichMediaMessageToCreate{FileType: 1, Url: retStuct.ReplyMsg.Images[1], SrvSendMsg: false})
+							resp, err := Apis[bot.XBotAppid[0]].PostC2CRichMediaMessage(ctx, data.Author.UserOpenId, &dto.C2CRichMediaMessageToCreate{FileType: 1, Url: retStuct.ReplyMsg.Images[1], SrvSendMsg: false})
 							log.Info(err)
 							if resp != nil {
 								newMsg := &dto.C2CMessageToCreate{
@@ -809,10 +339,10 @@ func StartOffical() {
 									MsgType: 7,
 									MsgReq:  1,
 								}
-								_, err := api.PostC2CMessage(ctx, data.Author.UserOpenId, newMsg)
+								_, err := Apis[bot.XBotAppid[0]].PostC2CMessage(ctx, data.Author.UserOpenId, newMsg)
 								log.Info(err)
 							}
-							resp1, err := api.PostC2CRichMediaMessage(ctx, data.Author.UserOpenId, &dto.C2CRichMediaMessageToCreate{FileType: 1, Url: retStuct.ReplyMsg.Images[2], SrvSendMsg: false})
+							resp1, err := Apis[bot.XBotAppid[0]].PostC2CRichMediaMessage(ctx, data.Author.UserOpenId, &dto.C2CRichMediaMessageToCreate{FileType: 1, Url: retStuct.ReplyMsg.Images[2], SrvSendMsg: false})
 							log.Info(err)
 							if resp1 != nil {
 								newMsg := &dto.C2CMessageToCreate{
@@ -823,7 +353,7 @@ func StartOffical() {
 									MsgType: 7,
 									MsgReq:  1,
 								}
-								_, err := api.PostC2CMessage(ctx, data.Author.UserOpenId, newMsg)
+								_, err := Apis[bot.XBotAppid[0]].PostC2CMessage(ctx, data.Author.UserOpenId, newMsg)
 								log.Info(err)
 							}
 						}
@@ -834,7 +364,7 @@ func StartOffical() {
 		}
 
 		if data.Content == "测试" {
-			resp, err := api.PostC2CRichMediaMessage(ctx, data.Author.UserOpenId, &dto.C2CRichMediaMessageToCreate{FileType: 1, Url: "https://www.2mf8.cn/static/image/cube3/b1.png", SrvSendMsg: false})
+			resp, err := Apis[bot.XBotAppid[0]].PostC2CRichMediaMessage(ctx, data.Author.UserOpenId, &dto.C2CRichMediaMessageToCreate{FileType: 1, Url: "https://www.2mf8.cn/static/image/cube3/b1.png", SrvSendMsg: false})
 			log.Info(err)
 			if resp != nil {
 				newMsg := &dto.C2CMessageToCreate{
@@ -846,13 +376,201 @@ func StartOffical() {
 					MsgType: 7,
 					MsgReq:  1,
 				}
-				_, err := api.PostC2CMessage(ctx, data.Author.UserOpenId, newMsg)
+				_, err := Apis[bot.XBotAppid[0]].PostC2CMessage(ctx, data.Author.UserOpenId, newMsg)
 				log.Info(err)
 			}
 			return nil
 		}
 		return nil
 	}
-	intent := websocket.RegisterHandlers(groupMessage, recall, c2cMessage, guildMsg)
-	bot.NewSessionManager().Start(ws, token, &intent)
+	webhook.MessageEventHandler = func(bot *webhook.BotHeaderInfo, event *dto.WSPayload, data *dto.WSMessageData) error {
+		guildId := data.GuildID
+		channelId := data.ChannelID
+		userId := data.Author.ID
+		content := strings.TrimSpace(data.Content)
+		msgId := data.ID
+		reg4 := regexp.MustCompile("/")
+		content = strings.TrimSpace(reg4.ReplaceAllString(content, ""))
+		super := public.IsBotAdmin(userId, database.AllConfig.Admins)
+		ctx := context.WithValue(context.Background(), "key", "value")
+		me, _ := Apis[bot.XBotAppid[0]].Me(ctx)
+		reg7 := regexp.MustCompile(fmt.Sprintf("<@!%s> ", me.ID))
+		content = reg7.ReplaceAllString(content, ".")
+		sg, _ := database.SGBGIACI(guildId, channelId)
+		botType := utils.BotIdType{
+			Common:  0,
+			Offical: "",
+		}
+		groupIdType := utils.GroupIdType{
+			Common:  0,
+			Offical: channelId,
+		}
+		userIdType := utils.UserIdType{
+			Common:  0,
+			Offical: userId,
+		}
+		msgIdType := utils.MsgIdType{
+			Common:  0,
+			Offical: msgId,
+		}
+		for _, i := range database.AllConfig.Plugins {
+			intent := sg.PluginSwitch.IsCloseOrGuard & int64(database.PluginNameToIntent(i))
+			if intent == int64(database.PluginReply) {
+				break
+			}
+			if intent > 0 {
+				continue
+			}
+			retStuct := utils.PluginSet[i].Do(&ctx, &botType, &groupIdType, &userIdType, "", &msgIdType, content, "", true, false, super)
+			if retStuct.RetVal == utils.MESSAGE_BLOCK {
+				if retStuct.ReqType == utils.GroupMsg {
+					if retStuct.ReplyMsg != nil {
+						msg := fmt.Sprintf("%s", strings.TrimSpace(retStuct.ReplyMsg.Text))
+						if retStuct.ReplyMsg.Image != "" {
+							Apis[bot.XBotAppid[0]].PostMessage(ctx, channelId, &dto.MessageToCreate{
+								Content: msg,
+								Image:   retStuct.ReplyMsg.Image,
+								MsgID:   data.ID,
+							})
+						} else {
+							Apis[bot.XBotAppid[0]].PostMessage(ctx, channelId, &dto.MessageToCreate{
+								Content: msg,
+								MsgID:   data.ID,
+							})
+						}
+						if len(retStuct.ReplyMsg.Images) == 2 {
+							Apis[bot.XBotAppid[0]].PostMessage(ctx, channelId, &dto.MessageToCreate{
+								Content: msg,
+								Image:   retStuct.ReplyMsg.Images[1],
+								MsgID:   data.ID,
+							})
+						}
+						if len(retStuct.ReplyMsg.Images) >= 3 {
+							Apis[bot.XBotAppid[0]].PostMessage(ctx, channelId, &dto.MessageToCreate{
+								Content: msg,
+								Image:   retStuct.ReplyMsg.Images[1],
+								MsgID:   data.ID,
+							})
+							Apis[bot.XBotAppid[0]].PostMessage(ctx, channelId, &dto.MessageToCreate{
+								Content: msg,
+								Image:   retStuct.ReplyMsg.Images[2],
+								MsgID:   data.ID,
+							})
+						}
+					}
+					break
+				}
+			}
+		}
+		return nil
+	}
+	webhook.InteractionEventHandler = func(bot *webhook.BotHeaderInfo, event *dto.WSPayload, data *dto.WSInteractionData) error {
+		dr := &Resolved{}
+		b, err := json.Marshal(data.Data.Resolved)
+		if err != nil {
+			return err
+		}
+		json.Unmarshal(b, dr)
+		fmt.Println("\n\n\n", string(b))
+		sg, _ := database.SGBGIACI(data.GroupOpenID, data.GroupOpenID)
+		botType := utils.BotIdType{
+			Common:  0,
+			Offical: "",
+		}
+		groupIdType := utils.GroupIdType{
+			Common:  0,
+			Offical: data.GroupOpenID,
+		}
+		userIdType := utils.UserIdType{
+			Common:  0,
+			Offical: data.GroupMemberOpenID,
+		}
+		for _, i := range database.AllConfig.Plugins {
+			intent := sg.PluginSwitch.IsCloseOrGuard & int64(database.PluginNameToIntent(i))
+			if intent == int64(database.PluginReply) {
+				break
+			}
+			if intent > 0 {
+				continue
+			}
+			fmt.Println("eventId", data.ID)
+			retStuct := utils.PluginSet[i].Do(&ctx, &botType, &groupIdType, &userIdType, "", &utils.MsgIdType{}, dr.ButtonData, "", true, false, false)
+			if retStuct.RetVal == utils.MESSAGE_BLOCK {
+				if retStuct.ReqType == utils.GroupMsg {
+					if retStuct.ReplyMsg != nil {
+						msg := strings.TrimSpace(retStuct.ReplyMsg.Text)
+						if retStuct.ReplyMsg.Image != "" {
+							resp, _ := Apis[bot.XBotAppid[0]].PostGroupRichMediaMessage(ctx, data.GroupOpenID, &dto.GroupRichMediaMessageToCreate{FileType: 1, Url: retStuct.ReplyMsg.Image, SrvSendMsg: false})
+							if resp != nil {
+								newMsg := &dto.GroupMessageToCreate{
+									Content: msg, //+ "\n[🔗奇乐最新价格]\n(https://2mf8.cn/webview/#/pages/index/webview?url=https%3A%2F%2Fqilecube.gitee.io%2F)",
+									Media: &dto.FileInfo{
+										FileInfo: resp.FileInfo,
+									},
+									EventID: dto.EventType(data.ID),
+									MsgType: 7,
+									MsgReq:  1,
+								}
+								Apis[bot.XBotAppid[0]].PostGroupMessage(ctx, data.GroupOpenID, newMsg)
+							}
+						} else {
+							newMsg := &dto.GroupMessageToCreate{
+								Content: msg, //+ "\n[🔗奇乐最新价格]\n(https://2mf8.cn/webview/#/pages/index/webview?url=https%3A%2F%2Fqilecube.gitee.io%2F)",
+								EventID: dto.EventType(data.ID),
+								MsgType: 0,
+							}
+							Apis[bot.XBotAppid[0]].PostGroupMessage(ctx, data.GroupOpenID, newMsg)
+						}
+						if len(retStuct.ReplyMsg.Images) == 2 {
+							resp, _ := Apis[bot.XBotAppid[0]].PostGroupRichMediaMessage(ctx, data.GroupOpenID, &dto.GroupRichMediaMessageToCreate{FileType: 1, Url: retStuct.ReplyMsg.Images[1], SrvSendMsg: false})
+							if resp != nil {
+								newMsg := &dto.GroupMessageToCreate{
+									Content: msg, //+ "\n[🔗奇乐最新价格]\n(https://2mf8.cn/webview/#/pages/index/webview?url=https%3A%2F%2Fqilecube.gitee.io%2F)",
+									Media: &dto.FileInfo{
+										FileInfo: resp.FileInfo,
+									},
+									EventID: dto.EventType(data.ID),
+									MsgType: 7,
+									MsgReq:  2,
+								}
+								Apis[bot.XBotAppid[0]].PostGroupMessage(ctx, data.GroupOpenID, newMsg)
+							}
+						}
+						if len(retStuct.ReplyMsg.Images) >= 3 {
+							resp, _ := Apis[bot.XBotAppid[0]].PostGroupRichMediaMessage(ctx, data.GroupOpenID, &dto.GroupRichMediaMessageToCreate{FileType: 1, Url: retStuct.ReplyMsg.Images[1], SrvSendMsg: false})
+							if resp != nil {
+								newMsg := &dto.GroupMessageToCreate{
+									Content: msg, //+ "\n[🔗奇乐最新价格]\n(https://2mf8.cn/webview/#/pages/index/webview?url=https%3A%2F%2Fqilecube.gitee.io%2F)",
+									Media: &dto.FileInfo{
+										FileInfo: resp.FileInfo,
+									},
+									EventID: dto.EventType(data.ID),
+									MsgType: 7,
+									MsgReq:  2,
+								}
+								Apis[bot.XBotAppid[0]].PostGroupMessage(ctx, data.GroupOpenID, newMsg)
+							}
+							resp1, _ := Apis[bot.XBotAppid[0]].PostGroupRichMediaMessage(ctx, data.GroupOpenID, &dto.GroupRichMediaMessageToCreate{FileType: 1, Url: retStuct.ReplyMsg.Images[2], SrvSendMsg: false})
+							if resp1 != nil {
+								newMsg := &dto.GroupMessageToCreate{
+									Content: msg, //+ "\n[🔗奇乐最新价格]\n(https://2mf8.cn/webview/#/pages/index/webview?url=https%3A%2F%2Fqilecube.gitee.io%2F)",
+									Media: &dto.FileInfo{
+										FileInfo: resp1.FileInfo,
+									},
+									EventID: dto.EventType(data.ID),
+									MsgType: 7,
+									MsgReq:  3,
+								}
+								Apis[bot.XBotAppid[0]].PostGroupMessage(ctx, data.GroupOpenID, newMsg)
+							}
+						}
+					}
+					break
+				}
+			}
+		}
+		return nil
+	}
+	webhook.InitGin()
+	select {}
 }

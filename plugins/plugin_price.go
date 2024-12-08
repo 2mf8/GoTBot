@@ -85,13 +85,18 @@ func (price *PricePlugin) Do(ctx *context.Context, botId *utils.BotIdType, group
 		}
 	}
 
-	if StartsWith(s, "#+") && (userRole || super) {
-		sub, err := SubscribeRead()
+	auser := fmt.Sprintf("%s_%s", groupId.Offical, userId.Offical)
+	fmt.Println(auser, userId.Offical)
+	fmt.Println(isAuth(auser, userId.Offical))
+	if StartsWith(s, "#+") && (userRole || super || isAuth(auser, userId.Offical)) {
 		str4 := strings.TrimSpace(string([]byte(s)[len("#+"):]))
 		str5 := strings.Split(str4, "##")
+		sub, err := SubscribeRead()
+		fmt.Println("suberr", err)
 		if len(str5) != 2 {
 			if err != nil {
-				err := IDBGAN(gid, gid, str5[0])
+				err := IDBGAN(gid, gid, strings.TrimSpace(str5[0]))
+				fmt.Println(err, str5[0])
 				if err != nil {
 					replyText := "删除失败"
 					log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
@@ -113,7 +118,8 @@ func (price *PricePlugin) Do(ctx *context.Context, botId *utils.BotIdType, group
 					ReqType: utils.GroupMsg,
 				}
 			} else {
-				err := IDBGAN(sub[gid], sub[gid], str5[0])
+				err := IDBGAN(strings.TrimSpace(sub[gid]), strings.TrimSpace(sub[gid]), strings.TrimSpace(str5[0]))
+				fmt.Println(sub[gid], gid, err, str5[0], sub[gid])
 				if err != nil {
 					replyText := "删除失败"
 					log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
@@ -150,7 +156,7 @@ func (price *PricePlugin) Do(ctx *context.Context, botId *utils.BotIdType, group
 		str6 := strings.Split(str5[1], "#&")
 		if len(str6) != 2 {
 			if err != nil {
-				_, err := ItemSave(gid, gid, null.String{}, str5[0], null.NewString(str6[0], true), null.String{}, null.NewString(uid, true), time.Now().Unix(), isMagnetism, null.NewString("", true))
+				_, err := ItemSave(gid, gid, null.String{}, strings.TrimSpace(str5[0]), null.NewString(str6[0], true), null.String{}, null.NewString(uid, true), time.Now().Unix(), isMagnetism, null.NewString("", true))
 				if err != nil {
 					replyText := "添加失败"
 					log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
@@ -174,7 +180,7 @@ func (price *PricePlugin) Do(ctx *context.Context, botId *utils.BotIdType, group
 					ReqType: utils.GroupMsg,
 				}
 			} else {
-				_, err := ItemSave(sub[gid], sub[gid], null.String{}, str5[0], null.NewString(str6[0], true), null.String{}, null.NewString(uid, true), time.Now().Unix(), isMagnetism, null.NewString("", true))
+				_, err := ItemSave(sub[gid], sub[gid], null.String{}, strings.TrimSpace(str5[0]), null.NewString(str6[0], true), null.String{}, null.NewString(uid, true), time.Now().Unix(), isMagnetism, null.NewString("", true))
 				if err != nil {
 					replyText := "添加失败"
 					log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
@@ -201,7 +207,7 @@ func (price *PricePlugin) Do(ctx *context.Context, botId *utils.BotIdType, group
 			}
 		}
 		if err != nil {
-			_, err := ItemSave(gid, gid, null.String{}, str5[0], null.NewString(str6[0], true), null.NewString(str6[1], true), null.NewString(uid, true), time.Now().Unix(), isMagnetism, null.NewString("", true))
+			_, err := ItemSave(gid, gid, null.String{}, strings.TrimSpace(str5[0]), null.NewString(str6[0], true), null.NewString(str6[1], true), null.NewString(uid, true), time.Now().Unix(), isMagnetism, null.NewString("", true))
 			if err != nil {
 				replyText := "添加失败"
 				log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
@@ -224,7 +230,7 @@ func (price *PricePlugin) Do(ctx *context.Context, botId *utils.BotIdType, group
 				ReqType: utils.GroupMsg,
 			}
 		} else {
-			_, err := ItemSave(sub[gid], sub[gid], null.String{}, str5[0], null.NewString(str6[0], true), null.NewString(str6[1], true), null.NewString(uid, true), time.Now().Unix(), isMagnetism, null.NewString("", true))
+			_, err := ItemSave(sub[gid], sub[gid], null.String{}, strings.TrimSpace(str5[0]), null.NewString(str6[0], true), null.NewString(str6[1], true), null.NewString(uid, true), time.Now().Unix(), isMagnetism, null.NewString("", true))
 			if err != nil {
 				replyText := "添加失败"
 				log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, replyText)
@@ -255,18 +261,43 @@ func (price *PricePlugin) Do(ctx *context.Context, botId *utils.BotIdType, group
 	sub, err := SubscribeRead()
 	if err != nil {
 		from = gid
-		cps, _ = GetItems(groupId.Offical, groupId.Offical, s)
-		for _, i := range cps {
-			if i.Shipping.String == "" {
-				ps += "\n" + i.Item + " | " + i.Price.String
+		index := 0
+		ss := strings.Split(s, "#")
+		if len(ss) > 1 {
+			i, err := strconv.ParseInt(ss[1], 10, 64)
+			if err == nil {
+				index = int(i)
+			}
+		}
+		cps, _ = GetItems(groupId.Offical, groupId.Offical, ss[0])
+		for id, i := range cps {
+			if index > 0 {
+				if id < index-1 {
+					continue
+				} else {
+					if i.Shipping.String == "" {
+						ps += "\n" + i.Item + " | " + i.Price.String
+					} else {
+						ps += "\n" + i.Item + " | " + i.Price.String + " | " + i.Shipping.String
+					}
+					if ic == 19 {
+						ps += "\n..." + "\n\n翻页请使用\n%[品名]#[序号]\n指令。例如：\n%三#21\n"
+						break
+					}
+					ic++
+				}
 			} else {
-				ps += "\n" + i.Item + " | " + i.Price.String + " | " + i.Shipping.String
+				if i.Shipping.String == "" {
+					ps += "\n" + i.Item + " | " + i.Price.String
+				} else {
+					ps += "\n" + i.Item + " | " + i.Price.String + " | " + i.Shipping.String
+				}
+				if ic == 19 {
+					ps += "\n..." + "\n\n翻页请使用\n%[品名]#[序号]\n指令。例如：\n%三#21\n"
+					break
+				}
+				ic++
 			}
-			if ic == 19 {
-				ps += "\n..."
-				break
-			}
-			ic++
 		}
 		if len(cps) == 0 {
 			replyText := "暂无相关记录"
@@ -295,18 +326,43 @@ func (price *PricePlugin) Do(ctx *context.Context, botId *utils.BotIdType, group
 		if from == "" {
 			from = gid
 		}
-		cps, _ := GetItems(sub[groupId.Offical], sub[groupId.Offical], s)
-		for _, i := range cps {
-			if i.Shipping.String == "" {
-				ps += "\n" + i.Item + " | " + i.Price.String
+		index := 0
+		ss := strings.Split(s, "#")
+		if len(ss) > 1 {
+			i, err := strconv.ParseInt(ss[1], 10, 64)
+			if err == nil {
+				index = int(i)
+			}
+		}
+		cps, _ := GetItems(sub[groupId.Offical], sub[groupId.Offical], ss[0])
+		for id, i := range cps {
+			if index > 0 {
+				if id < index-1 {
+					continue
+				} else {
+					if i.Shipping.String == "" {
+						ps += "\n" + i.Item + " | " + i.Price.String
+					} else {
+						ps += "\n" + i.Item + " | " + i.Price.String + " | " + i.Shipping.String
+					}
+					if ic == 19 {
+						ps += "\n..." + "\n\n翻页请使用\n%[品名]#[序号]\n指令。例如：\n%三#21\n"
+						break
+					}
+					ic++
+				}
 			} else {
-				ps += "\n" + i.Item + " | " + i.Price.String + " | " + i.Shipping.String
+				if i.Shipping.String == "" {
+					ps += "\n" + i.Item + " | " + i.Price.String
+				} else {
+					ps += "\n" + i.Item + " | " + i.Price.String + " | " + i.Shipping.String
+				}
+				if ic == 19 {
+					ps += "\n..." + "\n\n翻页请使用\n%[品名]#[序号]\n指令。例如：\n%三#21\n"
+					break
+				}
+				ic++
 			}
-			if ic == 19 {
-				ps += "\n..."
-				break
-			}
-			ic++
 		}
 		if len(cps) == 0 {
 			replyText := "暂无相关记录"
@@ -331,6 +387,17 @@ func (price *PricePlugin) Do(ctx *context.Context, botId *utils.BotIdType, group
 			}
 		}
 	}
+}
+
+func isAuth(k string, u string) bool {
+	ia, err := AuthRead()
+	if err != nil {
+		return false
+	}
+	if ia[k] == u {
+		return true
+	}
+	return false
 }
 
 func init() {

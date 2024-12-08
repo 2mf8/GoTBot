@@ -2,7 +2,6 @@ package database
 
 import (
 	"fmt"
-	"strconv"
 	"time"
 
 	"github.com/2mf8/GoTBot/config"
@@ -43,12 +42,7 @@ type TCuberPrice struct {
 func GetItem(guildId, channelId string, item string) (cp CuberPrice, err error) {
 	statment := ""
 	cp = CuberPrice{}
-	_, err = strconv.Atoi(item)
-	if err != nil {
-		statment = fmt.Sprintf("select ID, guild_id, channel_id, brand, item, price, shipping, updater, gmt_modified, is_magnetism, magnetism_type from [%s].[dbo].[guild_shop] where guild_id = $1 and channel_id = $3 and item = $2", config.Conf.DatabaseName)
-	} else {
-		statment = fmt.Sprintf("select ID, guild_id, channel_id, brand, item, price, shipping, updater, gmt_modified, is_magnetism, magnetism_type from [%s].[dbo].[guild_shop] where guild_id = $1 and channel_id = $3 and ID = $2", config.Conf.DatabaseName)
-	}
+	statment = fmt.Sprintf("select ID, guild_id, channel_id, brand, item, price, shipping, updater, gmt_modified, is_magnetism, magnetism_type from [%s].[dbo].[guild_shop] where guild_id = $1 and channel_id = $3 and item = $2", config.Conf.DatabaseName)
 	err = Db.QueryRow(statment, guildId, item, channelId).Scan(&cp.Id, &cp.GuildId, &cp.ChannelId, &cp.Brand, &cp.Item, &cp.Price, &cp.Shipping, &cp.Updater, &cp.GmtModified, &cp.IsMagnetism, &cp.MagnetismType)
 	return
 }
@@ -147,7 +141,7 @@ func IDBGAN(guildId, channelId, item string) (err error) {
 
 func GetAll() (err error) {
 	ii := 0
-	statment := fmt.Sprintf("select guild_id, channel_id, brand, item, price, shipping, updater, gmt_modified, is_magnetism, magnetism_type from [%s].[dbo].[guild_price]", config.Conf.DatabaseName)
+	statment := fmt.Sprintf("select guild_id, channel_id, brand, item, price, shipping, updater, gmt_modified, is_magnetism, magnetism_type from [%s].[dbo].[guild_shop]", config.Conf.DatabaseName)
 	rows, err := Db.Query(statment)
 	fmt.Println(err)
 	if err != nil {

@@ -6,7 +6,7 @@ import (
 
 	"github.com/2mf8/GoTBot/config"
 	"github.com/2mf8/GoTBot/public"
-	"github.com/2mf8/Go-QQ-Client/log"
+	"github.com/2mf8/Go-QQ-SDK/log"
 	"gopkg.in/guregu/null.v3"
 )
 

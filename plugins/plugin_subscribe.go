@@ -2,7 +2,9 @@ package plugins
 
 import (
 	"context"
+	"fmt"
 	"log"
+	"regexp"
 	"strings"
 
 	//. "github.com/2mf8/GoTBot/config"
@@ -61,6 +63,52 @@ func (sub *Sub) Do(ctx *context.Context, botId *utils.BotIdType, groupId *utils.
 			ReqType: utils.GroupMsg,
 		}
 	}
+
+	reg1 := regexp.MustCompile("<at qq=\"")
+	reg2 := regexp.MustCompile("\"/>")
+	reg3 := regexp.MustCompile("<@")
+	reg4 := regexp.MustCompile(">")
+	reg5 := regexp.MustCompile("!")
+	str1 := strings.TrimSpace(reg5.ReplaceAllString(reg4.ReplaceAllString(reg3.ReplaceAllString(reg1.ReplaceAllString(s, ""), ""), ""), ""))
+	str2 := strings.TrimSpace(reg2.ReplaceAllString(str1, " "))
+	if StartsWith(s, "授权") && (userRole || super) {
+		as := strings.TrimSpace(strings.TrimPrefix(str2, "授权"))
+		if as == "" {
+			reply := " 授权失败，对象为空"
+			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, reply)
+			return utils.RetStuct{
+				RetVal: utils.MESSAGE_BLOCK,
+				ReplyMsg: &utils.Msg{
+					Text: reply},
+				ReqType: utils.GroupMsg,
+			}
+		} else {
+			auser := fmt.Sprintf("%s_%s", groupId.Offical, as)
+			AuthCreate(auser, as)
+			reply := " 授权成功"
+			log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, reply)
+			return utils.RetStuct{
+				RetVal: utils.MESSAGE_BLOCK,
+				ReplyMsg: &utils.Msg{
+					Text: reply},
+				ReqType: utils.GroupMsg,
+			}
+		}
+	}
+	if StartsWith(s, "取消授权") && (userRole || super) {
+		as := strings.TrimSpace(strings.TrimPrefix(str2, "取消授权"))
+		auser := fmt.Sprintf("%s_%s", groupId.Offical, as)
+		AuthDelete(auser)
+		reply := "取消授权成功"
+		log.Printf("[INFO] Bot(%v) Group(%v) -> %v", botId, groupId, reply)
+		return utils.RetStuct{
+			RetVal: utils.MESSAGE_BLOCK,
+			ReplyMsg: &utils.Msg{
+				Text: reply},
+			ReqType: utils.GroupMsg,
+		}
+	}
+
 	return utils.RetStuct{
 		RetVal: utils.MESSAGE_IGNORE,
 	}

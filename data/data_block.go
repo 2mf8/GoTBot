@@ -7,7 +7,7 @@ import (
 	"github.com/2mf8/GoTBot/config"
 	"github.com/2mf8/GoTBot/public"
 	_ "github.com/denisenkom/go-mssqldb"
-	"github.com/2mf8/Go-QQ-Client/log"
+	"github.com/2mf8/Go-QQ-SDK/log"
 	_ "gopkg.in/guregu/null.v3/zero"
 )
 

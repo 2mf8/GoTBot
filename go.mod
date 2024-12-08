@@ -3,7 +3,7 @@ module github.com/2mf8/GoTBot
 go 1.22
 
 require (
-	github.com/2mf8/Go-QQ-Client v0.0.1
+	github.com/2mf8/Go-QQ-SDK v0.0.7-0.20241208010632-f15d2917c9f6
 	github.com/2mf8/GoneBot v0.0.0-20240530161035-7805c1b7056b
 	github.com/BurntSushi/toml v1.4.0
 	github.com/denisenkom/go-mssqldb v0.12.3
@@ -12,10 +12,7 @@ require (
 	github.com/go-resty/resty/v2 v2.11.0
 	github.com/golang-jwt/jwt/v5 v5.2.0
 	github.com/gomodule/redigo v1.9.2
-	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible
-	github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5
 	github.com/sirupsen/logrus v1.9.3
-	github.com/t-tomalak/logrus-easy-formatter v0.0.0-20190827215021-c074f06c5816
 	google.golang.org/grpc v1.62.0
 	google.golang.org/protobuf v1.34.1
 	gopkg.in/guregu/null.v3 v3.5.0
@@ -37,21 +34,23 @@ require (
 	github.com/golang-sql/sqlexp v0.1.0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/gopherjs/gopherjs v1.17.2 // indirect
-	github.com/gorilla/websocket v1.5.1 // indirect
+	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/jefferyjob/go-easy-utils/v2 v2.1.1 // indirect
-	github.com/jonboulle/clockwork v0.4.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/jtolds/gls v4.20.0+incompatible // indirect
 	github.com/klauspost/cpuid/v2 v2.2.7 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
-	github.com/lestrrat-go/strftime v1.0.6 // indirect
+	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible // indirect
+	github.com/lestrrat-go/strftime v1.1.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.2 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5 // indirect
 	github.com/smarty/assertions v1.15.1 // indirect
+	github.com/t-tomalak/logrus-easy-formatter v0.0.0-20190827215021-c074f06c5816 // indirect
 	github.com/tidwall/gjson v1.9.3 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.0 // indirect

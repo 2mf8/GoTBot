@@ -1,5 +1,5 @@
-github.com/2mf8/Go-QQ-Client v0.0.1 h1:vic+YdQAJjivMK/Dh4vGzuLsrNikSJmJv8b+g/ZfUso=
-github.com/2mf8/Go-QQ-Client v0.0.1/go.mod h1:hHswrf6QKwurx+CJtXollyciwan8Ff1DTEguz+loF8E=
+github.com/2mf8/Go-QQ-SDK v0.0.7-0.20241208010632-f15d2917c9f6 h1:FH2zm+6+jJyihBcyXiLYsZs0Lrx0G8xE5heCHGQWOeE=
+github.com/2mf8/Go-QQ-SDK v0.0.7-0.20241208010632-f15d2917c9f6/go.mod h1:BmsXV+OGeO4akYdl3zoxmDfBs59dizATl+CzNNjnTQQ=
 github.com/2mf8/GoneBot v0.0.0-20240530161035-7805c1b7056b h1:pDD7e4Uex3QbBo9NnmXA+55aS4zL0IILclB2oaeE22M=
 github.com/2mf8/GoneBot v0.0.0-20240530161035-7805c1b7056b/go.mod h1:S8VxX6yRZKLrchSi0gjB7tBbNkJ3CsstT9oDupIrtlk=
 github.com/Azure/azure-sdk-for-go/sdk/azcore v0.19.0/go.mod h1:h6H6c8enJmmocHUbLiiGY6sx7f9i+X3m1CHdd5c6Rdw=
@@ -60,8 +60,8 @@ github.com/google/go-cmp v0.6.0/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeN
 github.com/google/gofuzz v1.0.0/go.mod h1:dBl0BpW6vV/+mYPU4Po3pmUjxk6FQPldtuIdl/M65Eg=
 github.com/gopherjs/gopherjs v1.17.2 h1:fQnZVsXk8uxXIStYb0N4bGk7jeyTalG/wsZjQ25dO0g=
 github.com/gopherjs/gopherjs v1.17.2/go.mod h1:pRRIvn/QzFLrKfvEz3qUuEhtE/zLCWfreZ6J5gM2i+k=
-github.com/gorilla/websocket v1.5.1 h1:gmztn0JnHVt9JZquRuzLw3g4wouNVzKL15iLr/zn/QY=
-github.com/gorilla/websocket v1.5.1/go.mod h1:x3kM2JMyaluk02fnUJpQuwD2dCS5NDG2ZHL0uE0tcaY=
+github.com/gorilla/websocket v1.5.3 h1:saDtZ6Pbx/0u+bgYQ3q96pZgCzfhKXGPqt7kZ72aNNg=
+github.com/gorilla/websocket v1.5.3/go.mod h1:YR8l580nyteQvAITg2hZ9XVh4b55+EU/adAjf1fMHhE=
 github.com/jefferyjob/go-easy-utils/v2 v2.1.1 h1:1ZASJWxnq3uPVq9E/dAnquBr/cPw3u0ADgfT2+GzGuk=
 github.com/jefferyjob/go-easy-utils/v2 v2.1.1/go.mod h1:jR7TTWaezivFkuAHIv4WCYdmnd22bpZkrOI+YH5AIro=
 github.com/jonboulle/clockwork v0.4.0 h1:p4Cf1aMWXnXAUh8lVfewRBx1zaTSYKrKMF2g3ST4RZ4=
@@ -81,8 +81,8 @@ github.com/lestrrat-go/envload v0.0.0-20180220234015-a3eb8ddeffcc h1:RKf14vYWi2t
 github.com/lestrrat-go/envload v0.0.0-20180220234015-a3eb8ddeffcc/go.mod h1:kopuH9ugFRkIXf3YoqHKyrJ9YfUFsckUU9S7B+XP+is=
 github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible h1:Y6sqxHMyB1D2YSzWkLibYKgg+SwmyFU9dF2hn6MdTj4=
 github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible/go.mod h1:ZQnN8lSECaebrkQytbHj4xNgtg8CR7RYXnPok8e0EHA=
-github.com/lestrrat-go/strftime v1.0.6 h1:CFGsDEt1pOpFNU+TJB0nhz9jl+K0hZSLE205AhTIGQQ=
-github.com/lestrrat-go/strftime v1.0.6/go.mod h1:f7jQKgV5nnJpYgdEasS+/y7EsTb8ykN2z68n3TtcTaw=
+github.com/lestrrat-go/strftime v1.1.0 h1:gMESpZy44/4pXLO/m+sL0yBd1W6LjgjrrD4a68Gapyg=
+github.com/lestrrat-go/strftime v1.1.0/go.mod h1:uzeIB52CeUJenCo1syghlugshMysrqUT51HlxphXVeI=
 github.com/mattn/go-colorable v0.1.13 h1:fFA4WZxdEF4tXPZVKMLwD8oUnCTTo08duU7wxecdEvA=
 github.com/mattn/go-colorable v0.1.13/go.mod h1:7S9/ev0klgBDR4GtXTXX8a3vIGJpMovkB8vQcUbaXHg=
 github.com/mattn/go-isatty v0.0.16/go.mod h1:kYGgaQfpe5nmfYZH+SKPsOc2e4SrIfOl2e/yFXSvRLM=
