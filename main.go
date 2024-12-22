@@ -108,13 +108,13 @@ func main() {
 	}
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.New()
-	router.GET("/onebot/v11/ws", func(c *gin.Context) {
+	router.GET("/", func(c *gin.Context) {
 		if err := gonebot.UpgradeWebsocket(c.Writer, c.Request); err != nil {
 			log.Info("[失败] 创建机器人失败")
 		}
 	})
 
-	if err := router.Run(":8080"); err != nil {
+	if err := router.Run(":9443"); err != nil {
 		panic(err)
 	}
 	select {}
@@ -126,7 +126,7 @@ func StartOffical() {
 	var ctx context.Context
 	for i, v := range as.Apps {
 		token := token.BotToken(v.AppId, v.Token, string(token.TypeBot))
-		api := bot.NewOpenAPI(token).WithTimeout(3 * time.Second)
+		api := bot.NewSandboxOpenAPI(token).WithTimeout(3 * time.Second)
 		Apis[i] = api
 	}
 	b, _ := json.Marshal(as)
