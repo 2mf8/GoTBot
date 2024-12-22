@@ -3,7 +3,7 @@ module github.com/2mf8/GoTBot
 go 1.22
 
 require (
-	github.com/2mf8/Go-QQ-SDK v0.0.7-0.20241208010632-f15d2917c9f6
+	github.com/2mf8/Better-Bot-Go v0.0.0-20241222011748-a87e0e13fef3
 	github.com/2mf8/GoneBot v0.0.0-20240530161035-7805c1b7056b
 	github.com/BurntSushi/toml v1.4.0
 	github.com/denisenkom/go-mssqldb v0.12.3

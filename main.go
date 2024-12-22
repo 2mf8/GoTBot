@@ -10,16 +10,18 @@ import (
 	"strings"
 	"time"
 
-	bot "github.com/2mf8/Go-QQ-SDK"
-	"github.com/2mf8/Go-QQ-SDK/dto"
-	"github.com/2mf8/Go-QQ-SDK/openapi"
-	"github.com/2mf8/Go-QQ-SDK/token"
-	"github.com/2mf8/Go-QQ-SDK/webhook"
+	bot "github.com/2mf8/Better-Bot-Go"
+	"github.com/2mf8/Better-Bot-Go/dto"
+	"github.com/2mf8/Better-Bot-Go/dto/keyboard"
+	"github.com/2mf8/Better-Bot-Go/openapi"
+	"github.com/2mf8/Better-Bot-Go/token"
+	"github.com/2mf8/Better-Bot-Go/webhook"
 	database "github.com/2mf8/GoTBot/data"
 	_ "github.com/2mf8/GoTBot/plugins"
 	"github.com/2mf8/GoTBot/public"
 	"github.com/2mf8/GoTBot/utils"
 	gonebot "github.com/2mf8/GoneBot"
+	gkb "github.com/2mf8/GoneBot/keyboard"
 	"github.com/2mf8/GoneBot/onebot"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
@@ -102,7 +104,7 @@ func main() {
 
 		if strings.HasPrefix(rawMsg, ".") || strings.HasPrefix(rawMsg, "%") {
 			bot.SendGroupBotCallback(102070767, groupId, "1", rawMsg)
-		} 
+		}
 	}
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.New()
@@ -163,6 +165,52 @@ func StartOffical() {
 		msgIdType := utils.MsgIdType{
 			Common:  0,
 			Offical: msgId,
+		}
+		if content == ".del" {
+			mi, err := Apis[bot.XBotAppid[0]].PostGroupMessage(ctx, data.GroupId, &dto.C2CMessageToCreate{
+				Content: "测试撤回",
+				MsgType: dto.C2CMsgTypeText,
+				MsgID: data.MsgId,
+			})
+			if err == nil {
+				fmt.Println(mi.Id, mi.Timestamp)
+				go func ()  {
+					time.Sleep(time.Second * 10)
+					Apis[bot.XBotAppid[0]].DelGroupBotMessage(ctx, data.GroupId, mi.Id, openapi.RetractMessageOptionHidetip)
+				}()
+			}else{
+				fmt.Println(err)
+			}
+		}
+		if content == ".get" {
+			gm, err := Apis[bot.XBotAppid[0]].GetGroupMembers(ctx, data.GroupId, 0, 0)
+			b,_:=json.Marshal(gm)
+			fmt.Println(string(b), err)
+		}
+		if content == ".at" {
+			Apis[bot.XBotAppid[0]].PostGroupMessage(ctx, data.GroupId, &dto.C2CMessageToCreate{
+				Content: "测试<qqbot-at-user id="+data.Author.UserId+" />",
+				MsgType: dto.C2CMsgTypeText,
+			})
+		}
+		if content == ".k" {
+			/* rows := keyboard.CustomKeyboard{} */
+			/* kb := gkb.Builder().
+			TextButton("测试", "已测试", "成功", false, true).
+			UrlButton("爱魔方吧", "一仝", "https://2mf8.cn", false, true).
+			SetRow().
+			TextButton("测试", "已测试", "成功", false, true).
+			SetRow()
+			b, _:= json.Marshal(kb)
+			json.Unmarshal(b, &rows) */
+			fmt.Println("测试")
+			Apis[bot.XBotAppid[0]].PostGroupMessage(ctx, data.GroupId, &dto.C2CMessageToCreate{
+				Keyboard: &keyboard.MessageKeyboard{
+					ID: "101981675_1734764173",
+				},
+				MsgType: dto.C2CMsgTypeMarkdown,
+				MsgID:   data.MsgId,
+			})
 		}
 		for _, i := range database.AllConfig.Plugins {
 			intent := sg.PluginSwitch.IsCloseOrGuard & int64(database.PluginNameToIntent(i))
@@ -271,6 +319,39 @@ func StartOffical() {
 		msgIdType := utils.MsgIdType{
 			Common:  0,
 			Offical: msgId,
+		}
+		if content == ".del" {
+			mi, err := Apis[bot.XBotAppid[0]].PostC2CMessage(ctx, data.Author.UserOpenId, &dto.C2CMessageToCreate{
+				Content: "测试撤回",
+				MsgType: dto.C2CMsgTypeText,
+				MsgID: data.Id,
+			})
+			if err == nil {
+				fmt.Println(mi.Id, mi.Timestamp)
+				go func ()  {
+					time.Sleep(time.Second * 10)
+					Apis[bot.XBotAppid[0]].DelC2CMessage(ctx, data.Author.UserOpenId, mi.Id, openapi.RetractMessageOptionHidetip)
+				}()
+			}else{
+				fmt.Println(err)
+			}
+		}
+		if content == "k" {
+			kb := gkb.Builder().
+				TextButton("测试", "已测试", "成功", false, true).
+				UrlButton("爱魔方吧", "一仝", "https://2mf8.cn", false, true).
+				SetRow().
+				TextButton("测试", "已测试", "成功", false, true).
+				SetRow()
+			b, _ := json.Marshal(kb)
+			fmt.Println(string(b))
+			Apis[bot.XBotAppid[0]].PostC2CMessage(ctx, data.Author.UserOpenId, &dto.C2CMessageToCreate{
+				Keyboard: &keyboard.MessageKeyboard{
+					ID: "101981675_1734764173",
+				},
+				MsgType: dto.C2CMsgTypeMarkdown,
+				MsgID:   data.Id,
+			})
 		}
 
 		for _, i := range database.AllConfig.Plugins {
@@ -412,6 +493,24 @@ func StartOffical() {
 		msgIdType := utils.MsgIdType{
 			Common:  0,
 			Offical: msgId,
+		}
+		if content == ".k" {
+			/* rows := keyboard.CustomKeyboard{} */
+			/* kb := gkb.Builder().
+			TextButton("测试", "已测试", "成功", false, true).
+			UrlButton("爱魔方吧", "一仝", "https://2mf8.cn", false, true).
+			SetRow().
+			TextButton("测试", "已测试", "成功", false, true).
+			SetRow()
+			b, _:= json.Marshal(kb)
+			json.Unmarshal(b, &rows) */
+			fmt.Println("测试")
+			Apis[bot.XBotAppid[0]].PostMessage(ctx, data.ChannelID, &dto.MessageToCreate{
+				Keyboard: &keyboard.MessageKeyboard{
+					ID: "101981675_1734764173",
+				},
+				MsgID:   data.ID,
+			})
 		}
 		for _, i := range database.AllConfig.Plugins {
 			intent := sg.PluginSwitch.IsCloseOrGuard & int64(database.PluginNameToIntent(i))
