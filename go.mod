@@ -3,7 +3,7 @@ module github.com/2mf8/GoTBot
 go 1.22
 
 require (
-	github.com/2mf8/Better-Bot-Go v0.0.2-0.20241222122527-36ae35854f24
+	github.com/2mf8/Better-Bot-Go v0.0.3-0.20241223125436-82dcb11358db
 	github.com/2mf8/GoneBot v0.0.0-20240530161035-7805c1b7056b
 	github.com/BurntSushi/toml v1.4.0
 	github.com/denisenkom/go-mssqldb v0.12.3

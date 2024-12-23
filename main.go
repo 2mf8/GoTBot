@@ -126,8 +126,13 @@ func StartOffical() {
 	var ctx context.Context
 	for i, v := range as.Apps {
 		token := token.BotToken(v.AppId, v.Token, string(token.TypeBot))
-		api := bot.NewSandboxOpenAPI(token).WithTimeout(3 * time.Second)
-		Apis[i] = api
+		if v.IsSandBox {
+			api := bot.NewSandboxOpenAPI(token).WithTimeout(3 * time.Second)
+			Apis[i] = api
+		} else {
+			api := bot.NewOpenAPI(token).WithTimeout(3 * time.Second)
+			Apis[i] = api
+		}
 	}
 	b, _ := json.Marshal(as)
 	fmt.Println("配置", string(b))
@@ -136,8 +141,7 @@ func StartOffical() {
 		userId := data.Author.UserId
 		content := strings.TrimSpace(data.Content)
 		msgId := data.MsgId
-		reg4 := regexp.MustCompile("/")
-		content = strings.TrimSpace(reg4.ReplaceAllString(content, ""))
+		content, _ = public.Prefix(content, "/")
 		super := public.IsBotAdmin(userId, database.AllConfig.Admins)
 		content = fmt.Sprintf(".%s", content)
 		ctx := context.WithValue(context.Background(), "key", "value")
@@ -303,7 +307,7 @@ func StartOffical() {
 		content := data.Content
 		super := public.IsBotAdmin(userId, database.AllConfig.Admins)
 		sg, _ := database.SGBGIACI("c2c", "c2c")
-
+		content = fmt.Sprintf(".%s", content)
 		botType := utils.BotIdType{
 			Common:  0,
 			Offical: "",
@@ -464,19 +468,114 @@ func StartOffical() {
 		}
 		return nil
 	}
+	webhook.ATMessageEventHandler = func(bot *webhook.BotHeaderInfo, event *dto.WSPayload, data *dto.WSATMessageData) error {
+		guildId := data.GuildID
+		channelId := data.ChannelID
+		userId := data.Author.ID
+		content := strings.TrimSpace(data.Content)
+		msgId := data.ID
+		super := public.IsBotAdmin(userId, database.AllConfig.Admins)
+		ctx := context.WithValue(context.Background(), "key", "value")
+		me, _ := Apis[bot.XBotAppid[0]].Me(ctx)
+		reg7 := regexp.MustCompile(fmt.Sprintf("<@!%s> ", me.ID))
+		reg4 := regexp.MustCompile(fmt.Sprintf("<@!%s> /", me.ID))
+		content = strings.TrimSpace(reg4.ReplaceAllString(content, "."))
+		content = reg7.ReplaceAllString(content, ".")
+		sg, _ := database.SGBGIACI(guildId, channelId)
+		botType := utils.BotIdType{
+			Common:  0,
+			Offical: "",
+		}
+		groupIdType := utils.GroupIdType{
+			Common:  0,
+			Offical: channelId,
+		}
+		userIdType := utils.UserIdType{
+			Common:  0,
+			Offical: userId,
+		}
+		msgIdType := utils.MsgIdType{
+			Common:  0,
+			Offical: msgId,
+		}
+		if content == ".k" {
+			/* rows := keyboard.CustomKeyboard{} */
+			/* kb := gkb.Builder().
+			TextButton("测试", "已测试", "成功", false, true).
+			UrlButton("爱魔方吧", "一仝", "https://2mf8.cn", false, true).
+			SetRow().
+			TextButton("测试", "已测试", "成功", false, true).
+			SetRow()
+			b, _:= json.Marshal(kb)
+			json.Unmarshal(b, &rows) */
+			fmt.Println("测试")
+			Apis[bot.XBotAppid[0]].PostMessage(ctx, data.ChannelID, &dto.MessageToCreate{
+				Keyboard: &keyboard.MessageKeyboard{
+					ID: "101981675_1734764173",
+				},
+				MsgID: data.ID,
+			})
+		}
+		for _, i := range database.AllConfig.Plugins {
+			intent := sg.PluginSwitch.IsCloseOrGuard & int64(database.PluginNameToIntent(i))
+			if intent == int64(database.PluginReply) {
+				break
+			}
+			if intent > 0 {
+				continue
+			}
+			retStuct := utils.PluginSet[i].Do(&ctx, &botType, &groupIdType, &userIdType, "", &msgIdType, content, "", true, false, super)
+			if retStuct.RetVal == utils.MESSAGE_BLOCK {
+				if retStuct.ReqType == utils.GroupMsg {
+					if retStuct.ReplyMsg != nil {
+						msg := fmt.Sprintf("%s", strings.TrimSpace(retStuct.ReplyMsg.Text))
+						if retStuct.ReplyMsg.Image != "" {
+							Apis[bot.XBotAppid[0]].PostMessage(ctx, channelId, &dto.MessageToCreate{
+								Content: msg,
+								Image:   retStuct.ReplyMsg.Image,
+								MsgID:   data.ID,
+							})
+						} else {
+							Apis[bot.XBotAppid[0]].PostMessage(ctx, channelId, &dto.MessageToCreate{
+								Content: msg,
+								MsgID:   data.ID,
+							})
+						}
+						if len(retStuct.ReplyMsg.Images) == 2 {
+							Apis[bot.XBotAppid[0]].PostMessage(ctx, channelId, &dto.MessageToCreate{
+								Content: msg,
+								Image:   retStuct.ReplyMsg.Images[1],
+								MsgID:   data.ID,
+							})
+						}
+						if len(retStuct.ReplyMsg.Images) >= 3 {
+							Apis[bot.XBotAppid[0]].PostMessage(ctx, channelId, &dto.MessageToCreate{
+								Content: msg,
+								Image:   retStuct.ReplyMsg.Images[1],
+								MsgID:   data.ID,
+							})
+							Apis[bot.XBotAppid[0]].PostMessage(ctx, channelId, &dto.MessageToCreate{
+								Content: msg,
+								Image:   retStuct.ReplyMsg.Images[2],
+								MsgID:   data.ID,
+							})
+						}
+					}
+					break
+				}
+			}
+		}
+		return nil
+	}
 	webhook.MessageEventHandler = func(bot *webhook.BotHeaderInfo, event *dto.WSPayload, data *dto.WSMessageData) error {
 		guildId := data.GuildID
 		channelId := data.ChannelID
 		userId := data.Author.ID
 		content := strings.TrimSpace(data.Content)
 		msgId := data.ID
-		reg4 := regexp.MustCompile("/")
-		content = strings.TrimSpace(reg4.ReplaceAllString(content, ""))
 		super := public.IsBotAdmin(userId, database.AllConfig.Admins)
 		ctx := context.WithValue(context.Background(), "key", "value")
-		me, _ := Apis[bot.XBotAppid[0]].Me(ctx)
-		reg7 := regexp.MustCompile(fmt.Sprintf("<@!%s> ", me.ID))
-		content = reg7.ReplaceAllString(content, ".")
+
 		sg, _ := database.SGBGIACI(guildId, channelId)
 		botType := utils.BotIdType{
 			Common:  0,
