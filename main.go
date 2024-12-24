@@ -696,7 +696,80 @@ func StartOffical() {
 			if retStuct.RetVal == utils.MESSAGE_BLOCK {
 				if retStuct.ReqType == utils.GroupMsg {
 					if retStuct.ReplyMsg != nil {
-						if data.ChannelID != "" {
+						if data.Scene == "c2c" {
+							if retStuct.ReplyMsg.Image != "" {
+								resp, err := Apis[bot.XBotAppid[0]].PostC2CRichMediaMessage(ctx, data.UserOpenId, &dto.C2CRichMediaMessageToCreate{FileType: 1, Url: retStuct.ReplyMsg.Image, SrvSendMsg: false})
+								log.Info(err)
+								if resp != nil {
+									newMsg := &dto.C2CMessageToCreate{
+										Content: strings.TrimSpace(retStuct.ReplyMsg.Text),
+										Media: &dto.FileInfo{
+											FileInfo: resp.FileInfo,
+										},
+										EventID:  dto.EventType(data.ID),
+										MsgType: 7,
+										MsgReq:  1,
+									}
+									_, err := Apis[bot.XBotAppid[0]].PostC2CMessage(ctx, data.UserOpenId, newMsg)
+									log.Info(err)
+								}
+							} else {
+								newMsg := &dto.C2CMessageToCreate{
+									Content: strings.TrimSpace(retStuct.ReplyMsg.Text),
+									EventID:  dto.EventType(data.ID),
+									MsgType: 0,
+									MsgReq:  1,
+								}
+								_, err := Apis[bot.XBotAppid[0]].PostC2CMessage(ctx, data.UserOpenId, newMsg)
+								log.Info(err)
+							}
+							if len(retStuct.ReplyMsg.Images) == 2 {
+								resp, err := Apis[bot.XBotAppid[0]].PostC2CRichMediaMessage(ctx, data.UserOpenId, &dto.C2CRichMediaMessageToCreate{FileType: 1, Url: retStuct.ReplyMsg.Images[1], SrvSendMsg: false})
+								log.Info(err)
+								if resp != nil {
+									newMsg := &dto.C2CMessageToCreate{
+										Media: &dto.FileInfo{
+											FileInfo: resp.FileInfo,
+										},
+										EventID:  dto.EventType(data.ID),
+										MsgType: 7,
+										MsgReq:  1,
+									}
+									_, err := Apis[bot.XBotAppid[0]].PostC2CMessage(ctx, data.UserOpenId, newMsg)
+									log.Info(err)
+								}
+							}
+							if len(retStuct.ReplyMsg.Images) >= 3 {
+								resp, err := Apis[bot.XBotAppid[0]].PostC2CRichMediaMessage(ctx, data.UserOpenId, &dto.C2CRichMediaMessageToCreate{FileType: 1, Url: retStuct.ReplyMsg.Images[1], SrvSendMsg: false})
+								log.Info(err)
+								if resp != nil {
+									newMsg := &dto.C2CMessageToCreate{
+										Media: &dto.FileInfo{
+											FileInfo: resp.FileInfo,
+										},
+										EventID:  dto.EventType(data.ID),
+										MsgType: 7,
+										MsgReq:  1,
+									}
+									_, err := Apis[bot.XBotAppid[0]].PostC2CMessage(ctx, data.UserOpenId, newMsg)
+									log.Info(err)
+								}
+								resp1, err := Apis[bot.XBotAppid[0]].PostC2CRichMediaMessage(ctx, data.UserOpenId, &dto.C2CRichMediaMessageToCreate{FileType: 1, Url: retStuct.ReplyMsg.Images[2], SrvSendMsg: false})
+								log.Info(err)
+								if resp1 != nil {
+									newMsg := &dto.C2CMessageToCreate{
+										Media: &dto.FileInfo{
+											FileInfo: resp1.FileInfo,
+										},
+										EventID:  dto.EventType(data.ID),
+										MsgType: 7,
+										MsgReq:  1,
+									}
+									_, err := Apis[bot.XBotAppid[0]].PostC2CMessage(ctx, data.UserOpenId, newMsg)
+									log.Info(err)
+								}
+							}
+						} else if data.ChannelID != "" {
 							msg := strings.TrimSpace(retStuct.ReplyMsg.Text)
 							if retStuct.ReplyMsg.Image != "" {
 								newMsg := &dto.MessageToCreate{
@@ -714,20 +787,20 @@ func StartOffical() {
 							}
 							if len(retStuct.ReplyMsg.Images) == 2 {
 								newMsg := &dto.MessageToCreate{
-									Image:   retStuct.ReplyMsg.Images[1],
-									MsgID:   data.ID,
+									Image: retStuct.ReplyMsg.Images[1],
+									MsgID: data.ID,
 								}
 								Apis[bot.XBotAppid[0]].PostMessage(ctx, data.ChannelID, newMsg)
 							}
 							if len(retStuct.ReplyMsg.Images) >= 3 {
 								newMsg := &dto.MessageToCreate{
-									Image:   retStuct.ReplyMsg.Images[1],
-									MsgID:   data.ID,
+									Image: retStuct.ReplyMsg.Images[1],
+									MsgID: data.ID,
 								}
 								Apis[bot.XBotAppid[0]].PostMessage(ctx, data.ChannelID, newMsg)
 								newMsg2 := &dto.MessageToCreate{
-									Image:   retStuct.ReplyMsg.Images[2],
-									MsgID:   data.ID,
+									Image: retStuct.ReplyMsg.Images[2],
+									MsgID: data.ID,
 								}
 								Apis[bot.XBotAppid[0]].PostMessage(ctx, data.ChannelID, newMsg2)
 							}
