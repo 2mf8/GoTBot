@@ -1,5 +1,5 @@
-github.com/2mf8/Better-Bot-Go v0.0.3-0.20241223143722-b5cdc05dee21 h1:EpScRbxiZqa0EERY9UC47kA6kg6U582BRc3SFdiDRtI=
-github.com/2mf8/Better-Bot-Go v0.0.3-0.20241223143722-b5cdc05dee21/go.mod h1:8ANZ42GDdTVsAaY+xZUE3lU0AunOtR8YGWsb2fZ1lrs=
+github.com/2mf8/Better-Bot-Go v0.0.4-0.20241224134124-02cb86eb4670 h1:ndHDEl8LxjEVsP0PGBpz6zRpHmuRHijBql29PbtQ4Bs=
+github.com/2mf8/Better-Bot-Go v0.0.4-0.20241224134124-02cb86eb4670/go.mod h1:8ANZ42GDdTVsAaY+xZUE3lU0AunOtR8YGWsb2fZ1lrs=
 github.com/2mf8/GoneBot v0.0.0-20240530161035-7805c1b7056b h1:pDD7e4Uex3QbBo9NnmXA+55aS4zL0IILclB2oaeE22M=
 github.com/2mf8/GoneBot v0.0.0-20240530161035-7805c1b7056b/go.mod h1:S8VxX6yRZKLrchSi0gjB7tBbNkJ3CsstT9oDupIrtlk=
 github.com/Azure/azure-sdk-for-go/sdk/azcore v0.19.0/go.mod h1:h6H6c8enJmmocHUbLiiGY6sx7f9i+X3m1CHdd5c6Rdw=

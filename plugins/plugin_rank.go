@@ -25,7 +25,6 @@ func (rp *RankPlugin) Do(ctx *context.Context, botId *utils.BotIdType, groupId *
 			RetVal: utils.MESSAGE_IGNORE,
 		}
 	}
-	fmt.Println("rank？")
 	if strings.HasPrefix(s, "rank") {
 		w_m := strings.TrimSpace(strings.TrimSpace(string([]byte(s)[len("rank"):])))
 		ss := strings.Split(w_m, "-")
@@ -101,7 +100,7 @@ func (rp *RankPlugin) Do(ctx *context.Context, botId *utils.BotIdType, groupId *
 		return utils.RetStuct{
 			RetVal: utils.MESSAGE_IGNORE,
 		}
-	} else {
+	} else if strings.HasPrefix(s, "top") {
 		e, r, t, g := database.ToRank(s)
 		if e != "" || r != "" || t != "" || g != "" {
 			ns := strings.TrimSpace(strings.TrimPrefix(s, "rank"))

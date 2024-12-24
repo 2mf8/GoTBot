@@ -19,7 +19,7 @@ type WCA struct {
 }
 
 func (wca *WCA) Do(ctx *context.Context, botId *utils.BotIdType, groupId *utils.GroupIdType, userId *utils.UserIdType, groupName string, messageId *utils.MsgIdType, rawMsg, card string, botRole, userRole, super bool) (retStuct utils.RetStuct) {
-	fmt.Println("rank插件测试，wca")
+	
 	s, b := public.Prefix(rawMsg, ".")
 	if !b {
 		return utils.RetStuct{
