@@ -669,7 +669,7 @@ func StartOffical() {
 			return err
 		}
 		json.Unmarshal(b, dr)
-		fmt.Println("\n\n\n", string(b))
+		content := fmt.Sprintf(".%s", dr.ButtonData)
 		sg, _ := database.SGBGIACI(data.GroupOpenID, data.GroupOpenID)
 		botType := utils.BotIdType{
 			Common:  0,
@@ -692,74 +692,111 @@ func StartOffical() {
 				continue
 			}
 			fmt.Println("eventId", data.ID)
-			retStuct := utils.PluginSet[i].Do(&ctx, &botType, &groupIdType, &userIdType, "", &utils.MsgIdType{}, dr.ButtonData, "", true, false, false)
+			retStuct := utils.PluginSet[i].Do(&ctx, &botType, &groupIdType, &userIdType, "", &utils.MsgIdType{}, content, "", true, false, false)
 			if retStuct.RetVal == utils.MESSAGE_BLOCK {
 				if retStuct.ReqType == utils.GroupMsg {
 					if retStuct.ReplyMsg != nil {
-						msg := strings.TrimSpace(retStuct.ReplyMsg.Text)
-						if retStuct.ReplyMsg.Image != "" {
-							resp, _ := Apis[bot.XBotAppid[0]].PostGroupRichMediaMessage(ctx, data.GroupOpenID, &dto.GroupRichMediaMessageToCreate{FileType: 1, Url: retStuct.ReplyMsg.Image, SrvSendMsg: false})
-							if resp != nil {
-								newMsg := &dto.GroupMessageToCreate{
+						if data.ChannelID != "" {
+							msg := strings.TrimSpace(retStuct.ReplyMsg.Text)
+							if retStuct.ReplyMsg.Image != "" {
+								newMsg := &dto.MessageToCreate{
 									Content: msg, //+ "\n[🔗奇乐最新价格]\n(https://2mf8.cn/webview/#/pages/index/webview?url=https%3A%2F%2Fqilecube.gitee.io%2F)",
-									Media: &dto.FileInfo{
-										FileInfo: resp.FileInfo,
-									},
-									EventID: dto.EventType(data.ID),
-									MsgType: 7,
-									MsgReq:  1,
+									Image:   retStuct.ReplyMsg.Image,
+									MsgID:   data.ID,
 								}
-								Apis[bot.XBotAppid[0]].PostGroupMessage(ctx, data.GroupOpenID, newMsg)
+								Apis[bot.XBotAppid[0]].PostMessage(ctx, data.ChannelID, newMsg)
+							} else {
+								newMsg := &dto.MessageToCreate{
+									Content: msg, //+ "\n[🔗奇乐最新价格]\n(https://2mf8.cn/webview/#/pages/index/webview?url=https%3A%2F%2Fqilecube.gitee.io%2F)",
+									MsgID:   data.ID,
+								}
+								Apis[bot.XBotAppid[0]].PostMessage(ctx, data.ChannelID, newMsg)
+							}
+							if len(retStuct.ReplyMsg.Images) == 2 {
+								newMsg := &dto.MessageToCreate{
+									Image:   retStuct.ReplyMsg.Images[1],
+									MsgID:   data.ID,
+								}
+								Apis[bot.XBotAppid[0]].PostMessage(ctx, data.ChannelID, newMsg)
+							}
+							if len(retStuct.ReplyMsg.Images) >= 3 {
+								newMsg := &dto.MessageToCreate{
+									Image:   retStuct.ReplyMsg.Images[1],
+									MsgID:   data.ID,
+								}
+								Apis[bot.XBotAppid[0]].PostMessage(ctx, data.ChannelID, newMsg)
+								newMsg2 := &dto.MessageToCreate{
+									Image:   retStuct.ReplyMsg.Images[2],
+									MsgID:   data.ID,
+								}
+								Apis[bot.XBotAppid[0]].PostMessage(ctx, data.ChannelID, newMsg2)
 							}
 						} else {
-							newMsg := &dto.GroupMessageToCreate{
-								Content: msg, //+ "\n[🔗奇乐最新价格]\n(https://2mf8.cn/webview/#/pages/index/webview?url=https%3A%2F%2Fqilecube.gitee.io%2F)",
-								EventID: dto.EventType(data.ID),
-								MsgType: 0,
-							}
-							Apis[bot.XBotAppid[0]].PostGroupMessage(ctx, data.GroupOpenID, newMsg)
-						}
-						if len(retStuct.ReplyMsg.Images) == 2 {
-							resp, _ := Apis[bot.XBotAppid[0]].PostGroupRichMediaMessage(ctx, data.GroupOpenID, &dto.GroupRichMediaMessageToCreate{FileType: 1, Url: retStuct.ReplyMsg.Images[1], SrvSendMsg: false})
-							if resp != nil {
+							msg := strings.TrimSpace(retStuct.ReplyMsg.Text)
+							if retStuct.ReplyMsg.Image != "" {
+								resp, _ := Apis[bot.XBotAppid[0]].PostGroupRichMediaMessage(ctx, data.GroupOpenID, &dto.GroupRichMediaMessageToCreate{FileType: 1, Url: retStuct.ReplyMsg.Image, SrvSendMsg: false})
+								if resp != nil {
+									newMsg := &dto.GroupMessageToCreate{
+										Content: msg, //+ "\n[🔗奇乐最新价格]\n(https://2mf8.cn/webview/#/pages/index/webview?url=https%3A%2F%2Fqilecube.gitee.io%2F)",
+										Media: &dto.FileInfo{
+											FileInfo: resp.FileInfo,
+										},
+										EventID: dto.EventType(data.ID),
+										MsgType: 7,
+										MsgReq:  1,
+									}
+									Apis[bot.XBotAppid[0]].PostGroupMessage(ctx, data.GroupOpenID, newMsg)
+								}
+							} else {
 								newMsg := &dto.GroupMessageToCreate{
 									Content: msg, //+ "\n[🔗奇乐最新价格]\n(https://2mf8.cn/webview/#/pages/index/webview?url=https%3A%2F%2Fqilecube.gitee.io%2F)",
-									Media: &dto.FileInfo{
-										FileInfo: resp.FileInfo,
-									},
 									EventID: dto.EventType(data.ID),
-									MsgType: 7,
-									MsgReq:  2,
+									MsgType: 0,
 								}
 								Apis[bot.XBotAppid[0]].PostGroupMessage(ctx, data.GroupOpenID, newMsg)
 							}
-						}
-						if len(retStuct.ReplyMsg.Images) >= 3 {
-							resp, _ := Apis[bot.XBotAppid[0]].PostGroupRichMediaMessage(ctx, data.GroupOpenID, &dto.GroupRichMediaMessageToCreate{FileType: 1, Url: retStuct.ReplyMsg.Images[1], SrvSendMsg: false})
-							if resp != nil {
-								newMsg := &dto.GroupMessageToCreate{
-									Content: msg, //+ "\n[🔗奇乐最新价格]\n(https://2mf8.cn/webview/#/pages/index/webview?url=https%3A%2F%2Fqilecube.gitee.io%2F)",
-									Media: &dto.FileInfo{
-										FileInfo: resp.FileInfo,
-									},
-									EventID: dto.EventType(data.ID),
-									MsgType: 7,
-									MsgReq:  2,
+							if len(retStuct.ReplyMsg.Images) == 2 {
+								resp, _ := Apis[bot.XBotAppid[0]].PostGroupRichMediaMessage(ctx, data.GroupOpenID, &dto.GroupRichMediaMessageToCreate{FileType: 1, Url: retStuct.ReplyMsg.Images[1], SrvSendMsg: false})
+								if resp != nil {
+									newMsg := &dto.GroupMessageToCreate{
+										Content: msg, //+ "\n[🔗奇乐最新价格]\n(https://2mf8.cn/webview/#/pages/index/webview?url=https%3A%2F%2Fqilecube.gitee.io%2F)",
+										Media: &dto.FileInfo{
+											FileInfo: resp.FileInfo,
+										},
+										EventID: dto.EventType(data.ID),
+										MsgType: 7,
+										MsgReq:  2,
+									}
+									Apis[bot.XBotAppid[0]].PostGroupMessage(ctx, data.GroupOpenID, newMsg)
 								}
-								Apis[bot.XBotAppid[0]].PostGroupMessage(ctx, data.GroupOpenID, newMsg)
 							}
-							resp1, _ := Apis[bot.XBotAppid[0]].PostGroupRichMediaMessage(ctx, data.GroupOpenID, &dto.GroupRichMediaMessageToCreate{FileType: 1, Url: retStuct.ReplyMsg.Images[2], SrvSendMsg: false})
-							if resp1 != nil {
-								newMsg := &dto.GroupMessageToCreate{
-									Content: msg, //+ "\n[🔗奇乐最新价格]\n(https://2mf8.cn/webview/#/pages/index/webview?url=https%3A%2F%2Fqilecube.gitee.io%2F)",
-									Media: &dto.FileInfo{
-										FileInfo: resp1.FileInfo,
-									},
-									EventID: dto.EventType(data.ID),
-									MsgType: 7,
-									MsgReq:  3,
+							if len(retStuct.ReplyMsg.Images) >= 3 {
+								resp, _ := Apis[bot.XBotAppid[0]].PostGroupRichMediaMessage(ctx, data.GroupOpenID, &dto.GroupRichMediaMessageToCreate{FileType: 1, Url: retStuct.ReplyMsg.Images[1], SrvSendMsg: false})
+								if resp != nil {
+									newMsg := &dto.GroupMessageToCreate{
+										Content: msg, //+ "\n[🔗奇乐最新价格]\n(https://2mf8.cn/webview/#/pages/index/webview?url=https%3A%2F%2Fqilecube.gitee.io%2F)",
+										Media: &dto.FileInfo{
+											FileInfo: resp.FileInfo,
+										},
+										EventID: dto.EventType(data.ID),
+										MsgType: 7,
+										MsgReq:  2,
+									}
+									Apis[bot.XBotAppid[0]].PostGroupMessage(ctx, data.GroupOpenID, newMsg)
 								}
-								Apis[bot.XBotAppid[0]].PostGroupMessage(ctx, data.GroupOpenID, newMsg)
+								resp1, _ := Apis[bot.XBotAppid[0]].PostGroupRichMediaMessage(ctx, data.GroupOpenID, &dto.GroupRichMediaMessageToCreate{FileType: 1, Url: retStuct.ReplyMsg.Images[2], SrvSendMsg: false})
+								if resp1 != nil {
+									newMsg := &dto.GroupMessageToCreate{
+										Content: msg, //+ "\n[🔗奇乐最新价格]\n(https://2mf8.cn/webview/#/pages/index/webview?url=https%3A%2F%2Fqilecube.gitee.io%2F)",
+										Media: &dto.FileInfo{
+											FileInfo: resp1.FileInfo,
+										},
+										EventID: dto.EventType(data.ID),
+										MsgType: 7,
+										MsgReq:  3,
+									}
+									Apis[bot.XBotAppid[0]].PostGroupMessage(ctx, data.GroupOpenID, newMsg)
+								}
 							}
 						}
 					}
