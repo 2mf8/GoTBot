@@ -1,7 +1,7 @@
 github.com/2mf8/Better-Bot-Go v0.0.8-0.20250119055917-55f0e3ec335d h1:PKDIFTVmtCzWYH59BcuIU7VWjj/g6ufgbR9rEQBG5Vc=
 github.com/2mf8/Better-Bot-Go v0.0.8-0.20250119055917-55f0e3ec335d/go.mod h1:8ANZ42GDdTVsAaY+xZUE3lU0AunOtR8YGWsb2fZ1lrs=
-github.com/2mf8/GoneBot v0.0.0-20240530161035-7805c1b7056b h1:pDD7e4Uex3QbBo9NnmXA+55aS4zL0IILclB2oaeE22M=
-github.com/2mf8/GoneBot v0.0.0-20240530161035-7805c1b7056b/go.mod h1:S8VxX6yRZKLrchSi0gjB7tBbNkJ3CsstT9oDupIrtlk=
+github.com/2mf8/GoneBot v0.0.0-20250207150220-39a13aa5f1b3 h1:Yx1AH0U6X8DuLv7ana8ehOHXgnAp4ciOd3++/1NfbK4=
+github.com/2mf8/GoneBot v0.0.0-20250207150220-39a13aa5f1b3/go.mod h1:rZV3pfp7EXrsjfpoaZU24Y/cBLq/+EeObyKJ2XXone8=
 github.com/Azure/azure-sdk-for-go/sdk/azcore v0.19.0/go.mod h1:h6H6c8enJmmocHUbLiiGY6sx7f9i+X3m1CHdd5c6Rdw=
 github.com/Azure/azure-sdk-for-go/sdk/azidentity v0.11.0/go.mod h1:HcM1YX14R7CJcghJGOYCgdezslRSVzqwLf/q+4Y2r/0=
 github.com/Azure/azure-sdk-for-go/sdk/internal v0.7.0/go.mod h1:yqy467j36fJxcRV2TzfVZ1pCb5vxm4BtZPUdYWe/Xo8=

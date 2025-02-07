@@ -4,7 +4,7 @@ go 1.23
 
 require (
 	github.com/2mf8/Better-Bot-Go v0.0.8-0.20250119055917-55f0e3ec335d
-	github.com/2mf8/GoneBot v0.0.0-20240530161035-7805c1b7056b
+	github.com/2mf8/GoneBot v0.0.0-20250207150220-39a13aa5f1b3
 	github.com/BurntSushi/toml v1.4.0
 	github.com/denisenkom/go-mssqldb v0.12.3
 	github.com/fatih/color v1.16.0
