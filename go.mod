@@ -3,8 +3,7 @@ module github.com/2mf8/GoTBot
 go 1.23
 
 require (
-	github.com/2mf8/Better-Bot-Go v0.0.8-0.20250119055917-55f0e3ec335d
-	github.com/2mf8/GoneBot v0.0.0-20250207150220-39a13aa5f1b3
+	github.com/2mf8/Better-Bot-Go v0.0.10-0.20250505022506-dbc3acea73ef
 	github.com/BurntSushi/toml v1.4.0
 	github.com/denisenkom/go-mssqldb v0.12.3
 	github.com/fatih/color v1.16.0
@@ -35,7 +34,6 @@ require (
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/gopherjs/gopherjs v1.17.2 // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
-	github.com/jefferyjob/go-easy-utils/v2 v2.1.1 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/jtolds/gls v4.20.0+incompatible // indirect
 	github.com/klauspost/cpuid/v2 v2.2.7 // indirect
