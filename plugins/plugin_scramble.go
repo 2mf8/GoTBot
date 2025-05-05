@@ -75,6 +75,3 @@ func (scramble *ScramblePlugin) Do(ctx *context.Context, botId *utils.BotIdType,
 	}
 }
 
-func init() {
-	utils.Register("打乱", &ScramblePlugin{})
-}

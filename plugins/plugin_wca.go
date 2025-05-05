@@ -94,7 +94,3 @@ func (wca *WCA) Do(ctx *context.Context, botId *utils.BotIdType, groupId *utils.
 		RetVal: utils.MESSAGE_IGNORE,
 	}
 }
-
-func init() {
-	utils.Register("WCA", &WCA{})
-}

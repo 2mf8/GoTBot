@@ -58,6 +58,3 @@ func (rep *Repeat) Do(ctx *context.Context, botId *utils.BotIdType, groupId *uti
 	}
 }
 
-func init() {
-	utils.Register("复读", &Repeat{})
-}

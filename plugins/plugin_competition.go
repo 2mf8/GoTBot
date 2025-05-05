@@ -1099,6 +1099,3 @@ func (rep *Competition) Do(ctx *context.Context, botId *utils.BotIdType, groupId
 	}
 }
 
-func init() {
-	utils.Register("赛季", &Competition{})
-}

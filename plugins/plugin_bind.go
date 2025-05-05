@@ -75,6 +75,3 @@ func (rep *Bind) Do(ctx *context.Context, botId *utils.BotIdType, groupId *utils
 	}
 }
 
-func init() {
-	Register("Bind", &Bind{})
-}

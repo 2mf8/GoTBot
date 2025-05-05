@@ -151,6 +151,3 @@ func (botSwitch *BotSwitch) Do(ctx *context.Context, botId *utils.BotIdType, gro
 	}
 }
 
-func init() {
-	utils.Register("开关", &BotSwitch{})
-}

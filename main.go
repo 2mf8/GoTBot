@@ -19,6 +19,7 @@ import (
 	"github.com/2mf8/Better-Bot-Go/token"
 	"github.com/2mf8/Better-Bot-Go/webhook"
 	database "github.com/2mf8/GoTBot/data"
+	"github.com/2mf8/GoTBot/plugins"
 	"github.com/2mf8/GoTBot/public"
 	"github.com/2mf8/GoTBot/utils"
 	log "github.com/sirupsen/logrus"
@@ -70,6 +71,7 @@ func main() {
 	log.Infof("已加载插件 %s", pluginString)
 
 	ctx := context.WithValue(context.Background(), GloKey, "cn2mf8")
+
 	as := webhook.ReadSetting()
 	for _, v := range as.Apps {
 		atr := v1.GetAccessToken(fmt.Sprintf("%v", v.AppId), v.AppSecret)
@@ -147,7 +149,7 @@ func main() {
 			if intent > 0 {
 				continue
 			}
-			retStuct := utils.PluginSet[i].Do(&ctx, &botType, &groupIdType, &userIdType, "", &msgIdType, content, "", true, false, super)
+			retStuct := plugins.PluginMap[i].Do(&ctx, &botType, &groupIdType, &userIdType, "", &msgIdType, content, "", true, false, super)
 			if retStuct.RetVal == utils.MESSAGE_BLOCK {
 				if retStuct.ReqType == utils.GroupMsg {
 					if retStuct.ReplyMsg != nil {
@@ -284,7 +286,7 @@ func main() {
 			if intent > 0 {
 				continue
 			}
-			retStuct := utils.PluginSet[i].Do(&ctx, &botType, &groupIdType, &userIdType, "", &msgIdType, content, "", true, false, super)
+			retStuct := plugins.PluginMap[i].Do(&ctx, &botType, &groupIdType, &userIdType, "", &msgIdType, content, "", true, false, super)
 			if retStuct.RetVal == utils.MESSAGE_BLOCK {
 				if retStuct.ReqType == utils.GroupMsg {
 					if retStuct.ReplyMsg != nil {
@@ -417,7 +419,7 @@ func main() {
 			if intent > 0 {
 				continue
 			}
-			retStuct := utils.PluginSet[i].Do(&ctx, &botType, &groupIdType, &userIdType, "", &msgIdType, content, "", true, false, super)
+			retStuct := plugins.PluginMap[i].Do(&ctx, &botType, &groupIdType, &userIdType, "", &msgIdType, content, "", true, false, super)
 			if retStuct.RetVal == utils.MESSAGE_BLOCK {
 				if retStuct.ReqType == utils.GroupMsg {
 					if retStuct.ReplyMsg != nil {
@@ -498,7 +500,7 @@ func main() {
 			if intent > 0 {
 				continue
 			}
-			retStuct := utils.PluginSet[i].Do(&ctx, &botType, &groupIdType, &userIdType, "", &msgIdType, content, "", true, false, super)
+			retStuct := plugins.PluginMap[i].Do(&ctx, &botType, &groupIdType, &userIdType, "", &msgIdType, content, "", true, false, super)
 			if retStuct.RetVal == utils.MESSAGE_BLOCK {
 				if retStuct.ReqType == utils.GroupMsg {
 					if retStuct.ReplyMsg != nil {

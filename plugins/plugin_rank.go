@@ -121,6 +121,3 @@ func (rp *RankPlugin) Do(ctx *context.Context, botId *utils.BotIdType, groupId *
 	}
 }
 
-func init() {
-	utils.Register("Rank", &RankPlugin{})
-}

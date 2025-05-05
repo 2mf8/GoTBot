@@ -31,6 +31,3 @@ func (rep *Reply) Do(ctx *context.Context, botId *utils.BotIdType, groupId *util
 	}
 }
 
-func init() {
-	Register("回复", &Reply{})
-}

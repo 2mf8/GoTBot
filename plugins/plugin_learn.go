@@ -246,6 +246,3 @@ func (learnPlugin *LearnPlugin) Do(ctx *context.Context, botId *utils.BotIdType,
 		RetVal: utils.MESSAGE_IGNORE,
 	}
 }
-func init() {
-	utils.Register("学习", &LearnPlugin{})
-}

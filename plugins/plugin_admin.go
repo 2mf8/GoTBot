@@ -229,7 +229,3 @@ func convertJinTime(i int) string {
 	timeString = fmt.Sprintf("%v 小时 %v 分钟 %v 秒钟", hour, min, sec)
 	return timeString
 }
-
-func init() {
-	utils.Register("群管", &Admin{})
-}

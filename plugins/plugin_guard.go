@@ -115,7 +115,3 @@ func (guard *Guard) Do(ctx *context.Context, botId *utils.BotIdType, groupId *ut
 		RetVal: utils.MESSAGE_IGNORE,
 	}
 }
-
-func init() {
-	utils.Register("守卫", &Guard{})
-}

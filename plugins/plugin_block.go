@@ -149,6 +149,3 @@ func (block *Block) Do(ctx *context.Context, botId *utils.BotIdType, groupId *ut
 	}
 }
 
-func init() {
-	utils.Register("屏蔽", &Block{})
-}

@@ -35,6 +35,3 @@ func (l *Log) Do(ctx *context.Context, botId *utils.BotIdType, groupId *utils.Gr
 	}
 }
 
-func init() {
-	Register("Log", &Log{})
-}

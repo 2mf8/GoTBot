@@ -400,6 +400,3 @@ func isAuth(k string, u string) bool {
 	return false
 }
 
-func init() {
-	utils.Register("查价", &PricePlugin{})
-}

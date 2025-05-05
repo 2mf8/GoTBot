@@ -63,20 +63,10 @@ type Plugin interface {
 	Do(ctx *context.Context, botId *BotIdType, groupId *GroupIdType, userId *UserIdType, groupName string, messageId *MsgIdType, rawMsg, card string, botRole, userRole, super bool) (retStuct RetStuct)
 }
 
-var PluginSet map[string]Plugin
-
 const (
 	MESSAGE_BLOCK  uint = 0
 	MESSAGE_IGNORE uint = 1
 )
-
-func init() {
-	PluginSet = make(map[string]Plugin)
-}
-
-func Register(k string, v Plugin) {
-	PluginSet[k] = v
-}
 
 func FatalError(err error) {
 	log.Errorf(err.Error())
